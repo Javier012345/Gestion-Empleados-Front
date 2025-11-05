@@ -7,9 +7,19 @@ const AppLayout = ({ children, pageTitle }) => {
     
     // Simulación de usuario logueado. En una aplicación real, esto vendría de tu contexto de autenticación.
     // Asumimos que el usuario tiene una propiedad 'isAdmin' y 'name'.
+    const getInitials = (name) => {
+        if (!name) return '';
+        const nameParts = name.split(' ');
+        if (nameParts.length > 1) {
+            return nameParts[0][0] + nameParts[nameParts.length - 1][0];
+        }
+        return nameParts[0].slice(0, 2);
+    };
+
     const currentUser = { 
         name: 'Maxi K', 
-        isAdmin: true // Cambia a false para probar el modo empleado por defecto
+        isAdmin: true, // Cambia a false para probar el modo empleado por defecto
+        initials: getInitials('Maxi K')
     };
 
     // Estado para gestionar la vista. Por defecto, 'admin' si el usuario es admin, sino 'employee'.

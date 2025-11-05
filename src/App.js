@@ -7,6 +7,7 @@ import Home from './pages/home/Home';
 import AppLayout from './components/AppLayout';
 import VerEmpleado from './pages/empleados/VerEmpleado';
 import EditarEmpleado from './pages/empleados/EditarEmpleado';
+import PerfilEmpleado from './pages/empleados/PerfilEmpleado';
 import Recibos from './pages/recibos/Recibos';
 import MisRecibos from './pages/recibos/MisRecibos';
 import Horarios from './pages/horarios/Horarios';
@@ -64,6 +65,7 @@ function App() {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
             <Route path="/" element={<RouteWithTitle title="Inicio" element={<Home />} />} />
+            <Route path="/perfil" element={<RouteWithTitle title="Mi Perfil" element={<PerfilEmpleado />} />} />
             <Route path="/empleados" element={<RouteWithTitle title="Empleados" element={<Empleados />} />} />
             <Route path="/empleados/crear" element={<RouteWithTitle title="Crear Empleado" element={<CrearEmpleado />} />} />
             <Route path="/empleados/:id" element={<RouteWithTitle title="Ver Empleado" element={<VerEmpleado />} />} />
