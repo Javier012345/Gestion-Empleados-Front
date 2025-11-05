@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Menu, Sun, Moon, Bell, UserCog, User, ChevronDown } from 'lucide-react';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Header = ({ onMenuClick, pageTitle }) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
     // Datos de ejemplo
     const notifications_count = 3;
@@ -22,10 +24,8 @@ const Header = ({ onMenuClick, pageTitle }) => {
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
-                <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-                    {/* Lógica de Theme toggle no implementada, solo íconos */}
-                    <Sun className="hidden dark:block" />
-                    <Moon className="dark:hidden" />
+                <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    {theme === 'light' ? <Moon /> : <Sun />}
                 </button>
 
                 <div className="relative">
