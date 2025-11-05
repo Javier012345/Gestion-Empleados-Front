@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Menu, Sun, Moon, Bell, UserCog, User, ChevronDown } from 'lucide-react';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const Header = ({ onMenuClick, pageTitle }) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
