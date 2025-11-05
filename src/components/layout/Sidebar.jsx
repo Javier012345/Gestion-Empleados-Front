@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Receipt, CalendarDays, ShieldAlert, AlertTriangle, Camera, ClipboardList, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Users, Receipt, CalendarDays, ShieldAlert, AlertTriangle, Camera, ClipboardList, LogOut, X, User } from 'lucide-react';
 
 const adminLinks = [
     { icon: <LayoutDashboard size={20} />, name: 'Inicio', path: '/' },
@@ -13,8 +13,13 @@ const adminLinks = [
     { icon: <ClipboardList size={20} />, name: 'Reportes', path: '/reportes' },
 ];
 
-// En el futuro, podrías tener un set de links para empleados
-// const employeeLinks = [ ... ];
+const employeeLinks = [
+    { icon: <User size={20} />, name: 'Mi Perfil', path: '/perfil' },
+    { icon: <Receipt size={20} />, name: 'Mis Recibos', path: '/mis-recibos' },
+    { icon: <CalendarDays size={20} />, name: 'Mis Horarios', path: '/horarios/mis-horarios' },
+    { icon: <AlertTriangle size={20} />, name: 'Mis Incidentes', path: '/mis-incidentes' },
+    { icon: <Camera size={20} />, name: 'Mi Asistencia', path: '/mis-asistencias' },
+];
 
 const NavLinks = ({ links }) => (
     <nav className="flex-1 px-4 py-6 space-y-1.5">
@@ -34,7 +39,9 @@ const NavLinks = ({ links }) => (
     </nav>
 );
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, userRole }) => {
+    const links = userRole === 'admin' ? adminLinks : employeeLinks;
+
     return (
         <>
             {/* Sidebar de Escritorio */}
@@ -42,7 +49,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 <div className="h-24 flex items-center justify-center px-4 pt-4">
                     <img src="/images/logo-nuevas-energias-v2.png" alt="Nuevas Energias" className="w-[150px] h-auto" />
                 </div>
-                <NavLinks links={adminLinks} />
+                <NavLinks links={links} />
                 <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
                     <a href="#" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white">
                         <LogOut size={20} />
@@ -66,7 +73,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         <X size={24} />
                     </button>
                 </div>
-                <NavLinks links={adminLinks} />
+                <NavLinks links={links} />
                  <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
                     <a href="#" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white">
                         <LogOut size={20} />

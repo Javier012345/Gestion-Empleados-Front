@@ -1,21 +1,25 @@
-import React, { useState, useContext } from 'react';
-import { Menu, Sun, Moon, Bell, UserCog, User, ChevronDown } from 'lucide-react';
-import { ThemeContext } from '../../context/ThemeContext';
+import React, { useState } from 'react';
+import { Menu, Sun, Moon, Bell, UserCog, User } from 'lucide-react';
 
-const Header = ({ onMenuClick, pageTitle }) => {
+const Header = ({ 
+    onOpenMobileMenu, 
+    user, 
+    viewMode, 
+    theme, 
+    toggleTheme, 
+    pageTitle, 
+    onToggleViewMode 
+}) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
-    const { theme, toggleTheme } = useContext(ThemeContext);
 
-    // Datos de ejemplo
+    // Datos de ejemplo para notificaciones
     const notifications_count = 3;
-    const user = { name: 'Admin User', initials: 'AU' };
-    const view_as_employee = false;
 
     return (
         <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
             <div className="flex items-center gap-4">
-                <button onClick={onMenuClick} className="lg:hidden text-gray-600 dark:text-gray-300 p-2 rounded-lg">
+                <button onClick={onOpenMobileMenu} className="lg:hidden text-gray-600 dark:text-gray-300 p-2 rounded-lg">
                     <Menu size={20} />
                 </button>
                 <h1 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
@@ -61,10 +65,18 @@ const Header = ({ onMenuClick, pageTitle }) => {
                 </div>
 
                 {/* Role Switcher */}
-                <a href="#" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center gap-2 text-sm whitespace-nowrap">
-                    {view_as_employee ? <UserCog /> : <User />}
-                    <span className="hidden sm:inline">{view_as_employee ? 'Modo Admin' : 'Modo Empleado'}</span>
-                </a>
+                {user && user.isAdmin && (
+                    <button 
+                        onClick={onToggleViewMode}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center gap-2 text-sm whitespace-nowrap"
+                        title={viewMode === 'admin' ? 'Cambiar a Modo Empleado' : 'Cambiar a Modo Admin'}
+                    >
+                        {viewMode === 'admin' ? <User /> : <UserCog />}
+                        <span className="hidden sm:inline">
+                            {viewMode === 'admin' ? 'Modo Empleado' : 'Modo Admin'}
+                        </span>
+                    </button>
+                )}
 
                 <div className="relative">
                     <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2">
