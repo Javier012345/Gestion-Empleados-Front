@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const Login = () => {
+const Login = ({ onLogin }) => {
     // --- ESTADO --- //
     // Simula el contexto que venía de Django
     // Puedes cambiar estos valores para probar diferentes escenarios
@@ -52,16 +52,7 @@ const Login = () => {
         e.preventDefault();
         // Aquí iría la lógica para enviar los datos a tu API de Django
         console.log('Intentando iniciar sesión con:', { username, password });
-
-        // Simulación de un intento de login fallido que causa bloqueo
-        setError('Usuario o contraseña incorrectos.');
-        // Después de 3 intentos fallidos, la API debería responder con un estado de bloqueo.
-        // Aquí lo simulamos:
-        const attempts = 3;
-        if (attempts >= 3) {
-            setIsBlocked(true);
-            setBlockedUntil(new Date(Date.now() + 30000)); // Bloqueo de 30 segundos para el ejemplo
-        }
+        onLogin();
     };
 
     const togglePasswordVisibility = () => {

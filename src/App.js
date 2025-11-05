@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './componentes/Login';
 import Empleados from './componentes/Empleados';
 import CrearEmpleado from './componentes/CrearEmpleado';
@@ -7,8 +7,8 @@ import Home from './componentes/Home';
 import Layout from './componentes/Layout';
 import VerEmpleado from './componentes/VerEmpleado';
 import EditarEmpleado from './componentes/EditarEmpleado';
-import Recibos from './componentes/Recibos'; // Importar Recibos
-import MisRecibos from './componentes/MisRecibos'; // Importar MisRecibos
+import Recibos from './componentes/Recibos';
+import MisRecibos from './componentes/MisRecibos';
 import Horarios from './componentes/horarios/Horarios';
 import AsignarHorario from './componentes/horarios/AsignarHorario';
 import CargarHorario from './componentes/horarios/CargarHorario';
@@ -34,63 +34,71 @@ import AsistenciaAdmin from './componentes/asistencia/AsistenciaAdmin';
 import MisAsistencias from './componentes/asistencia/MisAsistencias';
 import VerAsistencias from './componentes/asistencia/VerAsistencias';
 import ReportesHome from './componentes/reportes/ReportesHome';
+import PrivateRoute from './componentes/PrivateRoute';
+import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
-// Un componente para las rutas que requieren autenticación y layout
-const AuthenticatedLayout = () => (
-  <Layout pageTitle="Inicio"> {/* El pageTitle podría ser dinámico en el futuro */}
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/empleados" element={<Empleados />} />
-      <Route path="/empleados/crear" element={<CrearEmpleado />} />
-      <Route path="/empleados/:id" element={<VerEmpleado />} />
-      <Route path="/empleados/editar/:id" element={<EditarEmpleado />} />
-      <Route path="/recibos" element={<Recibos />} /> {/* Nueva ruta para Recibos */}
-      <Route path="/mis-recibos" element={<MisRecibos />} /> {/* Nueva ruta para Mis Recibos */}
-      <Route path="/horarios" element={<Horarios />} />
-      <Route path="/horarios/asignar" element={<AsignarHorario />} />
-      <Route path="/horarios/cargar" element={<CargarHorario />} />
-      <Route path="/horarios/historial" element={<HistorialHorarios />} />
-      <Route path="/horarios/mis-horarios" element={<MisHorarios />} />
-      <Route path="/horarios/ver-asignados" element={<VerHorariosAsignados />} />
-      <Route path="/horarios/ver-empleado" element={<VerHorariosEmpleado />} />
-      <Route path="/sanciones" element={<Sanciones />} />
-      <Route path="/sanciones/agregar" element={<AgregarSancion />} />
-      <Route path="/sanciones/aplicar-masiva" element={<AplicarSancionMasiva />} />
-      <Route path="/sanciones/:id" element={<DetalleSancion />} />
-      <Route path="/mis-sanciones" element={<MisSanciones />} />
-      <Route path="/sanciones/pdf/:id" element={<SancionPDF />} />
-      <Route path="/sanciones/empleado/:id" element={<SancionesEmpleado />} />
-      <Route path="/incidentes" element={<Incidentes />} />
-      <Route path="/incidentes/corregir/:id" element={<CorregirIncidente />} />
-      <Route path="/incidentes/:id" element={<DetalleIncidente />} />
-      <Route path="/incidentes/pdf/:id" element={<IncidentePDF />} />
-      <Route path="/mis-incidentes" element={<MisIncidentes />} />
-      <Route path="/incidentes/registrar" element={<RegistrarIncidente />} />
-      <Route path="/incidentes/empleado/:id" element={<VerIncidentesEmpleado />} />
-      <Route path="/asistencia/*" element={<AsistenciaAdmin />} />
-      <Route path="/mis-asistencias" element={<MisAsistencias />} />
-      <Route path="/asistencia/empleado/:id" element={<VerAsistencias />} />
-      <Route path="/reportes" element={<ReportesHome />} />
-      {/* Añade aquí el resto de tus rutas autenticadas */}
-    </Routes>
-  </Layout>
-);
+const RouteWithTitle = ({ title, element }) => {
+  return (
+    <Layout pageTitle={title}>
+      {element}
+    </Layout>
+  );
+};
 
 function App() {
-  const isAuthenticated = true; 
+  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
+
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        {isAuthenticated ? (
-          <Route path="/*" element={<AuthenticatedLayout />} />
-        ) : (
-          <Route path="/*" element={<Navigate to="/login" />} />
-        )}
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
+            <Route path="/" element={<RouteWithTitle title="Inicio" element={<Home />} />} />
+            <Route path="/empleados" element={<RouteWithTitle title="Empleados" element={<Empleados />} />} />
+            <Route path="/empleados/crear" element={<RouteWithTitle title="Crear Empleado" element={<CrearEmpleado />} />} />
+            <Route path="/empleados/:id" element={<RouteWithTitle title="Ver Empleado" element={<VerEmpleado />} />} />
+            <Route path="/empleados/editar/:id" element={<RouteWithTitle title="Editar Empleado" element={<EditarEmpleado />} />} />
+            <Route path="/recibos" element={<RouteWithTitle title="Recibos" element={<Recibos />} />} />
+            <Route path="/mis-recibos" element={<RouteWithTitle title="Mis Recibos" element={<MisRecibos />} />} />
+            <Route path="/horarios" element={<RouteWithTitle title="Horarios" element={<Horarios />} />} />
+            <Route path="/horarios/asignar" element={<RouteWithTitle title="Asignar Horario" element={<AsignarHorario />} />} />
+            <Route path="/horarios/cargar" element={<RouteWithTitle title="Cargar Horario" element={<CargarHorario />} />} />
+            <Route path="/horarios/historial" element={<RouteWithTitle title="Historial de Horarios" element={<HistorialHorarios />} />} />
+            <Route path="/horarios/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
+            <Route path="/horarios/ver-asignados" element={<RouteWithTitle title="Ver Horarios Asignados" element={<VerHorariosAsignados />} />} />
+            <Route path="/horarios/ver-empleado" element={<RouteWithTitle title="Ver Horarios de Empleado" element={<VerHorariosEmpleado />} />} />
+            <Route path="/sanciones" element={<RouteWithTitle title="Sanciones" element={<Sanciones />} />} />
+            <Route path="/sanciones/agregar" element={<RouteWithTitle title="Agregar Sanción" element={<AgregarSancion />} />} />
+            <Route path="/sanciones/aplicar-masiva" element={<RouteWithTitle title="Aplicar Sanción Masiva" element={<AplicarSancionMasiva />} />} />
+            <Route path="/sanciones/:id" element={<RouteWithTitle title="Detalle de Sanción" element={<DetalleSancion />} />} />
+            <Route path="/mis-sanciones" element={<RouteWithTitle title="Mis Sanciones" element={<MisSanciones />} />} />
+            <Route path="/sanciones/pdf/:id" element={<RouteWithTitle title="Sanción PDF" element={<SancionPDF />} />} />
+            <Route path="/sanciones/empleado/:id" element={<RouteWithTitle title="Sanciones de Empleado" element={<SancionesEmpleado />} />} />
+            <Route path="/incidentes" element={<RouteWithTitle title="Incidentes" element={<Incidentes />} />} />
+            <Route path="/incidentes/corregir/:id" element={<RouteWithTitle title="Corregir Incidente" element={<CorregirIncidente />} />} />
+            <Route path="/incidentes/:id" element={<RouteWithTitle title="Detalle de Incidente" element={<DetalleIncidente />} />} />
+            <Route path="/incidentes/pdf/:id" element={<RouteWithTitle title="Incidente PDF" element={<IncidentePDF />} />} />
+            <Route path="/mis-incidentes" element={<RouteWithTitle title="Mis Incidentes" element={<MisIncidentes />} />} />
+            <Route path="/incidentes/registrar" element={<RouteWithTitle title="Registrar Incidente" element={<RegistrarIncidente />} />} />
+            <Route path="/incidentes/empleado/:id" element={<RouteWithTitle title="Incidentes de Empleado" element={<VerIncidentesEmpleado />} />} />
+            <Route path="/asistencia/*" element={<RouteWithTitle title="Asistencia" element={<AsistenciaAdmin />} />} />
+            <Route path="/mis-asistencias" element={<RouteWithTitle title="Mis Asistencias" element={<MisAsistencias />} />} />
+            <Route path="/asistencia/empleado/:id" element={<RouteWithTitle title="Asistencias de Empleado" element={<VerAsistencias />} />} />
+            <Route path="/reportes" element={<RouteWithTitle title="Reportes" element={<ReportesHome />} />} />
+          </Route>
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
