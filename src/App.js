@@ -1,48 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './componentes/Login';
-import Empleados from './componentes/Empleados';
-import CrearEmpleado from './componentes/CrearEmpleado';
-import Home from './componentes/Home';
-import Layout from './componentes/Layout';
-import VerEmpleado from './componentes/VerEmpleado';
-import EditarEmpleado from './componentes/EditarEmpleado';
-import Recibos from './componentes/Recibos';
-import MisRecibos from './componentes/MisRecibos';
-import Horarios from './componentes/horarios/Horarios';
-import AsignarHorario from './componentes/horarios/AsignarHorario';
-import CargarHorario from './componentes/horarios/CargarHorario';
-import HistorialHorarios from './componentes/horarios/HistorialHorarios';
-import MisHorarios from './componentes/horarios/MisHorarios';
-import VerHorariosAsignados from './componentes/horarios/VerHorariosAsignados';
-import VerHorariosEmpleado from './componentes/horarios/VerHorariosEmpleado';
-import Sanciones from './componentes/sanciones/Sanciones';
-import AgregarSancion from './componentes/sanciones/AgregarSancion';
-import AplicarSancionMasiva from './componentes/sanciones/AplicarSancionMasiva';
-import DetalleSancion from './componentes/sanciones/DetalleSancion';
-import MisSanciones from './componentes/sanciones/MisSanciones';
-import SancionPDF from './componentes/sanciones/SancionPDF';
-import SancionesEmpleado from './componentes/sanciones/SancionesEmpleado';
-import Incidentes from './componentes/incidentes/Incidentes';
-import CorregirIncidente from './componentes/incidentes/CorregirIncidente';
-import DetalleIncidente from './componentes/incidentes/DetalleIncidente';
-import IncidentePDF from './componentes/incidentes/IncidentePDF';
-import MisIncidentes from './componentes/incidentes/MisIncidentes';
-import RegistrarIncidente from './componentes/incidentes/RegistrarIncidente';
-import VerIncidentesEmpleado from './componentes/incidentes/VerIncidentesEmpleado';
-import AsistenciaAdmin from './componentes/asistencia/AsistenciaAdmin';
-import MisAsistencias from './componentes/asistencia/MisAsistencias';
-import VerAsistencias from './componentes/asistencia/VerAsistencias';
-import ReportesHome from './componentes/reportes/ReportesHome';
-import PrivateRoute from './componentes/PrivateRoute';
+import Login from './pages/usuarios/Login';
+import Empleados from './pages/empleados/Empleados';
+import CrearEmpleado from './pages/empleados/CrearEmpleado';
+import Home from './pages/home/Home'; 
+import AppLayout from './components/AppLayout';
+import VerEmpleado from './pages/empleados/VerEmpleado';
+import EditarEmpleado from './pages/empleados/EditarEmpleado';
+import Recibos from './pages/recibos/Recibos';
+import MisRecibos from './pages/recibos/MisRecibos';
+import Horarios from './pages/horarios/Horarios';
+import AsignarHorario from './pages/horarios/AsignarHorario';
+import CargarHorario from './pages/horarios/CargarHorario';
+import HistorialHorarios from './pages/horarios/HistorialHorarios';
+import MisHorarios from './pages/horarios/MisHorarios';
+import VerHorariosAsignados from './pages/horarios/VerHorariosAsignados';
+import VerHorariosEmpleado from './pages/horarios/VerHorariosEmpleado';
+import Sanciones from './pages/sanciones/Sanciones';
+import AgregarSancion from './pages/sanciones/AgregarSancion';
+import AplicarSancionMasiva from './pages/sanciones/AplicarSancionMasiva';
+import DetalleSancion from './pages/sanciones/DetalleSancion';
+import MisSanciones from './pages/sanciones/MisSanciones';
+import SancionPDF from './pages/sanciones/SancionPDF';
+import SancionesEmpleado from './pages/sanciones/SancionesEmpleado';
+import Incidentes from './pages/incidentes/Incidentes';
+import CorregirIncidente from './pages/incidentes/CorregirIncidente';
+import DetalleIncidente from './pages/incidentes/DetalleIncidente';
+import IncidentePDF from './pages/incidentes/IncidentePDF';
+import MisIncidentes from './pages/incidentes/MisIncidentes';
+import RegistrarIncidente from './pages/incidentes/RegistrarIncidente';
+import VerIncidentesEmpleado from './pages/incidentes/VerIncidentesEmpleado';
+import AsistenciaAdmin from './pages/asistencia/AsistenciaAdmin';
+import MisAsistencias from './pages/asistencia/MisAsistencias';
+import VerAsistencias from './pages/asistencia/VerAsistencias';
+import ReportesHome from './pages/reportes/ReportesHome';
+import PrivateRoute from './components/route/PrivateRoute';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
 const RouteWithTitle = ({ title, element }) => {
   return (
-    <Layout pageTitle={title}>
+    <AppLayout pageTitle={title}>
       {element}
-    </Layout>
+    </AppLayout>
   );
 };
 

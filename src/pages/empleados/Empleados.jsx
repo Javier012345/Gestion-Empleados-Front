@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users } from 'lucide-react';
-import ConfirmDeleteModal from './ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 
 // --- Mock Data ---
 const mockEmpleados = Array.from({ length: 25 }, (_, i) => ({
