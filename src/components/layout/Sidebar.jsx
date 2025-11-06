@@ -18,7 +18,8 @@ const employeeLinks = [
     { icon: <Receipt size={20} />, name: 'Mis Recibos', path: '/mis-recibos' },
     { icon: <CalendarDays size={20} />, name: 'Mis Horarios', path: '/horarios/mis-horarios' },
     { icon: <AlertTriangle size={20} />, name: 'Mis Incidentes', path: '/mis-incidentes' },
-    { icon: <Camera size={20} />, name: 'Mi Asistencia', path: '/mis-asistencias' },
+    { icon: <ShieldAlert size={20} />, name: 'Mis Sanciones', path: '/mis-sanciones' },
+    { icon: <Camera size={20} />, name: 'Mis Asistencias', path: '/mis-asistencias' },
 ];
 
 const NavLinks = ({ links }) => (
@@ -45,7 +46,7 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
     return (
         <>
             {/* Sidebar de Escritorio */}
-            <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 hidden lg:flex flex-col">
+            <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 shadow-md hidden lg:flex flex-col">
                 <div className="h-24 flex items-center justify-center px-4 pt-4">
                     <img src="/images/logo-nuevas-energias-v2.png" alt="Nuevas Energias" className="w-[150px] h-auto" />
                 </div>
@@ -75,7 +76,7 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
                 </div>
                 <NavLinks links={links} />
                  <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
-                    <a href="#" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white">
+                    <a href="#" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:.text-white">
                         <LogOut size={20} />
                         <span className="font-medium">Cerrar sesión</span>
                     </a>

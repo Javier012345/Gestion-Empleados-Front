@@ -1,9 +1,8 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileAlert } from 'lucide-react';
+import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileWarning } from 'lucide-react';
 
 // --- Mock Data ---
-// En una aplicación real, usarías el `id` para fetchear datos de la API.
 const mockEmpleados = [
     {
         id: 1,
@@ -14,16 +13,11 @@ const mockEmpleados = [
         ruta_foto: 'https://i.pravatar.cc/150?u=ana',
         estado: 'Activo',
         telefono: '600112233',
-        fecha_nacimiento: '15/08/1990',
+        fecha_nacimiento: '1990-08-15',
         genero: 'Femenino',
         estado_civil: 'Soltera',
         user: { groups: [{ name: 'Admin' }] },
-        legajo: {
-            documentos: [
-                { id: 1, nombre: 'DNI FRENTE', subido: '2023-10-01 10:00', url: '#' },
-                { id: 2, nombre: 'DNI DORSO', subido: '2023-10-01 10:01', url: null },
-            ]
-        }
+        legajo_id: 1, // Simulate legajo existence
     },
     {
         id: 2,
@@ -34,12 +28,23 @@ const mockEmpleados = [
         ruta_foto: null,
         estado: 'Inactivo',
         telefono: '655443322',
-        fecha_nacimiento: '20/04/1985',
+        fecha_nacimiento: '1985-04-20',
         genero: 'Masculino',
         estado_civil: 'Casado',
         user: { groups: [{ name: 'Empleado' }] },
-        legajo: null
+        legajo_id: null,
     },
+];
+
+const mockLegajos = [
+    {
+        id: 1,
+        empleado_id: 1,
+        documentos: [
+            { id: 1, id_requisito: { nombre_doc: 'DNI FRENTE' }, fecha_hora_subida: '2023-10-01T10:00:00Z', ruta_archivo: '#' },
+            { id: 2, id_requisito: { nombre_doc: 'DNI DORSO' }, fecha_hora_subida: '2023-10-01T10:01:00Z', ruta_archivo: null },
+        ]
+    }
 ];
 
 const getGroupColorClasses = (groupName) => {
@@ -58,11 +63,14 @@ const VerEmpleado = () => {
         return <div className="p-6 text-center">Empleado no encontrado.</div>;
     }
 
+    const legajo = mockLegajos.find(l => l.empleado_id === empleado.id);
+    const documentos = legajo ? legajo.documentos : [];
+
     const statusColor = empleado.estado === 'Activo'
         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
 
-    const groupColor = empleado.user.groups[0] ? getGroupColorClasses(empleado.user.groups[0].name) : '';
+    const groupColor = empleado.user?.groups[0] ? getGroupColorClasses(empleado.user.groups[0].name) : '';
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -70,7 +78,7 @@ const VerEmpleado = () => {
                 <Link to="/empleados" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500">
                     <ArrowLeft size={16} /> Volver a Empleados
                 </Link>
-                <a href="#" target="_blank" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
+                <a href={`/empleados/generar-perfil-pdf/${empleado.id}`} target="_blank" rel="noreferrer" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
                     <Printer size={16} /> Imprimir Perfil
                 </a>
             </div>
@@ -82,10 +90,10 @@ const VerEmpleado = () => {
                         <img 
                             src={empleado.ruta_foto || '/images/default-user.jpg'}
                             alt={`Foto de ${empleado.nombre}`}
-                            className="h-32 w-32 rounded-full mx-auto mb-4 object-cover ring-4 ring-white dark:ring-gray-800 shadow-lg"
+                            className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
                         />
                         <h2 className="text-2xl font-bold">{empleado.nombre} {empleado.apellido}</h2>
-                        {empleado.user.groups[0] && 
+                        {empleado.user?.groups[0] && 
                             <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${groupColor}`}>
                                 {empleado.user.groups[0].name}
                             </span>
@@ -100,7 +108,26 @@ const VerEmpleado = () => {
                                 <span className="font-medium">Editar Datos Personales</span>
                                 <UserCog size={20} className="text-gray-500" />
                             </Link>
-                            {/* Otros links de gestión... */}
+                            <Link to={`/asistencia/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="font-medium">Ver Asistencias</span>
+                                <CalendarCheck size={20} className="text-gray-500" />
+                            </Link>
+                            <Link to={`/sanciones/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="font-medium">Administrar Sanciones</span>
+                                <ShieldAlert size={20} className="text-gray-500" />
+                            </Link>
+                            <Link to={`/horarios/ver-empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="font-medium">Administrar Horarios</span>
+                                <Clock size={20} className="text-gray-500" />
+                            </Link>
+                            <Link to={`/recibos/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="font-medium">Ver Recibos de Sueldo</span>
+                                <Receipt size={20} className="text-gray-500" />
+                            </Link>
+                            <Link to={`/incidentes/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="font-medium">Ver Incidentes</span>
+                                <FileWarning size={20} className="text-gray-500" />
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -113,25 +140,25 @@ const VerEmpleado = () => {
                             <div><strong className="block text-gray-500">DNI:</strong> {empleado.dni}</div>
                             <div><strong className="block text-gray-500">Email:</strong> {empleado.email}</div>
                             <div><strong className="block text-gray-500">Teléfono:</strong> {empleado.telefono || '-'}</div>
-                            <div><strong className="block text-gray-500">Fecha de Nac.:</strong> {empleado.fecha_nacimiento}</div>
+                            <div><strong className="block text-gray-500">Fecha de Nac.:</strong> {new Date(empleado.fecha_nacimiento).toLocaleDateString()}</div>
                             <div><strong className="block text-gray-500">Género:</strong> {empleado.genero}</div>
                             <div><strong className="block text-gray-500">Estado Civil:</strong> {empleado.estado_civil}</div>
                         </div>
                     </div>
 
-                    {empleado.legajo && (
+                    {legajo && (
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
                             <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700">Documentación del Legajo</h3>
                             <ul className="divide-y dark:divide-gray-700 mt-4">
-                                {empleado.legajo.documentos.map(doc => (
+                                {documentos.map(doc => (
                                     <li key={doc.id} className="flex items-center justify-between py-3">
                                         <div>
-                                            <p className="text-sm font-medium">{doc.nombre}</p>
-                                            <p className="text-xs text-gray-500">Subido: {new Date(doc.subido).toLocaleString()}</p>
+                                            <p className="text-sm font-medium">{doc.id_requisito.nombre_doc}</p>
+                                            <p className="text-xs text-gray-500">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
                                         </div>
                                         <div>
-                                            {doc.url ? (
-                                                <a href={doc.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-600 bg-blue-100 dark:text-blue-200 dark:bg-blue-900 px-3 py-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800">Ver Archivo</a>
+                                            {doc.ruta_archivo ? (
+                                                <a href={doc.ruta_archivo} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-600 bg-blue-100 dark:text-blue-200 dark:bg-blue-900 px-3 py-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800">Ver Archivo</a>
                                             ) : (
                                                 <span className="text-xs font-semibold text-yellow-600 bg-yellow-100 dark:text-yellow-200 dark:bg-yellow-900 px-3 py-1.5 rounded-full">Pendiente</span>
                                             )}
@@ -148,3 +175,4 @@ const VerEmpleado = () => {
 };
 
 export default VerEmpleado;
+

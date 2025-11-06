@@ -4,39 +4,24 @@ import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Mock data que simula la respuesta de la API
 const mockApiResponse = {
-    total_records: 8,
-    total_pages: 1,
-    current_page: 1,
-    records: [
-        {
-            id_incidente: { id: 1, tipo_incid: 'Llegada Tarde', descripcion_incid: 'El empleado llegó 15 minutos tarde sin previo aviso.' },
-            fecha_ocurrencia: '2024-10-25',
-            estado: 'ABIERTO',
+    total_records: 15, // Aumentado para probar paginación
+    records: Array.from({ length: 15 }, (_, i) => ({
+        id_incidente: { 
+            id: i + 1, 
+            tipo_incid: ['Llegada Tarde', 'Ausencia Injustificada', 'Conflicto Laboral', 'Incumplimiento'][(i % 4)],
+            descripcion_incid: `Descripción del incidente número ${i + 1}.`
         },
-        {
-            id_incidente: { id: 2, tipo_incid: 'Ausencia Injustificada', descripcion_incid: 'El empleado no se presentó a trabajar y no comunicó el motivo.' },
-            fecha_ocurrencia: '2024-10-20',
-            estado: 'CERRADO',
-        },
-        {
-            id_incidente: { id: 3, tipo_incid: 'Conflicto Laboral', descripcion_incid: 'Discusión con un compañero en el área de producción.' },
-            fecha_ocurrencia: '2024-09-15',
-            estado: 'CERRADO',
-        },
-        {
-            id_incidente: { id: 4, tipo_incid: 'Incumplimiento de Tareas', descripcion_incid: 'No completó el reporte diario asignado.' },
-            fecha_ocurrencia: '2024-09-10',
-            estado: 'ABIERTO',
-        },
-    ]
+        fecha_ocurrencia: new Date(2024, 9 - (i % 3), 25 - i).toISOString().split('T')[0], // Fechas variadas
+        estado: i % 2 === 0 ? 'ABIERTO' : 'CERRADO',
+    }))
 };
 
 const MisIncidentes = () => {
-    const [incidentes, setIncidentes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [pagination, setPagination] = useState({});
     const [filters, setFilters] = useState({ month: '', year: '', status: '' });
     const [recordsPerPage, setRecordsPerPage] = useState(9);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagedData, setPagedData] = useState({ data: [], total_records: 0, total_pages: 0 });
 
     const years = useMemo(() => {
         const currentYear = new Date().getFullYear();
@@ -46,50 +31,75 @@ const MisIncidentes = () => {
 
     useEffect(() => {
         fetchData();
-    }, [filters, recordsPerPage]); // Se ejecuta cuando cambian los filtros o registros por página
+    }, [filters, recordsPerPage, currentPage]);
 
     const fetchData = () => {
         setLoading(true);
-        // --- SIMULACIÓN DE LLAMADA A LA API ---
-        // En una app real, aquí llamarías a tu API con los filtros
-        // ej: api.get('/mis-incidentes', { params: { ...filters, por_pagina: recordsPerPage, page: pagination.current_page } })
-        console.log("Fetching data with filters:", { ...filters, por_pagina: recordsPerPage });
+        // --- SIMULACIÓN DE LLAMADA Y FILTRADO EN EL FRONTEND ---
         setTimeout(() => {
-            // Aquí filtrarías mockApiResponse basado en los `filters` para simular el backend
-            setIncidentes(mockApiResponse.records);
-            setPagination({
-                total_records: mockApiResponse.total_records,
-                total_pages: mockApiResponse.total_pages,
-                current_page: mockApiResponse.current_page,
+            const filtered = mockApiResponse.records.filter(inc => {
+                const date = new Date(inc.fecha_ocurrencia);
+                const monthMatch = filters.month ? (date.getMonth() + 1) === parseInt(filters.month) : true;
+                const yearMatch = filters.year ? date.getFullYear() === parseInt(filters.year) : true;
+                const statusMatch = filters.status ? inc.estado === filters.status : true;
+                return monthMatch && yearMatch && statusMatch;
+            });
+
+            const totalRecords = filtered.length;
+            const totalPages = Math.ceil(totalRecords / recordsPerPage);
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const paginatedRecords = filtered.slice(startIndex, startIndex + recordsPerPage);
+
+            setPagedData({
+                data: paginatedRecords,
+                total_records: totalRecords,
+                total_pages: totalPages,
+                start_index: startIndex + 1,
+                end_index: startIndex + paginatedRecords.length
             });
             setLoading(false);
-        }, 500);
+        }, 300);
         // --- FIN DE LA SIMULACIÓN ---
     };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
+        setCurrentPage(1); // Reset page on filter change
     };
 
     const handleRecordsPerPageChange = (e) => {
         setRecordsPerPage(Number(e.target.value));
+        setCurrentPage(1); // Reset page on records per page change
     };
 
     const handleFilterSubmit = (e) => {
         e.preventDefault();
+        setCurrentPage(1);
         fetchData();
     };
 
     const clearFilters = () => {
         setFilters({ month: '', year: '', status: '' });
+        setCurrentPage(1);
+    };
+
+    const nextPage = () => {
+        if (currentPage < pagedData.total_pages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
     };
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-6 dark:text-white">Mis Incidentes</h1>
 
-            {/* Filter Form */}
             <form onSubmit={handleFilterSubmit} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
                     <div className="md:col-span-2">
@@ -97,7 +107,7 @@ const MisIncidentes = () => {
                         <div className="flex items-center gap-2">
                             <select name="month" value={filters.month} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
                                 <option value="">Mes</option>
-                                {Array.from({ length: 12 }, (_, i) => <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>)}
+                                {Array.from({ length: 12 }, (_, i) => <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                             </select>
                             <select name="year" value={filters.year} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
                                 <option value="">Año</option>
@@ -129,11 +139,11 @@ const MisIncidentes = () => {
             </form>
 
             {loading ? (
-                <div className="text-center py-10">Cargando...</div>
-            ) : incidentes.length > 0 ? (
+                <div className="text-center py-10 dark:text-white">Cargando...</div>
+            ) : pagedData.data.length > 0 ? (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {incidentes.map(incidente => (
+                        {pagedData.data.map(incidente => (
                             <div key={incidente.id_incidente.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex flex-col">
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
@@ -153,22 +163,33 @@ const MisIncidentes = () => {
                             </div>
                         ))}
                     </div>
+                    
                     {/* Paginación */}
-                    <div className="mt-8 flex items-center justify-between">
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
-                            Mostrando 1 a {incidentes.length} de {pagination.total_records} resultados
-                        </p>
-                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                            <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-                                <ChevronLeft className="h-5 w-5" />
-                            </button>
-                            <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
-                                Página {pagination.current_page} de {pagination.total_pages}
-                            </span>
-                            <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-                                <ChevronRight className="h-5 w-5" />
-                            </button>
-                        </nav>
+                    <div className="mt-8 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6">
+                        <div className="flex-1 flex justify-between sm:hidden">
+                            <button onClick={prevPage} disabled={currentPage === 1} className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"> Anterior </button>
+                            <button onClick={nextPage} disabled={currentPage === pagedData.total_pages} className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"> Siguiente </button>
+                        </div>
+                        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Mostrando <span className="font-medium">{pagedData.start_index}</span> a <span className="font-medium">{pagedData.end_index}</span> de <span className="font-medium">{pagedData.total_records}</span> resultados
+                                </p>
+                            </div>
+                            <div>
+                                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <button onClick={prevPage} disabled={currentPage === 1} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                                        <span className="sr-only">Anterior</span>
+                                        <ChevronLeft className="h-5 w-5" />
+                                    </button>
+                                    <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"> Página {currentPage} de {pagedData.total_pages} </span>
+                                    <button onClick={nextPage} disabled={currentPage === pagedData.total_pages} className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                                        <span className="sr-only">Siguiente</span>
+                                        <ChevronRight className="h-5 w-5" />
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
                     </div>
                 </>
             ) : (

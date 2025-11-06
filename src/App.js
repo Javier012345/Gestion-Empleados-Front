@@ -10,6 +10,7 @@ import EditarEmpleado from './pages/empleados/EditarEmpleado';
 import PerfilEmpleado from './pages/empleados/PerfilEmpleado';
 import Recibos from './pages/recibos/Recibos';
 import MisRecibos from './pages/recibos/MisRecibos';
+import VerRecibosEmpleado from './pages/recibos/VerRecibosEmpleado';
 import Horarios from './pages/horarios/Horarios';
 import AsignarHorario from './pages/horarios/AsignarHorario';
 import CargarHorario from './pages/horarios/CargarHorario';
@@ -72,6 +73,7 @@ function App() {
             <Route path="/empleados/editar/:id" element={<RouteWithTitle title="Editar Empleado" element={<EditarEmpleado />} />} />
             <Route path="/recibos" element={<RouteWithTitle title="Recibos" element={<Recibos />} />} />
             <Route path="/mis-recibos" element={<RouteWithTitle title="Mis Recibos" element={<MisRecibos />} />} />
+            <Route path="/recibos/empleado/:id" element={<RouteWithTitle title="Recibos de Empleado" element={<VerRecibosEmpleado />} />} />
             <Route path="/horarios" element={<RouteWithTitle title="Horarios" element={<Horarios />} />} />
             <Route path="/horarios/asignar" element={<RouteWithTitle title="Asignar Horario" element={<AsignarHorario />} />} />
             <Route path="/horarios/cargar" element={<RouteWithTitle title="Cargar Horario" element={<CargarHorario />} />} />
