@@ -1,6 +1,10 @@
 import React from 'react';
 
 const VerAsistenciasTab = () => {
+    const handleDniInput = (event) => {
+        event.target.value = event.target.value.replace(/[^0-9]/g, '');
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-bold mb-6">Ver Asistencias por Empleado</h2>
@@ -10,7 +14,7 @@ const VerAsistenciasTab = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label htmlFor="asistencia-dni-input" className="block mb-2 text-sm font-medium text-white">DNI Empleado</label>
-                        <input id="asistencia-dni-input" type="text" placeholder="Buscar por DNI..." className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600" />
+                        <input id="asistencia-dni-input" type="tel" placeholder="Buscar por DNI..." className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600" onInput={handleDniInput} />
                     </div>
                     <div className="flex items-end">
                         <button id="asistencia-search-btn" className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Buscar</button>
