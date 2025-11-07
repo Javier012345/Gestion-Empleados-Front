@@ -49,22 +49,12 @@ const RouteWithTitle = ({ title, element }) => {
 };
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
-
-  useEffect(() => {
-    localStorage.setItem('isAuthenticated', isAuthenticated);
-  }, [isAuthenticated]);
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
   return (
     <ThemeProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
+          <Route path="/login" element={<Login />} />
+          <Route element={<PrivateRoute />}>
             <Route path="/" element={<RouteWithTitle title="Inicio" element={<Home />} />} />
             <Route path="/perfil" element={<RouteWithTitle title="Mi Perfil" element={<PerfilEmpleado />} />} />
             <Route path="/empleados" element={<RouteWithTitle title="Empleados" element={<Empleados />} />} />

@@ -1,58 +1,42 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
     // --- ESTADO --- //
-    // Simula el contexto que venía de Django
-    // Puedes cambiar estos valores para probar diferentes escenarios
-    const [error, setError] = useState(null); // Ejemplo: 'Usuario o contraseña incorrectos.'
-    const [isBlocked, setIsBlocked] = useState(false);
-    const [blockedUntil, setBlockedUntil] = useState(null); // Ejemplo: new Date(Date.now() + 30000)
-
-    // Estado para los campos del formulario
+    const [error, setError] = useState(null);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
-    // Estado para el temporizador
-    const [timeLeft, setTimeLeft] = useState('');
-    const intervalRef = useRef(null);
-
-    // --- EFECTOS --- //
-
-    // Efecto para manejar el temporizador de bloqueo
-    useEffect(() => {
-        if (isBlocked && blockedUntil) {
-            intervalRef.current = setInterval(() => {
-                const now = new Date();
-                const remaining = blockedUntil - now;
-
-                if (remaining <= 0) {
-                    clearInterval(intervalRef.current);
-                    setIsBlocked(false);
-                    setBlockedUntil(null);
-                    setError(null);
-                    // Opcional: recargar la página como en el script original
-                    // window.location.reload(); 
-                    return;
-                }
-
-                const minutes = Math.floor((remaining / 1000) / 60);
-                const seconds = Math.floor((remaining / 1000) % 60);
-                setTimeLeft(`${minutes} m y ${seconds} s`);
-                setError(`Has superado el número máximo de intentos. Inténtalo de nuevo en `);
-
-            }, 1000);
+    const setCookie = (name, value, days) => {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
         }
-        return () => clearInterval(intervalRef.current);
-    }, [isBlocked, blockedUntil]);
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    };
 
     // --- MANEJADORES DE EVENTOS --- //
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Aquí iría la lógica para enviar los datos a tu API de Django
-        console.log('Intentando iniciar sesión con:', { username, password });
-        onLogin();
+        try {
+            const response = await axios.post('http://localhost:8000/api/login/', {
+                username,
+                password
+            });
+            const { token, user } = response.data;
+            setCookie('token', token, 7); // Store token in cookie for 7 days
+            localStorage.setItem('user', JSON.stringify(user)); // Store user data in local storage
+            navigate('/'); // Redirect to home page after login
+        } catch (err) {
+            setError('Usuario o contraseña incorrectos.');
+            console.error('Login error:', err);
+        }
     };
 
     const togglePasswordVisibility = () => {
@@ -93,7 +77,6 @@ const Login = ({ onLogin }) => {
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong className="font-bold">Error:</strong>
                             <span className="block sm:inline">{error}</span>
-                            {isBlocked && <span id="tiempo-bloqueo">{timeLeft}</span>}
                         </div>
                     )}
 
@@ -110,7 +93,6 @@ const Login = ({ onLogin }) => {
                                     required
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm dark:bg-gray-700 dark:text-white"
                                     placeholder="Ingrese su nombre de usuario"
-                                    disabled={isBlocked}
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
@@ -129,7 +111,6 @@ const Login = ({ onLogin }) => {
                                     required
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm dark:bg-gray-700 dark:text-white"
                                     placeholder="Ingrese su contraseña"
-                                    disabled={isBlocked}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -147,16 +128,14 @@ const Login = ({ onLogin }) => {
                             </div>
                         </div>
 
-                        {!isBlocked && (
-                            <div>
-                                <button
-                                    type="submit"
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                >
-                                    Ingresar
-                                </button>
-                            </div>
-                        )}
+                        <div>
+                            <button
+                                type="submit"
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            >
+                                Ingresar
+                            </button>
+                        </div>
                     </form>
 
                     <div className="mt-6">
