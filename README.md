@@ -1,70 +1,131 @@
-# Getting Started with Create React App
+# Sistema de Gestión de Empleados - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 
-## Available Scripts
+Una interfaz de usuario moderna y eficiente para la administración de empleados, asistencias e incidentes, construida con React y Tailwind CSS.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📜 Tabla de Contenidos
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- [Acerca del Proyecto](#-acerca-del-proyecto)
+  - [Tecnologías Utilizadas](#-tecnologías-utilizadas)
+- [🚀 Empezando](#-empezando)
+  - [Prerrequisitos](#-prerrequisitos)
+  - [Instalación](#-instalación)
+- [📦 Scripts Disponibles](#-scripts-disponibles)
+- [✨ Características Principales](#-características-principales)
+- [🖼️ Vistas Previas](#️-vistas-previas)
+- [🤝 Contribuciones](#-contribuciones)
+- [📄 Licencia](#-licencia)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 📖 Acerca del Proyecto
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Gestion-Empleados-Front** es el frontend de una aplicación completa diseñada para simplificar la administración de recursos humanos. Permite a los administradores gestionar la información de los empleados, registrar y visualizar las asistencias (incluyendo un sistema de reconocimiento facial) y documentar incidentes laborales.
 
-### `npm run build`
+### 🛠️ Tecnologías Utilizadas
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Este proyecto fue construido utilizando tecnologías modernas para el desarrollo web:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+*   **[React.js](https://reactjs.org/):** Una biblioteca de JavaScript para construir interfaces de usuario.
+*   **[Tailwind CSS](https://tailwindcss.com/):** Un framework de CSS "utility-first" para un diseño rápido y personalizado.
+*   **[React Router](https://reactrouter.com/):** Para la gestión de rutas en la aplicación.
+*   **[Create React App](https://github.com/facebook/create-react-app):** Como base para la configuración inicial del proyecto.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🚀 Empezando
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Sigue estos pasos para obtener una copia local del proyecto y ponerla en funcionamiento.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### ✅ Prerrequisitos
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Asegúrate de tener instalado Node.js en tu sistema.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+*   **npm**
+    ```sh
+    npm install npm@latest -g
+    ```
 
-## Learn More
+### 💻 Instalación
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1.  Clona el repositorio
+    ```sh
+    git clone https://github.com/tu-usuario/Gestion-Empleados-Front.git
+    ```
+2.  Navega al directorio del proyecto
+    ```sh
+    cd Gestion-Empleados-Front
+    ```
+3.  Instala las dependencias de NPM
+    ```sh
+    npm install
+    ```
+4.  Inicia el servidor de desarrollo
+    ```sh
+    npm start
+    ```
+    La aplicación se abrirá en [http://localhost:3000](http://localhost:3000).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 📦 Scripts Disponibles
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+En el directorio del proyecto, puedes ejecutar:
 
-### Analyzing the Bundle Size
+-   `npm start`: Inicia la aplicación en modo de desarrollo.
+-   `npm test`: Lanza el corredor de pruebas en modo interactivo.
+-   `npm run build`: Compila la aplicación para producción en la carpeta `build`.
+-   `npm run eject`: Expulsa las dependencias de configuración de Create React App para tener un control total. **(¡Operación irreversible!)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## ✨ Características Principales
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+-   **Gestión de Asistencias:**
+    -   Visualización de registros de asistencia por empleado.
+    -   Filtrado por período (mes/año).
+    -   Paginación para una navegación fluida.
+-   **Reconocimiento Facial:**
+    -   Registro de rostros de empleados para la toma de asistencia.
+    -   Modificación y actualización de los registros faciales existentes.
+-   **Gestión de Incidentes:**
+    -   Creación y seguimiento de incidentes laborales.
+    -   Generación de reportes en formato PDF para cada incidente.
+-   **Diseño Responsivo:** Interfaz adaptable a diferentes tamaños de pantalla gracias a Tailwind CSS.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🖼️ Vistas Previas
 
-### Deployment
+*(Aquí puedes agregar capturas de pantalla de tu aplicación para mostrar cómo se ve)*
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+**Ejemplo:**
 
-### `npm run build` fails to minify
+| Registro de Rostro                                     | Vista de Asistencias                                    |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| !Descripción de la imagen | !Descripción de la imagen |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones son lo que hace que la comunidad de código abierto sea un lugar increíble para aprender, inspirar y crear. Cualquier contribución que hagas será **muy apreciada**.
+
+Si tienes una sugerencia para mejorar esto, por favor bifurca el repositorio y crea una pull request. También puedes simplemente abrir un issue con la etiqueta "enhancement".
+
+1.  Bifurca el Proyecto (Fork the Project)
+2.  Crea tu Rama de Característica (`git checkout -b feature/AmazingFeature`)
+3.  Confirma tus Cambios (`git commit -m 'Add some AmazingFeature'`)
+4.  Empuja a la Rama (`git push origin feature/AmazingFeature`)
+5.  Abre una Pull Request
+
+---
+
+## 📄 Licencia
+
+Distribuido bajo la Licencia MIT. Consulta `LICENSE.txt` para más información.
