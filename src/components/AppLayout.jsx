@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import Sidebar from './layout/Sidebar.jsx';
 import Header from './layout/Header.jsx';
+import { ThemeContext } from '../context/ThemeContext';
 
 const AppLayout = ({ children, pageTitle }) => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { theme, toggleTheme } = useContext(ThemeContext);
     
     // Simulación de usuario logueado. En una aplicación real, esto vendría de tu contexto de autenticación.
     // Asumimos que el usuario tiene una propiedad 'isAdmin' y 'name'.
@@ -25,27 +27,12 @@ const AppLayout = ({ children, pageTitle }) => {
     // Estado para gestionar la vista. Por defecto, 'admin' si el usuario es admin, sino 'employee'.
     const [viewMode, setViewMode] = useState(currentUser.isAdmin ? 'admin' : 'employee');
 
-    // Estado para el tema (claro u oscuro)
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-
-    // Función para cambiar el tema
-    const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    };
-
-    // Efecto secundario para aplicar el tema al cargar el componente y cada vez que cambia el tema
-    useEffect(() => {
-        document.documentElement.classList.toggle('dark', theme === 'dark');
-    }, [theme]);
-
     const handleToggleViewMode = () => {
         setViewMode(prevMode => (prevMode === 'admin' ? 'employee' : 'admin'));
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="flex h-screen">
             <Sidebar 
                 isOpen={isMobileMenuOpen} 
                 onClose={() => setMobileMenuOpen(false)}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { ThemeContext } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import { Users, UserCheck, ShieldAlert, UserPlus, Wrench, FileWarning, Bell, LogIn } from 'lucide-react';
 import { Line, Doughnut } from 'react-chartjs-2';
@@ -29,6 +30,7 @@ ChartJS.register(
 );
 
 const Home = () => {
+    const { theme } = useContext(ThemeContext);
     // Estado para almacenar los datos del dashboard (simulados)
     const [dashboardData, setDashboardData] = useState({
         total_empleados: 0,
@@ -78,7 +80,7 @@ const Home = () => {
             label: 'Nuevos Empleados',
             data: dashboardData.hires_data,
             borderColor: '#D9232D',
-            backgroundColor: 'rgba(217, 35, 45, 0.1)',
+            backgroundColor: theme === 'dark' ? 'rgba(217, 35, 45, 0.3)' : 'rgba(217, 35, 45, 0.1)',
             fill: true,
             tension: 0.4,
         }],
@@ -95,7 +97,7 @@ const Home = () => {
         datasets: [{
             data: dashboardData.status_data,
             backgroundColor: ['#10B981', '#F59E0B', '#6B7280'],
-            borderColor: '#ffffff', // Simula el color de fondo para el borde
+            borderColor: 'transparent', // Simula el color de fondo para el borde
             borderWidth: 4,
         }],
     };
