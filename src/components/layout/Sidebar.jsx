@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Receipt, CalendarDays, ShieldAlert, AlertTriangle, Camera, ClipboardList, LogOut, X, User } from 'lucide-react';
+import AlertDialog from './AlertDialog';
 
 const adminLinks = [
     { icon: <LayoutDashboard size={20} />, name: 'Inicio', path: '/' },
@@ -43,14 +44,24 @@ const NavLinks = ({ links }) => (
 const Sidebar = ({ isOpen, onClose, userRole }) => {
     const links = userRole === 'admin' ? adminLinks : employeeLinks;
     const navigate = useNavigate();
+    const [isAlertOpen, setAlertOpen] = useState(false);
 
-    const handleLogout = () => {
+    const handleLogoutClick = () => {
+        setAlertOpen(true);
+    };
+
+    const handleCloseAlert = () => {
+        setAlertOpen(false);
+    };
+
+    const handleConfirmLogout = () => {
         // Eliminar la cookie del token
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         // Eliminar los datos del usuario del localStorage
         localStorage.removeItem('user');
         // Redirigir al login
         navigate('/login');
+        setAlertOpen(false);
     };
 
     return (
@@ -62,7 +73,7 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
                 </div>
                 <NavLinks links={links} />
                 <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
-                    <button onClick={handleLogout} className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white w-full">
+                    <button onClick={handleLogoutClick} className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white w-full">
                         <LogOut size={20} />
                         <span className="font-medium">Cerrar sesión</span>
                     </button>
@@ -86,12 +97,19 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
                 </div>
                 <NavLinks links={links} />
                  <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
-                    <button onClick={handleLogout} className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white w-full">
+                    <button onClick={handleLogoutClick} className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white w-full">
                         <LogOut size={20} />
                         <span className="font-medium">Cerrar sesión</span>
                     </button>
                 </div>
             </aside>
+            <AlertDialog
+                isOpen={isAlertOpen}
+                onClose={handleCloseAlert}
+                onConfirm={handleConfirmLogout}
+                title="Confirmar Cierre de Sesión"
+                message="¿Estás seguro de que quieres cerrar sesión?"
+            />
         </>
     );
 };
