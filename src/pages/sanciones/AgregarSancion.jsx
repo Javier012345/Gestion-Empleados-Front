@@ -33,7 +33,7 @@ const AgregarSancion = () => {
                             placeholder="DNI del empleado..." 
                             value={dni}
                             onChange={(e) => setDni(e.target.value)}
-                            className="flex-grow w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
+                            className="flex-grow w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                         />
                         <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                             <Search size={20} />
@@ -58,7 +58,7 @@ const AgregarSancion = () => {
                         <form className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Sanción</label>
-                                <select className="w-full mt-1 px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                                <select className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                     <option>Leve</option>
                                     <option>Moderada</option>
                                     <option>Grave</option>
@@ -66,15 +66,15 @@ const AgregarSancion = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Motivo</label>
-                                <textarea rows="4" className="w-full mt-1 px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"></textarea>
+                                <textarea rows="4" className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"></textarea>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Inicio</label>
-                                <input type="date" className="w-full mt-1 px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white" />
+                                <input type="date" className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Fin</label>
-                                <input type="date" className="w-full mt-1 px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white" />
+                                <input type="date" className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
                             </div>
                             <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-end gap-3">
                                 <a href="/sanciones" className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</a>

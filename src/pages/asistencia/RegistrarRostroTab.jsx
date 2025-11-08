@@ -14,8 +14,8 @@ const RegistrarRostroTab = () => {
                 <div>
                     <p className="text-gray-400">Seleccione un empleado y presione "Capturar Rostro" cuando esté listo.</p>
                     <div className="my-4">
-                        <label htmlFor="empleadoSelect" className="block text-sm font-medium text-gray-300">Empleado</label>
-                        <select id="empleadoSelect" className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 shadow-sm text-white">
+                        <label htmlFor="empleadoSelect" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empleado</label>
+                        <select id="empleadoSelect" className="mt-1 block w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 shadow-sm dark:text-white">
                             <option value="">Seleccione un empleado...</option>
                             {empleados_sin_rostro.map(empleado => (
                                 <option key={empleado.id} value={empleado.id}>{empleado.nombre} {empleado.apellido}</option>

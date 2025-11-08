@@ -20,22 +20,22 @@ const RegistrarIncidente = () => {
                 <form className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Incidente</label>
-                        <input type="text" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white" />
+                        <input type="text" className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha del Incidente</label>
-                        <input type="date" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white" />
+                        <input type="date" className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción del Incidente</label>
-                        <textarea rows="4" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white"></textarea>
+                        <textarea rows="4" className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white"></textarea>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empleados Involucrados</label>
-                        <div className="mt-2 p-2 border rounded-lg max-h-48 overflow-y-auto space-y-1 dark:border-gray-600">
+                        <div className="mt-2 p-2 border rounded-lg max-h-48 overflow-y-auto space-y-1 bg-white border-gray-300 dark:bg-gray-700/50 dark:border-gray-600">
                             {empleados.map(empleado => (
                                 <label key={empleado.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <input type="checkbox" className="form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
@@ -47,7 +47,7 @@ const RegistrarIncidente = () => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones</label>
-                        <textarea rows="4" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white"></textarea>
+                        <textarea rows="4" className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white"></textarea>
                     </div>
                     
                     <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-end gap-3">

@@ -39,16 +39,16 @@ const Incidentes = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar por Empleado</label>
-                        <input type="text" placeholder="Nombre o DNI..." className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white" />
+                        <input type="text" placeholder="Nombre o DNI..." className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Periodo</label>
                         <div className="flex gap-2 mt-1">
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                 <option value="">Mes</option>
                                 {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                             </select>
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                 <option value="">Año</option>
                                 {[2023, 2024, 2025].map(year => <option key={year} value={year}>{year}</option>)}
                             </select>
@@ -56,7 +56,7 @@ const Incidentes = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
-                        <select className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                        <select className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                             <option value="">Todos</option>
                             <option value="ABIERTO">Abierto</option>
                             <option value="CERRADO">Cerrado</option>
@@ -64,7 +64,7 @@ const Incidentes = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-900 dark:text-white">Registros</label>
-                        <select className="w-full mt-1 px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white">
+                        <select className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white">
                             <option value="9">9</option>
                             <option value="12">12</option>
                             <option value="18">18</option>

@@ -34,7 +34,7 @@ const FormField = ({ label, name, type = 'text', value, onChange, error, childre
                 name: name, 
                 value: value, 
                 onChange: onChange, 
-                className: 'mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm'
+                className: 'mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm'
             })
         ) : (
             <input 
@@ -47,7 +47,7 @@ const FormField = ({ label, name, type = 'text', value, onChange, error, childre
                 className={
                     type === 'file' 
                     ? 'mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600'
-                    : 'mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm'
+                    : 'mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm'
                 }
             />
         )}
