@@ -14,8 +14,8 @@ const ModificarRostroTab = () => {
                 <div>
                     <p className="text-gray-400">Seleccione un empleado para volver a capturar su rostro. El registro anterior será reemplazado.</p>
                     <div className="my-4">
-                        <label htmlFor="empleadoSelect-modify" className="block text-sm font-medium text-gray-300">Empleado con Rostro Registrado</label>
-                        <select id="empleadoSelect-modify" className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 shadow-sm text-white">
+                        <label htmlFor="empleadoSelect-modify" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empleado con Rostro Registrado</label>
+                        <select id="empleadoSelect-modify" className="mt-1 block w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 shadow-sm dark:text-white">
                             <option value="">Seleccione un empleado...</option>
                             {empleados_con_rostro.map(empleado => (
                                 <option key={empleado.id} value={empleado.id}>{empleado.nombre} {empleado.apellido}</option>

@@ -64,17 +64,17 @@ const UploadReciboModal = ({ isOpen, onClose, employeeDNI }) => {
                     <div>
                         <label htmlFor="dni" className="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI del Empleado</label>
                         <input type="text" name="dni" id="dni" value={formData.dni} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="fecha_emision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
                         <input type="date" name="fecha_emision" id="fecha_emision" value={formData.fecha_emision} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="periodo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
                         <input type="text" name="periodo" id="periodo" placeholder="2023-10" value={formData.periodo} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="ruta_pdf" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivo PDF</label>
@@ -148,7 +148,7 @@ const Recibos = () => {
 
 
     return (
-        <div className="p-4 sm:p-6 space-y-6">
+        <>
             {/* Barra de búsqueda y botón */}
             <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="relative flex-1 max-w-sm">
@@ -232,7 +232,7 @@ const Recibos = () => {
                 onClose={() => setUploadModalOpen(false)} 
                 employeeDNI={searchedDni} 
             />
-        </div>
+        </>
     );
 };
 
