@@ -19,7 +19,7 @@ const Header = ({
     return (
         <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
             <div className="flex items-center gap-4">
-                <button onClick={onOpenMobileMenu} className="lg:hidden text-gray-600 dark:text-gray-300 p-2 rounded-lg">
+<button onClick={onOpenMobileMenu} className="lg:hidden text-gray-600 dark:text-gray-300 p-2 rounded-lg">
                     <Menu size={20} />
                 </button>
                 <h1 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
@@ -28,7 +28,7 @@ const Header = ({
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
-                <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors duration-200">
                     {theme === 'light' ? <Moon /> : <Sun />}
                 </button>
 
@@ -47,14 +47,14 @@ const Header = ({
                     {notificationsOpen && (
                         <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-700 z-20">
                             <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-                                <h3 className="font-semibold">Notificaciones ({notifications_count})</h3>
+                                <h3 className="font-semibold text-gray-900 dark:text-white">Notificaciones ({notifications_count})</h3>
                                 <button className="text-sm text-red-600 hover:underline">Marcar como leídas</button>
                             </div>
                             <div className="max-h-96 overflow-y-auto divide-y dark:divide-gray-700">
                                 {/* Aquí iría la lista de notificaciones */}
                                 <a href="#" className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <p className="text-sm font-medium">Ejemplo de notificación</p>
-                                    <span className="text-xs text-gray-500">hace 5 minutos</span>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Ejemplo de notificación</p>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">hace 5 minutos</span>
                                 </a>
                             </div>
                             <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 text-center">

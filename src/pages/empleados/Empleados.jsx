@@ -41,21 +41,21 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
                         placeholder="Buscar por nombre o DNI..." 
                         value={searchTerm}
                         onChange={onSearchChange}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <select 
                         value={estadoFilter}
                         onChange={onEstadoChange}
-                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
+                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
                         <option value="">Todos los Estados</option>
                         {estado_choices.map(([value, display]) => <option key={value} value={value}>{display}</option>)}
                     </select>
                     <select 
                         value={cargoFilter}
                         onChange={onCargoChange}
-                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
+                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
                         <option value="">Todos los Cargos</option>
                         {cargos.map(cargo => <option key={cargo.id} value={cargo.name}>{cargo.name}</option>)}
                     </select>
