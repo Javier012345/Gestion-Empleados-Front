@@ -38,7 +38,7 @@ const VerEmpleado = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center p-10">
-                <Loader className="animate-spin text-red-600" size={48} />
+                <Loader className="animate-spin text-red-600" size={48} data-testid="loader" />
             </div>
         );
     }
@@ -79,7 +79,7 @@ const VerEmpleado = () => {
                             alt={`Foto de ${empleado.nombre}`}
                             className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
                         />
-                        <h2 className="text-2xl font-bold">{empleado.nombre} {empleado.apellido}</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</h2>
                         {empleado.grupo && 
                             <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${groupColor}`}>
                                 {empleado.grupo}
@@ -89,7 +89,7 @@ const VerEmpleado = () => {
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700">Gestión del Empleado</h3>
+                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Gestión del Empleado</h3>
                         <div className="mt-4 space-y-2">
                             <Link to={`/empleados/editar/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <span className="font-medium">Editar Datos Personales</span>
@@ -122,27 +122,27 @@ const VerEmpleado = () => {
                 {/* Columna Derecha */}
                 <div className="lg:col-span-2 space-y-8">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700">Datos Personales</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
-                            <div><strong className="block text-gray-500">DNI:</strong> {empleado.dni}</div>
-                            <div><strong className="block text-gray-500">Email:</strong> {empleado.email}</div>
-                            <div><strong className="block text-gray-500">Teléfono:</strong> {empleado.telefono || '-'}</div>
-                            <div><strong className="block text-gray-500">Fecha de Nac.:</strong> {new Date(empleado.fecha_nacimiento).toLocaleDateString()}</div>
-                            <div><strong className="block text-gray-500">Género:</strong> {empleado.genero}</div>
-                            <div><strong className="block text-gray-500">Estado Civil:</strong> {empleado.estado_civil}</div>
+                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Datos Personales</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-900 dark:text-gray-100">
+                            <div><strong className="block text-gray-600 dark:text-gray-400">DNI:</strong> {empleado.dni}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Email:</strong> {empleado.email}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Teléfono:</strong> {empleado.telefono || '-'}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Fecha de Nac.:</strong> {new Date(empleado.fecha_nacimiento).toLocaleDateString()}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Género:</strong> {empleado.genero}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Estado Civil:</strong> {empleado.estado_civil}</div>
                         </div>
                     </div>
 
                     {empleado.legajo && (
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-                            <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700">Documentación del Legajo</h3>
+                            <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Documentación del Legajo</h3>
                             <ul className="divide-y dark:divide-gray-700 mt-4">
                                 {documentos.map(doc => (
                                     <li key={doc.id} className="flex items-center justify-between py-3">
                                         <div>
                                             {/* Nota: La API no devuelve el nombre del requisito, solo el ID. */}
-                                            <p className="text-sm font-medium">Documento Requisito ID: {doc.id_requisito}</p>
-                                            <p className="text-xs text-gray-500">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Documento Requisito ID: {doc.id_requisito}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
                                         </div>
                                         <div>
                                             {doc.ruta_archivo ? (
