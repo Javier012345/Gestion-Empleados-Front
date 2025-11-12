@@ -268,7 +268,7 @@ const CrearEmpleado = () => {
 
                     {currentStep === 1 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">1. Datos Personales</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">1. Datos Personales</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} />
                                 <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} />
@@ -299,7 +299,7 @@ const CrearEmpleado = () => {
 
                     {currentStep === 2 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">2. Datos de Contacto</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">2. Datos de Contacto</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} />
                                 <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} />
@@ -309,7 +309,7 @@ const CrearEmpleado = () => {
 
                     {currentStep === 3 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">3. Foto del Empleado</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">3. Foto del Empleado</h3>
                             <FormField label="Foto de perfil" name="ruta_foto" type="file" onChange={handleFileChange} error={errors.ruta_foto} accept="image/*" />
                             {formData.ruta_foto && <img src={URL.createObjectURL(formData.ruta_foto)} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
                         </div>
@@ -317,11 +317,11 @@ const CrearEmpleado = () => {
 
                     {currentStep === 4 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">4. Documentación Requerida</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">4. Documentación Requerida</h3>
                             <div className="space-y-3">
                                 {requisitos.map(req => (
                                     <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                        <p className="text-sm font-medium">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
                                         <input type="file" name={`documento_${req.id}`} onChange={handleFileChange} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"/>
                                     </div>
                                 ))}
