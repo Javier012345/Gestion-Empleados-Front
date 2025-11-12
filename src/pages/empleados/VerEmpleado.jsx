@@ -1,55 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileWarning } from 'lucide-react';
-
-// --- Mock Data ---
-const mockEmpleados = [
-    {
-        id: 1,
-        nombre: 'Ana',
-        apellido: 'García',
-        dni: '12345678A',
-        email: 'ana.garcia@example.com',
-        ruta_foto: 'https://i.pravatar.cc/150?u=ana',
-        estado: 'Activo',
-        telefono: '600112233',
-        fecha_nacimiento: '1990-08-15',
-        genero: 'Femenino',
-        estado_civil: 'Soltera',
-        user: { groups: [{ name: 'Admin' }] },
-        legajo_id: 1, // Simulate legajo existence
-    },
-    {
-        id: 2,
-        nombre: 'Luis',
-        apellido: 'Martinez',
-        dni: '87654321B',
-        email: 'luis.martinez@example.com',
-        ruta_foto: null,
-        estado: 'Inactivo',
-        telefono: '655443322',
-        fecha_nacimiento: '1985-04-20',
-        genero: 'Masculino',
-        estado_civil: 'Casado',
-        user: { groups: [{ name: 'Empleado' }] },
-        legajo_id: null,
-    },
-];
-
-const mockLegajos = [
-    {
-        id: 1,
-        empleado_id: 1,
-        documentos: [
-            { id: 1, id_requisito: { nombre_doc: 'DNI FRENTE' }, fecha_hora_subida: '2023-10-01T10:00:00Z', ruta_archivo: '#' },
-            { id: 2, id_requisito: { nombre_doc: 'DNI DORSO' }, fecha_hora_subida: '2023-10-01T10:01:00Z', ruta_archivo: null },
-        ]
-    }
-];
+import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileWarning, Loader } from 'lucide-react';
+import { getEmpleadoById } from '../../services/api';
 
 const getGroupColorClasses = (groupName) => {
     switch (groupName) {
-        case 'Admin': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+        case 'Administrador': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
         case 'Gerente': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
         default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
@@ -57,20 +13,51 @@ const getGroupColorClasses = (groupName) => {
 
 const VerEmpleado = () => {
     const { id } = useParams();
-    const empleado = mockEmpleados.find(e => e.id === parseInt(id));
+    const [empleado, setEmpleado] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchEmpleado = async () => {
+            try {
+                setLoading(true);
+                const response = await getEmpleadoById(id);
+                setEmpleado(response.data);
+                setError(null);
+            } catch (err) {
+                setError('No se pudo cargar la información del empleado. Por favor, intente de nuevo más tarde.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEmpleado();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center p-10">
+                <Loader className="animate-spin text-red-600" size={48} />
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div className="p-6 text-center text-red-500">{error}</div>;
+    }
 
     if (!empleado) {
         return <div className="p-6 text-center">Empleado no encontrado.</div>;
     }
 
-    const legajo = mockLegajos.find(l => l.empleado_id === empleado.id);
-    const documentos = legajo ? legajo.documentos : [];
+    const documentos = empleado.legajo ? empleado.legajo.documento_set : [];
 
     const statusColor = empleado.estado === 'Activo'
         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
 
-    const groupColor = empleado.user?.groups[0] ? getGroupColorClasses(empleado.user.groups[0].name) : '';
+    const groupColor = empleado.grupo ? getGroupColorClasses(empleado.grupo) : '';
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -93,9 +80,9 @@ const VerEmpleado = () => {
                             className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
                         />
                         <h2 className="text-2xl font-bold">{empleado.nombre} {empleado.apellido}</h2>
-                        {empleado.user?.groups[0] && 
+                        {empleado.grupo && 
                             <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${groupColor}`}>
-                                {empleado.user.groups[0].name}
+                                {empleado.grupo}
                             </span>
                         }
                         <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${statusColor}`}>{empleado.estado}</span>
@@ -146,14 +133,15 @@ const VerEmpleado = () => {
                         </div>
                     </div>
 
-                    {legajo && (
+                    {empleado.legajo && (
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
                             <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700">Documentación del Legajo</h3>
                             <ul className="divide-y dark:divide-gray-700 mt-4">
                                 {documentos.map(doc => (
                                     <li key={doc.id} className="flex items-center justify-between py-3">
                                         <div>
-                                            <p className="text-sm font-medium">{doc.id_requisito.nombre_doc}</p>
+                                            {/* Nota: La API no devuelve el nombre del requisito, solo el ID. */}
+                                            <p className="text-sm font-medium">Documento Requisito ID: {doc.id_requisito}</p>
                                             <p className="text-xs text-gray-500">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
                                         </div>
                                         <div>
@@ -175,4 +163,3 @@ const VerEmpleado = () => {
 };
 
 export default VerEmpleado;
-

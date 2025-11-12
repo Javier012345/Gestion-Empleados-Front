@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createEmpleado } from '../../services/api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getEmpleadoById, updateEmpleado } from '../../services/api';
 
-// --- Validation logic ---
+// --- Validation logic (same as CrearEmpleado) ---
 const validationRules = {
     nombre: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
@@ -25,7 +25,7 @@ const validationRules = {
         required: true,
     },
     email: {
-        regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        regex: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
         message: 'El formato del email no es válido.',
         required: true,
     },
@@ -50,8 +50,8 @@ const validateField = (name, value) => {
     return '';
 };
 
+// --- Reusable Components (Stepper and FormField, same as in CrearEmpleado) ---
 
-// Componente para el indicador de pasos (Stepper)
 const Stepper = ({ currentStep }) => {
     const steps = ['Datos Personales', 'Contacto', 'Foto', 'Documentación'];
 
@@ -74,7 +74,6 @@ const Stepper = ({ currentStep }) => {
     );
 };
 
-// Componente para un campo de formulario genérico
 const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error, children, accept }) => (
     <div>
         <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
@@ -103,12 +102,12 @@ const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error,
                 }
             />
         )}
-        {/* El mensaje de error de texto se ha eliminado según la solicitud */}
     </div>
 );
 
-const CrearEmpleado = () => {
+const EditarEmpleado = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         nombre: '', 
@@ -121,15 +120,46 @@ const CrearEmpleado = () => {
         estado: 'Activo',
         telefono: '', 
         email: '',
-        fecha_ingreso: new Date().toISOString().split('T')[0],
+        fecha_ingreso: '',
         ruta_foto: null,
         documentos: {},
     });
     const [errors, setErrors] = useState({});
+    const [photoPreview, setPhotoPreview] = useState(null);
 
     const [grupos, setGrupos] = useState([]);
     const [requisitos, setRequisitos] = useState([]);
+
     useEffect(() => {
+        const fetchEmpleado = async () => {
+            try {
+                const response = await getEmpleadoById(id);
+                const empleado = response.data;
+                setFormData({
+                    nombre: empleado.nombre || '',
+                    apellido: empleado.apellido || '',
+                    dni: empleado.dni || '',
+                    fecha_nacimiento: empleado.fecha_nacimiento || '',
+                    genero: empleado.genero || '',
+                    estado_civil: empleado.estado_civil || '',
+                    grupo_input: empleado.grupo || '',
+                    estado: empleado.estado || 'Activo',
+                    telefono: empleado.telefono || '',
+                    email: empleado.email || '',
+                    fecha_ingreso: empleado.fecha_ingreso || '',
+                    ruta_foto: null, // File inputs can't be pre-filled for security reasons
+                    documentos: {}, // Handled separately
+                });
+                if (empleado.ruta_foto) {
+                    setPhotoPreview(empleado.ruta_foto);
+                }
+            } catch (error) {
+                console.error('Error al obtener los datos del empleado:', error);
+                alert('No se pudieron cargar los datos del empleado.');
+            }
+        };
+
+        fetchEmpleado();
         setGrupos([ { id: 1, name: 'Administrador' }, { id: 2, name: 'Empleado' } ]);
         setRequisitos([
             { id: 1, nombre_doc: 'DNI (frente)', obligatorio: false },
@@ -145,7 +175,7 @@ const CrearEmpleado = () => {
             { id: 11, nombre_doc: 'Copia de la libreta de asignaciones familiares', obligatorio: false },
             { id: 12, nombre_doc: 'Títulos académicos o certificados de estudios', obligatorio: false },
         ]);
-    }, []);
+    }, [id]);
 
     const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
     const handlePrev = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -153,23 +183,18 @@ const CrearEmpleado = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // --- Lógica de filtrado de entrada ---
         if (name === 'nombre' || name === 'apellido') {
-            // Solo permite letras, acentos y espacios.
             if (!/^[a-zA-Z\s\u00C0-\u017F]*$/.test(value)) return;
         }
         if (name === 'dni') {
-            // Solo permite números y hasta 8 dígitos.
             if (!/^[0-9]*$/.test(value) || value.length > 8) return;
         }
         if (name === 'telefono') {
-            // Solo permite números y hasta 10 dígitos.
             if (!/^[0-9]*$/.test(value) || value.length > 10) return;
         }
 
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Si hay un error para este campo, lo limpia para que el borde rojo desaparezca mientras se escribe.
         if (errors[name]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -182,15 +207,14 @@ const CrearEmpleado = () => {
     const handleBlur = (e) => {
         const { name, value } = e.target;
         const error = validateField(name, value);
-        // Actualiza el estado de error solo para el campo que perdió el foco.
         setErrors(prev => ({ ...prev, [name]: error }));
     };
-
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         if (name === 'ruta_foto') {
             setFormData(prev => ({ ...prev, ruta_foto: files[0] }));
+            setPhotoPreview(URL.createObjectURL(files[0]));
         } else {
             setFormData(prev => ({ 
                 ...prev, 
@@ -202,7 +226,6 @@ const CrearEmpleado = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validación completa del formulario antes de enviarlo.
         const formErrors = {};
         let firstErrorStep = null;
 
@@ -222,11 +245,11 @@ const CrearEmpleado = () => {
 
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
-            // Si se encuentra un error, navega al primer paso que contiene un error.
             if (firstErrorStep) {
                 setCurrentStep(firstErrorStep);
             }
-            return; // Detiene el envío del formulario.
+            alert('Error al actualizar el empleado. Revisa los campos marcados en rojo.');
+            return;
         }
 
         const postData = new FormData();
@@ -236,27 +259,31 @@ const CrearEmpleado = () => {
                 Object.keys(formData.documentos).forEach(docKey => {
                     postData.append(docKey, formData.documentos[docKey]);
                 });
-            } else if (formData[key] !== null) {
+            } else if (formData[key] !== null && key !== 'ruta_foto') { // No agregar la foto vieja
                 postData.append(key, formData[key]);
             }
         });
 
+        // Solo adjunta la nueva foto si se seleccionó una
+        if (formData.ruta_foto instanceof File) {
+            postData.append('ruta_foto', formData.ruta_foto);
+        }
+
         try {
-            await createEmpleado(postData);
-            alert('Empleado creado con éxito.');
+            await updateEmpleado(id, postData);
+            alert('Empleado actualizado con éxito.');
             navigate('/empleados');
         } catch (error) {
-            console.error('Error al crear el empleado:', error.response?.data || error.message);
+            console.error('Error al actualizar el empleado:', error.response?.data || error.message);
             if (error.response && error.response.data) {
-                // Mapea los errores del backend al estado de errores del frontend.
                 const backendErrors = error.response.data;
                 const newErrors = { ...errors };
                 for (const key in backendErrors) {
-                    newErrors[key] = backendErrors[key][0]; // Toma el primer mensaje de error.
+                    newErrors[key] = backendErrors[key][0];
                 }
                 setErrors(newErrors);
             }
-            alert('Error al crear el empleado. Revisa los campos marcados en rojo.');
+            alert('Error al actualizar el empleado. Revisa los campos marcados en rojo.');
         }
     };
 
@@ -264,6 +291,7 @@ const CrearEmpleado = () => {
         <div className="p-4 sm:p-6">
             <form onSubmit={handleSubmit} noValidate encType="multipart/form-data">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm max-w-4xl mx-auto">
+                    <h2 className="text-xl font-bold mb-4 text-center">Editar Empleado</h2>
                     <Stepper currentStep={currentStep} />
 
                     {currentStep === 1 && (
@@ -311,7 +339,7 @@ const CrearEmpleado = () => {
                         <div>
                             <h3 className="text-lg font-semibold mb-4">3. Foto del Empleado</h3>
                             <FormField label="Foto de perfil" name="ruta_foto" type="file" onChange={handleFileChange} error={errors.ruta_foto} accept="image/*" />
-                            {formData.ruta_foto && <img src={URL.createObjectURL(formData.ruta_foto)} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
+                            {photoPreview && <img src={photoPreview} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
                         </div>
                     )}
 
@@ -334,12 +362,11 @@ const CrearEmpleado = () => {
                         <div>
                             <button type="button" onClick={() => navigate('/empleados')} className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">Cancelar</button>
                             
-                            {/* Lógica de botones corregida */}
                             <button type="button" onClick={handleNext} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? 'hidden' : ''}`}>
                                 Siguiente
                             </button>
                             <button type="submit" className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? '' : 'hidden'}`}>
-                                Finalizar
+                                Guardar Cambios
                             </button>
                         </div>
                     </div>
@@ -349,4 +376,4 @@ const CrearEmpleado = () => {
     );
 };
 
-export default CrearEmpleado;
+export default EditarEmpleado;
