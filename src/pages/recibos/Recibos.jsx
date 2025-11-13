@@ -1,38 +1,35 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Upload, User, Filter, FileText, Image, Edit, X } from 'lucide-react';
+import { Search, Upload, User, FileText, Image, Edit, X } from 'lucide-react';
+import { getRecibosByDni, getEmpleadoById, createRecibo, getEmpleados, updateRecibo } from '../../services/api';
 
-// --- Mock Data ---
-const mockEmpleados = {
-    "12345678": {
-        nombre: "Juan",
-        apellido: "Perez",
-        recibos: [
-            { id: 1, fecha_emision: "2023-10-15", periodo: "2023-09", ruta_pdf: "/recibos/juan_perez_09_2023.pdf", ruta_imagen: null },
-            { id: 2, fecha_emision: "2023-09-15", periodo: "2023-08", ruta_pdf: "/recibos/juan_perez_08_2023.pdf", ruta_imagen: "/recibos/juan_perez_08_2023.jpg" },
-        ]
-    },
-    "87654321": {
-        nombre: "Maria",
-        apellido: "Gomez",
-        recibos: [
-            { id: 3, fecha_emision: "2023-10-15", periodo: "2023-09", ruta_pdf: "/recibos/maria_gomez_09_2023.pdf", ruta_imagen: null },
-        ]
-    }
-};
 
 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 // --- Sub-componente: Modal de Carga ---
-const UploadReciboModal = ({ isOpen, onClose, employeeDNI }) => {
+const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
     const [formData, setFormData] = useState({
-        dni: employeeDNI || '',
+        id_empl: '',
         fecha_emision: '',
         periodo: '',
         ruta_pdf: null,
         ruta_imagen: null
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadError, setUploadError] = useState('');
 
+    useEffect(() => {
+        if (isOpen) {
+            setFormData({
+                id_empl: '',
+                fecha_emision: '',
+                periodo: '',
+                ruta_pdf: null,
+                ruta_imagen: null
+            });
+            setUploadError('');
+        }
+    }, [isOpen]);
     // Mover la condición después de los hooks
     if (!isOpen) return null;
 
@@ -46,11 +43,35 @@ const UploadReciboModal = ({ isOpen, onClose, employeeDNI }) => {
         setFormData(prev => ({ ...prev, [name]: files[0] }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Aquí iría la lógica para subir los datos y el archivo a la API
-        console.log("Datos a enviar:", formData);
-        onClose(); // Cerrar modal después de enviar
+        if (!formData.id_empl) {
+            setUploadError("Por favor, selecciona un empleado.");
+            return;
+        }
+        setIsSubmitting(true);
+        setUploadError('');
+
+        const data = new FormData();
+        data.append('id_empl', formData.id_empl);
+        data.append('fecha_emision', formData.fecha_emision);
+        data.append('periodo', formData.periodo);
+        if (formData.ruta_pdf) {
+            data.append('ruta_pdf', formData.ruta_pdf);
+        }
+        if (formData.ruta_imagen) {
+            data.append('ruta_imagen', formData.ruta_imagen);
+        }
+
+        try {
+            await createRecibo(data);
+            onUploadSuccess();
+        } catch (error) {
+            setUploadError('Error al subir el recibo. Inténtalo de nuevo.');
+            console.error("Error creating receipt:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -62,9 +83,20 @@ const UploadReciboModal = ({ isOpen, onClose, employeeDNI }) => {
                 </div>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
-                        <label htmlFor="dni" className="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI del Empleado</label>
-                        <input type="text" name="dni" id="dni" value={formData.dni} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                        <label htmlFor="id_empl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empleado</label>
+                        <select
+                            name="id_empl"
+                            id="id_empl"
+                            value={formData.id_empl}
+                            onChange={handleInputChange}
+                            required
+                            className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        >
+                            <option value="">Selecciona un empleado</option>
+                            {empleados.map(emp => (
+                                <option key={emp.id} value={emp.id}>{emp.nombre} {emp.apellido} (DNI: {emp.dni})</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label htmlFor="fecha_emision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
@@ -87,9 +119,118 @@ const UploadReciboModal = ({ isOpen, onClose, employeeDNI }) => {
                                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">Cancelar</button>
-                        <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Guardar Recibo</button>
+                        <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Cancelar</button>
+                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-400">
+                            {isSubmitting ? 'Guardando...' : 'Guardar Recibo'}
+                        </button>
                     </div>
+                    {uploadError && <p className="text-sm text-red-500 text-right mt-2">{uploadError}</p>}
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// --- Sub-componente: Modal de Edición ---
+const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
+    const [formData, setFormData] = useState({});
+    const [originalData, setOriginalData] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+
+    useEffect(() => {
+        if (isOpen && recibo) {
+            const data = {
+                fecha_emision: recibo.fecha_emision,
+                periodo: recibo.periodo,
+                ruta_pdf: null, // Se manejan por separado
+                ruta_imagen: null,
+            };
+            setFormData(data);
+            setOriginalData(data);
+            setUploadError('');
+        }
+    }, [isOpen, recibo]);
+
+    if (!isOpen || !recibo) return null;
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+        setFormData(prev => ({ ...prev, [name]: files[0] }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setUploadError('');
+
+        const data = new FormData();
+        let hasChanges = false;
+
+        // Compara y añade solo los campos modificados
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== originalData[key]) {
+                if (formData[key] !== null) { // No enviar archivos si no se seleccionó uno nuevo
+                    data.append(key, formData[key]);
+                    hasChanges = true;
+                }
+            }
+        });
+
+        if (!hasChanges) {
+            setUploadError("No se ha realizado ningún cambio.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            await updateRecibo(recibo.id, data);
+            onUpdateSuccess();
+        } catch (error) {
+            setUploadError('Error al actualizar el recibo. Inténtalo de nuevo.');
+            console.error("Error updating receipt:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 m-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-xl font-semibold">Editar Recibo</h2>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><X size={20} /></button>
+                </div>
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                    {/* Los campos son similares al modal de carga, pero sin el selector de empleado */}
+                    <div>
+                        <label htmlFor="fecha_emision_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
+                        <input type="date" name="fecha_emision" id="fecha_emision_edit" value={formData.fecha_emision || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                    </div>
+                    <div>
+                        <label htmlFor="periodo_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
+                        <input type="text" name="periodo" id="periodo_edit" placeholder="2023-10" value={formData.periodo || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                    </div>
+                    <div>
+                        <label htmlFor="ruta_pdf_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar PDF</label>
+                        <input type="file" name="ruta_pdf" id="ruta_pdf_edit" onChange={handleFileChange} accept=".pdf" className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"/>
+                    </div>
+                    <div>
+                        <label htmlFor="ruta_imagen_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar Imagen</label>
+                        <input type="file" name="ruta_imagen" id="ruta_imagen_edit" onChange={handleFileChange} accept="image/*" className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    </div>
+                    <div className="pt-4 flex justify-end gap-3">
+                        <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Cancelar</button>
+                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-400">
+                            {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                        </button>
+                    </div>
+                    {uploadError && <p className="text-sm text-red-500 text-right mt-2">{uploadError}</p>}
                 </form>
             </div>
         </div>
@@ -106,32 +247,81 @@ const Recibos = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isUploadModalOpen, setUploadModalOpen] = useState(false);
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
+    const [reciboToEdit, setReciboToEdit] = useState(null);
+    const [allEmpleados, setAllEmpleados] = useState([]);
 
     const [filters, setFilters] = useState({ mes: '', anio: '' });
     const [availableYears, setAvailableYears] = useState([]);
 
-    const handleSearch = () => {
+    useEffect(() => {
+        const fetchAllEmpleados = async () => {
+            try {
+                const response = await getEmpleados();
+                setAllEmpleados(response.data);
+            } catch (error) {
+                console.error("Error fetching employees list:", error);
+            }
+        };
+        fetchAllEmpleados();
+    }, []);
+
+    const handleUploadSuccess = () => {
+        setUploadModalOpen(false);
+        if (searchedDni) handleSearch(searchedDni);
+    };
+
+    const handleUpdateSuccess = () => {
+        setEditModalOpen(false);
+        setReciboToEdit(null);
+        if (searchedDni) handleSearch();
+    };
+
+    const handleOpenEditModal = (recibo) => {
+        setReciboToEdit(recibo);
+        setEditModalOpen(true);
+    };
+
+    const handleSearch = async () => {
+        if (!dni) {
+            setError('Por favor, ingresa un DNI para buscar.');
+            return;
+        }
         setIsLoading(true);
         setError('');
         setEmpleado(null);
         setRecibos([]);
+        setFilteredRecibos([]);
+        setSearchedDni(dni);
 
-        // Simular llamada a la API
-        setTimeout(() => {
-            const foundEmpleado = mockEmpleados[dni];
-            if (foundEmpleado) {
-                setEmpleado({ nombre: foundEmpleado.nombre, apellido: foundEmpleado.apellido });
-                setRecibos(foundEmpleado.recibos);
-                setFilteredRecibos(foundEmpleado.recibos);
-                const years = [...new Set(foundEmpleado.recibos.map(r => new Date(r.fecha_emision).getFullYear()))];
+        try {
+            const recibosResponse = await getRecibosByDni(dni);
+            const recibosData = recibosResponse.data;
+
+            if (recibosData && recibosData.length > 0) {
+                const employeeId = recibosData[0].id_empl;
+                const empleadoResponse = await getEmpleadoById(employeeId);
+                const empleadoData = empleadoResponse.data;
+
+                setEmpleado({ nombre: empleadoData.nombre, apellido: empleadoData.apellido });
+                setRecibos(recibosData);
+                setFilteredRecibos(recibosData);
+                const years = [...new Set(recibosData.map(r => new Date(r.fecha_emision).getFullYear()))];
                 setAvailableYears(years.sort((a, b) => b - a));
                 setFilters({ mes: '', anio: years[0] || '' });
             } else {
-                setError('No se encontró ningún empleado con el DNI proporcionado.');
+                setError('No se encontraron recibos para el DNI proporcionado.');
             }
-            setSearchedDni(dni);
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setError('No se encontró ningún empleado con el DNI proporcionado.');
+            } else {
+                setError('Ocurrió un error al buscar los recibos. Inténtalo de nuevo.');
+                console.error("Error fetching receipts:", error);
+            }
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
     
     useEffect(() => {
@@ -211,7 +401,7 @@ const Recibos = () => {
                         </div>
                     </div>
                     {/* Lista de Recibos */}
-                    <RecibosList recibos={filteredRecibos} />
+                    <RecibosList recibos={filteredRecibos} onEdit={handleOpenEditModal} />
                 </div>
             )}
 
@@ -228,9 +418,17 @@ const Recibos = () => {
             )}
 
             <UploadReciboModal 
-                isOpen={isUploadModalOpen} 
-                onClose={() => setUploadModalOpen(false)} 
-                employeeDNI={searchedDni} 
+                isOpen={isUploadModalOpen}
+                onClose={() => setUploadModalOpen(false)}
+                empleados={allEmpleados}
+                onUploadSuccess={handleUploadSuccess}
+            />
+
+            <EditReciboModal
+                isOpen={isEditModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                recibo={reciboToEdit}
+                onUpdateSuccess={handleUpdateSuccess}
             />
         </>
     );
@@ -238,7 +436,7 @@ const Recibos = () => {
 
 
 // --- Sub-componente: Lista de Recibos ---
-const RecibosList = ({ recibos }) => {
+const RecibosList = ({ recibos, onEdit }) => {
     if (recibos.length === 0) {
         return <div className="text-center py-10 px-6"><p className="text-gray-500">No se encontraron recibos para los filtros seleccionados.</p></div>;
     }
@@ -278,7 +476,7 @@ const RecibosList = ({ recibos }) => {
                                 </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <button className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-200">
+                                <button onClick={() => onEdit(recibo)} className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-200">
                                     <Edit className="w-4 h-4" />
                                     <span>Editar</span>
                                 </button>

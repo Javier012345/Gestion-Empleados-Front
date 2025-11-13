@@ -63,4 +63,48 @@ export const updateEmpleado = (id, empleadoData) => {
     });
 };
 
+export const getRecibosByDni = (dni) => {
+    return apiClient.get(`recibos/por-dni/${dni}/`);
+};
+
+export const getEmpleadoByDni = (dni) => {
+    return apiClient.get(`empleados/por-dni/${dni}/`);
+};
+
+export const createRecibo = (reciboData) => {
+    return apiClient.post('recibos/', reciboData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const updateRecibo = (id, reciboData) => {
+    return apiClient.patch(`recibos/${id}/`, reciboData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const createHorario = (horarioData) => {
+    return apiClient.post('horarios/', horarioData);
+};
+
+export const getHorarios = () => {
+    return apiClient.get('horarios/');
+};
+
+export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
+    const data = {
+        empleado_ids: empleadoIds
+    };
+    return apiClient.post(`horarios/${horarioId}/sincronizar-empleados/`, data);
+};
+
+export const getHistorialAsignacionesDetallado = () => {
+    return apiClient.get('historial-asignaciones/');
+};
+
+
 export default apiClient;

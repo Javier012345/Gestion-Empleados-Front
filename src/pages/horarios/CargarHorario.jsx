@@ -1,8 +1,39 @@
 import React, { useState } from 'react';
-import { Clock, Settings } from 'lucide-react';
+import { Clock, Settings, CheckCircle, AlertTriangle } from 'lucide-react';
+import { createHorario } from '../../services/api';
+
+const plantillas = {
+    manana: {
+        nombre: 'Turno Mañana',
+        hora_entrada: '09:00:00',
+        hora_salida: '13:00:00',
+        lunes: true,
+        martes: true,
+        miercoles: true,
+        jueves: true,
+        viernes: true,
+        sabado: false,
+        domingo: false,
+    },
+    tarde: {
+        nombre: 'Turno Tarde',
+        hora_entrada: '14:00:00',
+        hora_salida: '18:00:00',
+        lunes: true,
+        martes: true,
+        miercoles: true,
+        jueves: true,
+        viernes: true,
+        sabado: false,
+        domingo: false,
+    }
+};
 
 const CargarHorario = () => {
     const [activeTab, setActiveTab] = useState('preset');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     return (
         <div>
@@ -27,71 +58,187 @@ const CargarHorario = () => {
                 </nav>
             </div>
 
-            {activeTab === 'preset' && (
-                <div className="max-w-md mx-auto">
-                    <div className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/10 dark:to-red-900/20 p-4 rounded-lg mb-6">
-                        <h3 className="text-lg font-semibold mb-2 text-red-800 dark:text-red-200">Crear Horario desde Plantilla</h3>
-                        <p className="text-sm text-red-600 dark:text-red-300">Crea rápidamente los turnos comunes de mañana o tarde.</p>
-                    </div>
-                    <form className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Turno</label>
-                            <select className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white">
-                                <option>Turno Mañana</option>
-                                <option>Turno Tarde</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad de Personal Requerida</label>
-                            <input type="number" className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
-                        </div>
-                        <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-4">Crear Horario</button>
-                    </form>
+            {success && (
+                <div className="mb-4 flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-900/20 p-4 text-sm text-green-700 dark:text-green-300">
+                    <CheckCircle className="h-5 w-5" />
+                    <p>{success}</p>
+                </div>
+            )}
+            {error && (
+                <div className="mb-4 flex items-center gap-3 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-700 dark:text-red-300">
+                    <AlertTriangle className="h-5 w-5" />
+                    <p>{error}</p>
                 </div>
             )}
 
+            {activeTab === 'preset' && (
+                <PresetForm isSubmitting={isSubmitting} setIsSubmitting={setIsSubmitting} setError={setError} setSuccess={setSuccess} />
+            )}
+
             {activeTab === 'custom' && (
-                <div className="max-w-2xl mx-auto">
-                     <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/10 dark:to-blue-900/20 p-4 rounded-lg mb-6">
-                        <h3 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-200">Crear Horario Personalizado</h3>
-                        <p className="text-sm text-blue-600 dark:text-blue-300">Define un horario con horas y días específicos.</p>
-                    </div>
-                    <form className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-                            <input type="text" className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora Entrada</label>
-                                <input type="time" className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora Salida</label>
-                                <input type="time" className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Días de la semana</label>
-                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-                                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map(day => (
-                                    <label key={day} className="flex items-center justify-center gap-2 p-3 border rounded-lg dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 has-[:checked]:bg-red-50 has-[:checked]:border-red-300 dark:has-[:checked]:bg-red-900/20 dark:has-[:checked]:border-red-700">
-                                        <input type="checkbox" className="form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
-                                        <span className="font-medium text-gray-900 dark:text-white">{day}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad de Personal Requerida</label>
-                            <input type="number" className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
-                        </div>
-                        <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Guardar Horario Personalizado</button>
-                    </form>
-                </div>
+                <CustomForm isSubmitting={isSubmitting} setIsSubmitting={setIsSubmitting} setError={setError} setSuccess={setSuccess} />
             )}
         </div>
     );
 };
 
+const PresetForm = ({ isSubmitting, setIsSubmitting, setError, setSuccess }) => {
+    const [selected, setSelected] = useState('manana');
+    const [cantidad, setCantidad] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!cantidad) {
+            setError("Por favor, ingresa la cantidad de personal requerida.");
+            return;
+        }
+        setIsSubmitting(true);
+        setError('');
+        setSuccess('');
+
+        const dataToSend = {
+            ...plantillas[selected],
+            cantidad_personal_requerida: parseInt(cantidad, 10)
+        };
+
+        try {
+            await createHorario(dataToSend);
+            setSuccess(`El horario "${dataToSend.nombre}" ha sido creado exitosamente.`);
+            setCantidad('');
+        } catch (error) {
+            setError("Error al crear el horario. Inténtalo de nuevo.");
+            console.error("Error creating preset schedule:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const current = plantillas[selected];
+
+    return (
+        <div className="max-w-md mx-auto">
+            <div className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/10 dark:to-red-900/20 p-4 rounded-lg mb-6">
+                <h3 className="text-lg font-semibold mb-2 text-red-800 dark:text-red-200">Crear Horario desde Plantilla</h3>
+                <p className="text-sm text-red-600 dark:text-red-300">Crea rápidamente los turnos comunes de mañana o tarde.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Turno</label>
+                    <select value={selected} onChange={(e) => setSelected(e.target.value)} className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white">
+                        <option value="manana">Turno Mañana</option>
+                        <option value="tarde">Turno Tarde</option>
+                    </select>
+                </div>
+
+                <div className="space-y-3 p-4 border rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30">
+                    <p className="text-sm"><span className="font-semibold">Horario:</span> {current.hora_entrada.slice(0,5)} - {current.hora_salida.slice(0,5)}</p>
+                    <p className="text-sm"><span className="font-semibold">Días:</span> Lunes a Viernes</p>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad de Personal Requerida</label>
+                    <input type="number" value={cantidad} onChange={(e) => setCantidad(e.target.value)} required className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                </div>
+                <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-4 disabled:bg-red-400">
+                    {isSubmitting ? 'Creando...' : 'Crear Horario'}
+                </button>
+            </form>
+        </div>
+    );
+};
+
+const CustomForm = ({ isSubmitting, setIsSubmitting, setError, setSuccess }) => {
+    const initialState = {
+        nombre: '',
+        hora_entrada: '',
+        hora_salida: '',
+        lunes: false,
+        martes: false,
+        miercoles: false,
+        jueves: false,
+        viernes: false,
+        sabado: false,
+        domingo: false,
+        cantidad_personal_requerida: ''
+    };
+    const [formData, setFormData] = useState(initialState);
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError('');
+        setSuccess('');
+
+        const dataToSend = {
+            ...formData,
+            cantidad_personal_requerida: parseInt(formData.cantidad_personal_requerida, 10),
+            hora_entrada: `${formData.hora_entrada}:00`,
+            hora_salida: `${formData.hora_salida}:00`,
+        };
+
+        try {
+            await createHorario(dataToSend);
+            setSuccess(`El horario "${dataToSend.nombre}" ha sido creado exitosamente.`);
+            setFormData(initialState); // Reset form
+        } catch (error) {
+            setError("Error al crear el horario. Verifica los datos e inténtalo de nuevo.");
+            console.error("Error creating custom schedule:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="max-w-2xl mx-auto">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/10 dark:to-blue-900/20 p-4 rounded-lg mb-6">
+                <h3 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-200">Crear Horario Personalizado</h3>
+                <p className="text-sm text-blue-600 dark:text-blue-300">Define un horario con horas y días específicos.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Horario</label>
+                    <input type="text" name="nombre" value={formData.nombre} onChange={handleInputChange} required className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora Entrada</label>
+                        <input type="time" name="hora_entrada" value={formData.hora_entrada} onChange={handleInputChange} required className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora Salida</label>
+                        <input type="time" name="hora_salida" value={formData.hora_salida} onChange={handleInputChange} required className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Días de la semana</label>
+                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                        {Object.keys(plantillas.manana).filter(k => typeof plantillas.manana[k] === 'boolean').map(day => (
+                            <label key={day} className="flex items-center justify-center gap-2 p-3 border rounded-lg dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 has-[:checked]:bg-red-50 has-[:checked]:border-red-300 dark:has-[:checked]:bg-red-900/20 dark:has-[:checked]:border-red-700">
+                                <input type="checkbox" name={day} checked={formData[day]} onChange={handleInputChange} className="form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
+                                <span className="font-medium text-gray-900 dark:text-white capitalize">{day}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad de Personal Requerida</label>
+                    <input type="number" name="cantidad_personal_requerida" value={formData.cantidad_personal_requerida} onChange={handleInputChange} required className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                </div>
+                <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-400">
+                    {isSubmitting ? 'Guardando...' : 'Guardar Horario Personalizado'}
+                </button>
+            </form>
+        </div>
+    );
+};
+
 export default CargarHorario;
+                      
