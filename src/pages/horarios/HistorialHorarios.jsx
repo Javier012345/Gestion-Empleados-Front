@@ -1,13 +1,49 @@
-import React from 'react';
-import { Filter, User, Search, ToggleLeft, Calendar, RotateCcw, Activity, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Filter, User, Search, ToggleLeft, Calendar, RotateCcw, Activity, Clock, Loader, AlertTriangle } from 'lucide-react';
+import { getHistorialAsignaciones, getEmpleados, getHorarios } from '../../services/api';
 
 const HistorialHorarios = () => {
-    const historial = [
-        { id: 1, empleado: 'Juan Perez', horario: 'Turno Mañana', fecha: '01/10/2025', estado: 'Activo' },
-        { id: 2, empleado: 'Maria Gomez', horario: 'Turno Mañana', fecha: '01/10/2025', estado: 'Activo' },
-        { id: 3, empleado: 'Carlos Lopez', horario: 'Turno Tarde', fecha: '01/10/2025', estado: 'Activo' },
-        { id: 4, empleado: 'Ana Martinez', horario: 'Turno Mañana', fecha: '15/09/2025', estado: 'Inactivo' },
-    ];
+    const [historial, setHistorial] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                setError('');
+                
+                const [historialRes, empleadosRes, horariosRes] = await Promise.all([
+                    getHistorialAsignaciones(),
+                    getEmpleados(),
+                    getHorarios()
+                ]);
+
+                const empleadosMap = new Map(empleadosRes.data.map(e => [e.id, `${e.nombre} ${e.apellido}`]));
+                const horariosMap = new Map(horariosRes.data.map(h => [h.id, h.nombre]));
+
+                const historialEnriquecido = historialRes.data.map(item => ({
+                    ...item,
+                    empleado: empleadosMap.get(item.id_empleado) || 'Empleado no encontrado',
+                    horario: horariosMap.get(item.id_horario) || 'Horario no encontrado',
+                }));
+
+                setHistorial(historialEnriquecido);
+
+            } catch (err) {
+                setError('Error al cargar el historial. Inténtalo de nuevo.');
+                console.error("Error fetching history:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('es-AR', { timeZone: 'UTC' });
+    };
 
     return (
         <div className="space-y-6">
@@ -95,6 +131,14 @@ const HistorialHorarios = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {isLoading && (
+                    <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando historial...</div>
+                )}
+                {error && (
+                    <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>
+                )}
+
+                {!isLoading && !error && (
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700/50">
@@ -129,11 +173,10 @@ const HistorialHorarios = () => {
                             {historial.map(item => (
                                 <tr key={item.id}>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{item.empleado}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{item.horario}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{item.fecha}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                            {item.estado}
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'}`}>
+                                            {item.estado ? 'Activo' : 'Inactivo'}
                                         </span>
                                     </td>
                                 </tr>
@@ -141,6 +184,7 @@ const HistorialHorarios = () => {
                         </tbody>
                     </table>
                 </div>
+                )}
             </div>
         </div>
     );
