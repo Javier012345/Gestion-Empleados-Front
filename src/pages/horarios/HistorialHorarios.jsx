@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, User, Search, ToggleLeft, Calendar, RotateCcw, Activity, Clock, Loader, AlertTriangle } from 'lucide-react';
-import { getHistorialAsignaciones, getEmpleados, getHorarios } from '../../services/api';
+import { getHistorialAsignacionesDetallado } from '../../services/api';
 
 const HistorialHorarios = () => {
     const [historial, setHistorial] = useState([]);
@@ -12,23 +12,15 @@ const HistorialHorarios = () => {
             try {
                 setIsLoading(true);
                 setError('');
-                
-                const [historialRes, empleadosRes, horariosRes] = await Promise.all([
-                    getHistorialAsignaciones(),
-                    getEmpleados(),
-                    getHorarios()
-                ]);
 
-                const empleadosMap = new Map(empleadosRes.data.map(e => [e.id, `${e.nombre} ${e.apellido}`]));
-                const horariosMap = new Map(horariosRes.data.map(h => [h.id, h.nombre]));
+                const response = await getHistorialAsignacionesDetallado();
 
-                const historialEnriquecido = historialRes.data.map(item => ({
+                const historialProcesado = response.data.map(item => ({
                     ...item,
-                    empleado: empleadosMap.get(item.id_empleado) || 'Empleado no encontrado',
-                    horario: horariosMap.get(item.id_horario) || 'Horario no encontrado',
+                    empleado: `${item.id_empl.nombre} ${item.id_empl.apellido}`,
+                    horario: item.id_horario.nombre,
                 }));
-
-                setHistorial(historialEnriquecido);
+                setHistorial(historialProcesado);
 
             } catch (err) {
                 setError('Error al cargar el historial. Inténtalo de nuevo.');

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
-import { getHorarios, getEmpleados, updateHorarioAsignacion } from '../../services/api';
+import { getHorarios, getEmpleados, sincronizarEmpleadosHorario } from '../../services/api';
 
 const AsignarHorario = () => {
     const [selectedScheduleId, setSelectedScheduleId] = useState('');
@@ -72,13 +72,11 @@ const AsignarHorario = () => {
         setError('');
         setSuccess('');
 
-        const dataToSend = {
-            id_horario: parseInt(selectedScheduleId, 10),
-            empleado_ids: assignedEmployees.map(e => e.id)
-        };
+        const horarioId = parseInt(selectedScheduleId, 10);
+        const empleadoIds = assignedEmployees.map(e => e.id);
 
         try {
-            await updateHorarioAsignacion(dataToSend);
+            await sincronizarEmpleadosHorario(horarioId, empleadoIds);
             setSuccess('Asignación guardada correctamente.');
             // Opcional: Recargar los datos para reflejar el estado guardado
             const updatedHorarios = await getHorarios();

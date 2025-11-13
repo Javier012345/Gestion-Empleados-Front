@@ -95,12 +95,15 @@ export const getHorarios = () => {
     return apiClient.get('horarios/');
 };
 
-export const updateHorarioAsignacion = (asignacionData) => {
-    return apiClient.post('asignacion-horario/', asignacionData);
+export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
+    const data = {
+        empleado_ids: empleadoIds
+    };
+    return apiClient.post(`horarios/${horarioId}/sincronizar-empleados/`, data);
 };
 
-export const getHistorialAsignaciones = () => {
-    return apiClient.get('asignacion-horario/');
+export const getHistorialAsignacionesDetallado = () => {
+    return apiClient.get('historial-asignaciones/');
 };
 
 
