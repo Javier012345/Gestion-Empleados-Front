@@ -84,7 +84,7 @@ const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error,
                 value: value, 
                 onChange: onChange, 
                 onBlur: onBlur,
-                className: `mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm ${error ? 'border-red-500' : 'focus:border-red-500 focus:ring-red-500'}`
+                className: `mt-1 block w-full rounded-md border-2 border-gray-400 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm ${error ? 'border-red-500' : 'focus:border-red-500 focus:ring-red-500'}`
             })
         ) : (
             <input 
@@ -98,7 +98,7 @@ const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error,
                 className={
                     `${type === 'file' 
                     ? 'mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600'
-                    : `mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-indigo-500 focus:ring-indigo-500'}`}`
+                    : `mt-1 block w-full rounded-md border-2 border-gray-400 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-indigo-500 focus:ring-indigo-500'}`}`
                 }
             />
         )}
@@ -295,12 +295,12 @@ const EditarEmpleado = () => {
         <div className="p-4 sm:p-6">
             <form onSubmit={handleSubmit} noValidate encType="multipart/form-data">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm max-w-4xl mx-auto">
-                    <h2 className="text-xl font-bold mb-4 text-center">Editar Empleado</h2>
+                    <h2 className="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Editar Empleado</h2>
                     <Stepper currentStep={currentStep} />
 
                     {currentStep === 1 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">1. Datos Personales</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">1. Datos Personales</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} />
                                 <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} />
@@ -331,7 +331,7 @@ const EditarEmpleado = () => {
 
                     {currentStep === 2 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">2. Datos de Contacto</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">2. Datos de Contacto</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} />
                                 <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} />
@@ -341,7 +341,7 @@ const EditarEmpleado = () => {
 
                     {currentStep === 3 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">3. Foto del Empleado</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">3. Foto del Empleado</h3>
                             <FormField label="Cambiar foto de perfil" name="ruta_foto" type="file" onChange={handleFileChange} error={errors.ruta_foto} accept="image/*" />
                             {photoPreview && <img src={photoPreview} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
                         </div>
@@ -349,11 +349,11 @@ const EditarEmpleado = () => {
 
                     {currentStep === 4 && (
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">4. Documentación Requerida</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">4. Documentación Requerida</h3>
                             <div className="space-y-3">
                                 {requisitos.map(req => (
                                     <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                        <p className="text-sm font-medium">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
                                         <div className="flex items-center gap-4">
                                             {existingDocuments[`documento_${req.id}`] && (
                                                 <a href={`http://localhost:8000${existingDocuments[`documento_${req.id}`]}`} target="_blank" rel="noopener noreferrer" className="text-sm text-red-600 hover:underline">
@@ -369,7 +369,7 @@ const EditarEmpleado = () => {
                     )}
 
                     <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-between items-center">
-                        <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Anterior</button>
+                        <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Anterior</button>
                         <div>
                             <button type="button" onClick={() => navigate('/empleados')} className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">Cancelar</button>
                             

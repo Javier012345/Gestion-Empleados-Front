@@ -74,13 +74,13 @@ const VerEmpleado = () => {
                 {/* Columna Izquierda */}
                 <div className="lg:col-span-1 space-y-8">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm text-center">
-                        <img 
+                        <img
                             src={empleado.ruta_foto || '/images/default-user.jpg'}
                             alt={`Foto de ${empleado.nombre}`}
                             className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
                         />
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</h2>
-                        {empleado.grupo && 
+                        {empleado.grupo &&
                             <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${groupColor}`}>
                                 {empleado.grupo}
                             </span>
@@ -89,30 +89,30 @@ const VerEmpleado = () => {
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Gestión del Empleado</h3>
+                        <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-white">Gestión del Empleado</h3>
                         <div className="mt-4 space-y-2">
-                            <Link to={`/empleados/editar/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Editar Datos Personales</span>
+                            <Link to={`/empleados/editar/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Editar Datos Personales</span>
                                 <UserCog size={20} className="text-gray-500" />
                             </Link>
-                            <Link to={`/asistencia/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Ver Asistencias</span>
+                            <Link to={`/asistencia/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Ver Asistencias</span>
                                 <CalendarCheck size={20} className="text-gray-500" />
                             </Link>
-                            <Link to={`/sanciones/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Administrar Sanciones</span>
+                            <Link to={`/sanciones/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Administrar Sanciones</span>
                                 <ShieldAlert size={20} className="text-gray-500" />
                             </Link>
-                            <Link to={`/horarios/ver-empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Administrar Horarios</span>
+                            <Link to={`/horarios/ver-empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Administrar Horarios</span>
                                 <Clock size={20} className="text-gray-500" />
                             </Link>
-                            <Link to={`/recibos/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Ver Recibos de Sueldo</span>
+                            <Link to={`/recibos/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Ver Recibos de Sueldo</span>
                                 <Receipt size={20} className="text-gray-500" />
                             </Link>
-                            <Link to={`/incidentes/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <span className="font-medium">Ver Incidentes</span>
+                            <Link to={`/incidentes/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                                <span className="font-medium ">Ver Incidentes</span>
                                 <FileWarning size={20} className="text-gray-500" />
                             </Link>
                         </div>
