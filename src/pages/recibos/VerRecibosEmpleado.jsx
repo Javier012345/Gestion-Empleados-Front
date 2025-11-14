@@ -59,15 +59,15 @@ const VerRecibosEmpleado = () => {
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
             <div className="p-6">
-                <h2 className="text-xl font-bold">Recibos de Sueldo</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recibos de Sueldo</h2>
             </div>
             {/* Filtros */}
-            <div className="p-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50">
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
                 <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-end gap-4">
                     <div className="w-32">
                         <label htmlFor="mes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Mes</label>
                         <select name="mes" id="mes" value={selectedFilters.mes} onChange={handleFilterChange}
-                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
+                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
                             <option value="">Todos</option>
                             {meses.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                         </select>
@@ -75,7 +75,7 @@ const VerRecibosEmpleado = () => {
                     <div className="w-28">
                         <label htmlFor="anio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Año</label>
                         <select name="anio" id="anio" value={selectedFilters.anio} onChange={handleFilterChange}
-                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
+                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
                             {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
                     </div>
@@ -106,14 +106,14 @@ const VerRecibosEmpleado = () => {
                                     <div className="flex items-center gap-3">
                                         {recibo.ruta_pdf && (
                                             <a href={recibo.ruta_pdf} target="_blank" rel="noreferrer"
-                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/30">
+                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/30 dark:text-red-300 dark:hover:text-red-200">
                                                 <FileText className="w-4 h-4" />
                                                 <span>PDF</span>
                                             </a>
                                         )}
                                         {recibo.ruta_imagen && (
                                             <a href={recibo.ruta_imagen} target="_blank" rel="noreferrer"
-                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 dark:text-blue-300 dark:hover:text-blue-200">
                                                 <Image className="w-4 h-4" />
                                                 <span>Imagen</span>
                                             </a>
@@ -130,7 +130,7 @@ const VerRecibosEmpleado = () => {
                                                 <Receipt className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                                             </div>
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">No se encontraron recibos</h3>
-                                            <p className="text-sm text-gray-500">Este empleado no tiene recibos cargados.</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Este empleado no tiene recibos cargados.</p>
                                         </div>
                                     </div>
                                 </td>

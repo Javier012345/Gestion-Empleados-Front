@@ -78,8 +78,8 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 m-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold">Cargar Nuevo Recibo</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><X size={20} /></button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Cargar Nuevo Recibo</h2>
+                    <button onClick={onClose} className="p-1 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><X size={20} /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
@@ -90,7 +90,7 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
                             value={formData.id_empl}
                             onChange={handleInputChange}
                             required
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-red-500 focus:ring-red-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500"
                         >
                             <option value="">Selecciona un empleado</option>
                             {empleados.map(emp => (
@@ -101,22 +101,22 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
                     <div>
                         <label htmlFor="fecha_emision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
                         <input type="date" name="fecha_emision" id="fecha_emision" value={formData.fecha_emision} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="periodo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
                         <input type="text" name="periodo" id="periodo" placeholder="2023-10" value={formData.periodo} onChange={handleInputChange} required
-                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                               className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="ruta_pdf" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivo PDF</label>
                         <input type="file" name="ruta_pdf" id="ruta_pdf" onChange={handleFileChange} accept=".pdf"
-                               className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"/>
+                               className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/40 file:text-red-700 dark:file:text-red-300 hover:file:bg-red-100 dark:hover:file:bg-red-900/60"/>
                     </div>
                      <div>
                         <label htmlFor="ruta_imagen" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivo de Imagen</label>
                         <input type="file" name="ruta_imagen" id="ruta_imagen" onChange={handleFileChange} accept="image/*"
-                               className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                               className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/40 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/60"/>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
                         <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Cancelar</button>
@@ -203,26 +203,26 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 m-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold">Editar Recibo</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><X size={20} /></button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Editar Recibo</h2>
+                    <button onClick={onClose} className="p-1 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><X size={20} /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     {/* Los campos son similares al modal de carga, pero sin el selector de empleado */}
                     <div>
                         <label htmlFor="fecha_emision_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
-                        <input type="date" name="fecha_emision" id="fecha_emision_edit" value={formData.fecha_emision || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                        <input type="date" name="fecha_emision" id="fecha_emision_edit" value={formData.fecha_emision || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="periodo_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
-                        <input type="text" name="periodo" id="periodo_edit" placeholder="2023-10" value={formData.periodo || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm" />
+                        <input type="text" name="periodo" id="periodo_edit" placeholder="2023-10" value={formData.periodo || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="ruta_pdf_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar PDF</label>
-                        <input type="file" name="ruta_pdf" id="ruta_pdf_edit" onChange={handleFileChange} accept=".pdf" className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"/>
+                        <input type="file" name="ruta_pdf" id="ruta_pdf_edit" onChange={handleFileChange} accept=".pdf" className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/40 file:text-red-700 dark:file:text-red-300 hover:file:bg-red-100 dark:hover:file:bg-red-900/60"/>
                     </div>
                     <div>
                         <label htmlFor="ruta_imagen_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar Imagen</label>
-                        <input type="file" name="ruta_imagen" id="ruta_imagen_edit" onChange={handleFileChange} accept="image/*" className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                        <input type="file" name="ruta_imagen" id="ruta_imagen_edit" onChange={handleFileChange} accept="image/*" className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/40 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/60"/>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
                         <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Cancelar</button>
@@ -352,14 +352,14 @@ const Recibos = () => {
                             value={dni}
                             onChange={(e) => setDni(e.target.value.replace(/[^0-9]/g, ''))}
                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="block w-full pl-10 pr-12 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
+                            className="block w-full pl-10 pr-12 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <User className="w-5 h-5 text-gray-400" />
+                            <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                         </div>
                         <button 
                             onClick={handleSearch}
-                            className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-500 transition-colors duration-200"
+                            className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
                         >
                             <Search className="w-5 h-5" />
                         </button>
@@ -372,21 +372,21 @@ const Recibos = () => {
             </div>
 
             {/* Contenedor de resultados */}
-            {isLoading && <div className="text-center p-8">Buscando...</div>}
+            {isLoading && <div className="text-center p-8 text-gray-600 dark:text-gray-300">Buscando...</div>}
             {error && <div className="text-center p-8 text-red-500">{error}</div>}
             
             {!isLoading && !error && empleado && (
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-bold">Resultados para {empleado.nombre} {empleado.apellido}</h2>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Resultados para {empleado.nombre} {empleado.apellido}</h2>
                     </div>
                     {/* Filtros */}
-                    <div className="p-4 bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
                         <div className="flex flex-wrap items-end gap-4">
                             <div className="w-32">
                                 <label htmlFor="mes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mes</label>
                                 <select name="mes" id="mes" value={filters.mes} onChange={(e) => setFilters({...filters, mes: e.target.value})}
-                                    className="mt-1 block w-full pl-3 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                                    className="mt-1 block w-full pl-3 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                                     <option value="">Todos</option>
                                     {meses.map((m, i) => <option key={i} value={i+1}>{m}</option>)}
                                 </select>
@@ -394,7 +394,7 @@ const Recibos = () => {
                             <div className="w-28">
                                 <label htmlFor="anio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Año</label>
                                 <select name="anio" id="anio" value={filters.anio} onChange={(e) => setFilters({...filters, anio: e.target.value})}
-                                    className="mt-1 block w-full pl-3 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                                    className="mt-1 block w-full pl-3 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                                     {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
                                 </select>
                             </div>
@@ -412,7 +412,7 @@ const Recibos = () => {
                             <Search className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                         </div>
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Buscar recibos de sueldo</h3>
-                        <p className="text-sm text-gray-500">Ingresa un DNI para ver los recibos de un empleado.</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Ingresa un DNI para ver los recibos de un empleado.</p>
                     </div>
                 </div>
             )}
@@ -438,7 +438,7 @@ const Recibos = () => {
 // --- Sub-componente: Lista de Recibos ---
 const RecibosList = ({ recibos, onEdit }) => {
     if (recibos.length === 0) {
-        return <div className="text-center py-10 px-6"><p className="text-gray-500">No se encontraron recibos para los filtros seleccionados.</p></div>;
+        return <div className="text-center py-10 px-6"><p className="text-gray-500 dark:text-gray-400">No se encontraron recibos para los filtros seleccionados.</p></div>;
     }
 
     return (
@@ -462,13 +462,13 @@ const RecibosList = ({ recibos, onEdit }) => {
                             <td className="px-6 py-4">
                                 <div className="flex flex-wrap gap-2">
                                     {recibo.ruta_pdf && (
-                                        <a href={recibo.ruta_pdf} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/30">
+                                        <a href={recibo.ruta_pdf} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/30 dark:text-red-300 dark:hover:text-red-200">
                                             <FileText className="w-4 h-4" />
                                             <span>PDF</span>
                                         </a>
                                     )}
                                     {recibo.ruta_imagen && (
-                                        <a href={recibo.ruta_imagen} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                                        <a href={recibo.ruta_imagen} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 dark:text-blue-300 dark:hover:text-blue-200">
                                             <Image className="w-4 h-4" />
                                             <span>Imagen</span>
                                         </a>
