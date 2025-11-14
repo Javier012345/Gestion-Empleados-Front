@@ -93,27 +93,27 @@ const VerEmpleado = () => {
                         <div className="mt-4 space-y-2">
                             <Link to={`/empleados/editar/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Editar Datos Personales</span>
-                                <UserCog size={20} className="text-gray-500" />
+                                <UserCog size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                             <Link to={`/asistencia/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Ver Asistencias</span>
-                                <CalendarCheck size={20} className="text-gray-500" />
+                                <CalendarCheck size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                             <Link to={`/sanciones/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Administrar Sanciones</span>
-                                <ShieldAlert size={20} className="text-gray-500" />
+                                <ShieldAlert size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                             <Link to={`/horarios/ver-empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Administrar Horarios</span>
-                                <Clock size={20} className="text-gray-500" />
+                                <Clock size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                             <Link to={`/recibos/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Ver Recibos de Sueldo</span>
-                                <Receipt size={20} className="text-gray-500" />
+                                <Receipt size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                             <Link to={`/incidentes/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Ver Incidentes</span>
-                                <FileWarning size={20} className="text-gray-500" />
+                                <FileWarning size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
                         </div>
                     </div>
