@@ -39,6 +39,10 @@ apiClient.interceptors.request.use(
     }
 );
 
+export const getEmpleadosBasico = () => {
+    return apiClient.get('empleados-basico/');
+};
+
 export const getEmpleados = () => {
     return apiClient.get('empleados/');
 };
@@ -104,6 +108,26 @@ export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
 
 export const getHistorialAsignacionesDetallado = () => {
     return apiClient.get('historial-asignaciones/');
+};
+
+export const getIncidentesAgrupados = () => {
+    return apiClient.get('incidentes-agrupados/');
+};
+
+export const getIncidenteAgrupadoPorId = (id) => {
+    return apiClient.get(`incidentes-agrupados/${id}/`);
+};
+
+export const getTiposIncidente = () => {
+    return apiClient.get('incidentes/');
+};
+
+export const createIncidenteEmpleado = (incidenteData) => {
+    return apiClient.post('incidente-empleado/', incidenteData);
+};
+
+export const corregirIncidente = (id, incidenteData) => {
+    return apiClient.post(`incidentes-agrupados/${id}/corregir/`, incidenteData);
 };
 
 
