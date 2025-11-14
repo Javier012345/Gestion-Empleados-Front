@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Upload, User, FileText, Image, Edit, X } from 'lucide-react';
-import { getRecibosByDni, getEmpleadoById, createRecibo, getEmpleados, updateRecibo } from '../../services/api';
+import { getRecibosByDni, getEmpleadoById, createRecibo, getEmpleadosBasico, updateRecibo } from '../../services/api';
 
 
 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -257,7 +257,7 @@ const Recibos = () => {
     useEffect(() => {
         const fetchAllEmpleados = async () => {
             try {
-                const response = await getEmpleados();
+                const response = await getEmpleadosBasico();
                 setAllEmpleados(response.data);
             } catch (error) {
                 console.error("Error fetching employees list:", error);

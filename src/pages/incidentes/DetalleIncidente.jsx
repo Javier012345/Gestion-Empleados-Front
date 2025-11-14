@@ -1,33 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, History, Pencil, Printer, User, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus } from 'lucide-react';
+import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle } from 'lucide-react';
+import { getIncidenteAgrupadoPorId } from '../../services/api';
 
 const DetalleIncidente = () => {
     const { id } = useParams();
+    const [incidente, setIncidente] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-    // Dummy data
-    const incidente = {
-        id: id,
-        tipo_incid: 'Ausencia Injustificada',
-        fecha_incidente: '25/10/2025',
-        descripcion_incid: 'El empleado no se presentó a trabajar sin previo aviso.',
-        involucrados: [
-            { id_empl: { nombre: 'Juan', apellido: 'Perez', dni: '12345678' }, estado: 'ABIERTO', ya_sancionado: false },
-            { id_empl: { nombre: 'Maria', apellido: 'Gomez', dni: '87654321' }, estado: 'CERRADO', ya_sancionado: true },
-        ],
-        descargos: [
-            {
-                empleado: { nombre: 'Juan', apellido: 'Perez' },
-                descargo: { fecha_descargo: '26/10/2025', contenido_descargo: 'Tuve una emergencia familiar y no pude avisar.', ruta_archivo_descargo: null }
+    useEffect(() => {
+        const fetchIncidente = async () => {
+            try {
+                setIsLoading(true);
+                const response = await getIncidenteAgrupadoPorId(id);
+                setIncidente(response.data);
+            } catch (err) {
+                setError('No se pudo cargar el detalle del incidente. Inténtalo de nuevo más tarde.');
+                console.error("Error fetching incident details:", err);
+            } finally {
+                setIsLoading(false);
             }
-        ],
-        resolucion: null, // { descripcion: 'Se aplica amonestación verbal.', fecha_resolucion: '27/10/2025' },
-        corrected_incident_id: null,
-    };
+        };
+        fetchIncidente();
+    }, [id]);
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando detalle del incidente...</div>;
+    }
+
+    if (error) {
+        return <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>;
+    }
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -39,46 +47,42 @@ const DetalleIncidente = () => {
                 <div className="flex justify-between items-start">
                     <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Detalle del Incidente</h2>
                     <div className="flex items-center gap-2">
-                        {incidente.corrected_incident_id && (
-                            <Link to={`/incidentes/${incidente.corrected_incident_id}`} className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-emerald-700 text-sm">
+                        {incidente?.grupo_anterior && (
+                            <Link to={`/incidentes/${incidente?.grupo_anterior}`} className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-emerald-700 text-sm">
                                 <History size={16} /> Ver Incidente Original
                             </Link>
                         )}
-                        {!incidente.resolucion && (
-                            <Link to={`/incidentes/corregir/${incidente.id}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700">
+                        {!incidente?.resolucion && (
+                            <Link to={`/incidentes/corregir/${incidente?.grupo_incidente}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700">
                                 <Pencil size={16} />Corregir
                             </Link>
                         )}
-                        <a href={`/incidentes/pdf/${incidente.id}`} target="_blank" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
+                        <a href={`/incidentes/pdf/${incidente?.grupo_incidente}`} target="_blank" rel="noopener noreferrer" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
                             <Printer size={16} /> Imprimir
                         </a>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <div><h4 className="text-sm font-semibold text-gray-500">Nombre del Incidente</h4><p className="text-gray-900 dark:text-white">{incidente.tipo_incid}</p></div>
-                    <div><h4 className="text-sm font-semibold text-gray-500">Fecha</h4><p className="text-gray-900 dark:text-white">{incidente.fecha_incidente}</p></div>
-                    <div><h4 className="text-sm font-semibold text-gray-500">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente.descripcion_incid}</p></div>
+                    <div><h4 className="text-sm font-semibold text-gray-500">Nombre del Incidente</h4><p className="text-gray-900 dark:text-white">{incidente?.incidente.tipo_incid}</p></div>
+                    <div><h4 className="text-sm font-semibold text-gray-500">Fecha</h4><p className="text-gray-900 dark:text-white">{new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</p></div>
+                    <div><h4 className="text-sm font-semibold text-gray-500">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente?.descripcion}</p></div>
                     
                     <div>
                         <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
                         <div className="space-y-2">
-                            {incidente.involucrados.map((involucrado, index) => (
+                            {incidente?.empleados_involucrados.map((involucrado, index) => (
                                 <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
                                     <div className="flex items-center gap-3">
                                         <div>
-                                            <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.id_empl.nombre} {involucrado.id_empl.apellido}</p>
-                                            <p className="text-xs text-gray-500">DNI: {involucrado.id_empl.dni}</p>
+                                            <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.nombre} {involucrado.apellido}</p>
+                                            <p className="text-xs text-gray-500">DNI: {involucrado.dni}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        {involucrado.ya_sancionado ? (
-                                            <span className="text-xs font-semibold text-green-600 bg-green-100 dark:text-green-200 dark:bg-green-900 px-2 py-1 rounded-full">Sancionado</span>
-                                        ) : involucrado.estado === 'CERRADO' ? (
-                                            <span className="text-xs font-semibold text-red-600 bg-red-100 dark:text-red-200 dark:bg-red-900 px-2 py-1 rounded-full">Cerrado</span>
-                                        ) : (
-                                            <span className="text-xs font-semibold text-yellow-600 bg-yellow-100 dark:text-yellow-200 dark:bg-yellow-900 px-2 py-1 rounded-full">Pendiente</span>
-                                        )}
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
+                                            {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
+                                        </span>
                                     </div>
                                 </div>
                             ))}
@@ -93,25 +97,25 @@ const DetalleIncidente = () => {
                             <FilePlus size={12} className="text-blue-800 dark:text-blue-300" />
                         </span>
                         <h3 className="flex items-center mb-1 text-md font-semibold text-gray-900 dark:text-white">Incidente Reportado</h3>
-                        <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Reportado el {incidente.fecha_incidente}</time>
+                        <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Reportado el {new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</time>
                     </li>
 
-                    {incidente.descargos.length > 0 ? (
+                    {incidente?.descargos_del_grupo.length > 0 ? (
                         <li className="mb-6 ml-6">
                             <span className="absolute flex items-center justify-center w-6 h-6 bg-cyan-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-cyan-900">
                                 <MessageSquare size={12} className="text-cyan-800 dark:text-cyan-300" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-900 dark:text-white">Descargos Recibidos</h3>
-                            {incidente.descargos.map((item, index) => (
+                            {incidente.descargos_del_grupo.map((item, index) => (
                                 <div key={index} className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                     <div className="flex items-center gap-2 mb-2">
                                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.empleado.nombre} {item.empleado.apellido}</p>
-                                        <time className="text-xs text-gray-400 dark:text-gray-500 ml-auto">{item.descargo.fecha_descargo}</time>
+                                        <time className="text-xs text-gray-400 dark:text-gray-500 ml-auto">{new Date(item.descargo.fecha_descargo).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</time>
                                     </div>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 italic">"{item.descargo.contenido_descargo}"</p>
                                     {item.descargo.ruta_archivo_descargo && (
                                         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                            <a href={item.descargo.ruta_archivo_descargo} className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
+                                            <a href={item.descargo.ruta_archivo_descargo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
                                                 <Paperclip size={12} /><span>Archivo Adjunto</span>
                                             </a>
                                         </div>
@@ -129,14 +133,14 @@ const DetalleIncidente = () => {
                         </li>
                     )}
 
-                    {incidente.resolucion ? (
+                    {incidente?.resolucion ? (
                         <li className="ml-6">
                             <span className="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-green-900">
                                 <Gavel size={12} className="text-green-800 dark:text-green-300" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-900 dark:text-white">Incidente Resuelto</h3>
-                            <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Resuelto el {incidente.resolucion.fecha_resolucion}</time>
-                            <p className="text-sm font-normal text-gray-500 dark:text-gray-400">{incidente.resolucion.descripcion}</p>
+                            <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Resuelto el {new Date(incidente.resolucion.fecha_resolucion).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</time>
+                            <p className="text-sm font-normal text-gray-500 dark:text-gray-400">{incidente.resolucion.descripcion_resolucion}</p>
                         </li>
                     ) : (
                         <li className="ml-6">
@@ -148,7 +152,7 @@ const DetalleIncidente = () => {
                     )}
                 </ol>
 
-                {!incidente.resolucion && (
+                {!incidente?.resolucion && (
                     <div id="incident-actions-container" className="mt-8 pt-6 border-t dark:border-gray-700">
                         <div className="flex justify-end">
                             <button onClick={handleOpenModal} className="bg-red-600 text-white px-6 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700">

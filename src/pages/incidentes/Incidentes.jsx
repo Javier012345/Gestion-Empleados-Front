@@ -1,30 +1,28 @@
-import React from 'react';
-import { Plus, Filter, RotateCw, User, ChevronLeft, ChevronRight, SearchX, AlertTriangle, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Filter, RotateCw, ArrowRight, Loader, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getIncidentesAgrupados } from '../../services/api';
 
 const Incidentes = () => {
-    const incidentes = [
-        {
-            id: 1,
-            tipo_incid: 'Ausencia Injustificada',
-            descripcion_incid: 'El empleado no se presentó a trabajar sin previo aviso.',
-            estado: 'ABIERTO',
-            involucrados: [
-                { id: 1, nombre: 'Juan', apellido: 'Perez', iniciales: 'JP', ruta_foto: null }
-            ],
-            fecha_ocurrencia: '25/10/2025'
-        },
-        {
-            id: 2,
-            tipo_incid: 'Retraso Crónico',
-            descripcion_incid: 'El empleado ha llegado tarde varias veces en la última semana.',
-            estado: 'CERRADO',
-            involucrados: [
-                { id: 2, nombre: 'Maria', apellido: 'Gomez', iniciales: 'MG', ruta_foto: null }
-            ],
-            fecha_ocurrencia: '20/10/2025'
-        },
-    ];
+    const [incidentes, setIncidentes] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchIncidentes = async () => {
+            try {
+                setIsLoading(true);
+                const response = await getIncidentesAgrupados();
+                setIncidentes(response.data);
+            } catch (err) {
+                setError('No se pudieron cargar los incidentes. Inténtalo de nuevo más tarde.');
+                console.error("Error fetching incidents:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchIncidentes();
+    }, []);
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -82,34 +80,41 @@ const Incidentes = () => {
                 </div>
             </form>
 
-            {incidentes.length > 0 ? (
+            {isLoading && (
+                <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando incidentes...</div>
+            )}
+            {error && (
+                <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>
+            )}
+
+            {!isLoading && !error && incidentes.length > 0 ? (
                 <div id="incidentesGrid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {incidentes.map(incidente => (
-                        <div key={incidente.id} className="incidente-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 flex flex-col border dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <div key={incidente.grupo_incidente} className="incidente-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 flex flex-col border dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                             <div className="flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{incidente.tipo_incid}</h3>
+                                    <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{incidente.incidente.tipo_incid}</h3>
                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
                                         {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 h-10 overflow-hidden">{incidente.descripcion_incid}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 h-10 overflow-hidden">{incidente.descripcion}</p>
                             </div>
                             <div className="border-t dark:border-gray-700 pt-4">
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Involucrados:</span>
                                         <div className="flex -space-x-2 mt-2">
-                                            {incidente.involucrados.map(empleado => (
+                                            {incidente.empleados_involucrados.map(empleado => (
                                                 <span key={empleado.id} className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800 bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-xs" title={`${empleado.nombre} ${empleado.apellido}`}>
-                                                    {empleado.iniciales}
+                                                    {`${empleado.nombre[0]}${empleado.apellido[0]}`}
                                                 </span>
                                             ))}
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{incidente.fecha_ocurrencia}</span>
-                                        <Link to={`/incidentes/${incidente.id}`} className="block mt-2 text-sm font-semibold text-red-600 hover:text-red-800 dark:hover:text-red-400">Ver Detalle <ArrowRight className="inline-block h-4 w-4" /></Link>
+                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{new Date(incidente.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</span>
+                                        <Link to={`/incidentes/${incidente.grupo_incidente}`} className="block mt-2 text-sm font-semibold text-red-600 hover:text-red-800 dark:hover:text-red-400">Ver Detalle <ArrowRight className="inline-block h-4 w-4" /></Link>
                                     </div>
                                 </div>
                             </div>
@@ -117,7 +122,7 @@ const Incidentes = () => {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                !isLoading && !error && <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                     <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No hay incidentes</h3>
                     <p className="mt-1 text-sm text-gray-500">No se encontraron incidentes con los filtros aplicados. Puedes <Link to="/incidentes/registrar" className="text-red-500 hover:underline">registrar uno nuevo</Link> o <Link to="/incidentes" className="text-red-500 hover:underline">limpiar los filtros</Link>.</p>
