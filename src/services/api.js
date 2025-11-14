@@ -67,6 +67,10 @@ export const updateEmpleado = (id, empleadoData) => {
     });
 };
 
+export const deleteEmpleado = (id) => {
+    return apiClient.delete(`empleados/${id}/`);
+};
+
 export const getRecibosByDni = (dni) => {
     return apiClient.get(`recibos/por-dni/${dni}/`);
 };
@@ -128,6 +132,10 @@ export const createIncidenteEmpleado = (incidenteData) => {
 
 export const corregirIncidente = (id, incidenteData) => {
     return apiClient.post(`incidentes-agrupados/${id}/corregir/`, incidenteData);
+};
+
+export const createResolucion = (resolucionData) => {
+    return apiClient.post('resoluciones/', resolucionData);
 };
 
 

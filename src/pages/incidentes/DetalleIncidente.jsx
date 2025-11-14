@@ -1,33 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle } from 'lucide-react';
-import { getIncidenteAgrupadoPorId } from '../../services/api';
+import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
+import { getIncidenteAgrupadoPorId, createResolucion } from '../../services/api';
 
 const DetalleIncidente = () => {
     const { id } = useParams();
     const [incidente, setIncidente] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
-        const fetchIncidente = async () => {
-            try {
-                setIsLoading(true);
-                const response = await getIncidenteAgrupadoPorId(id);
-                setIncidente(response.data);
-            } catch (err) {
-                setError('No se pudo cargar el detalle del incidente. Inténtalo de nuevo más tarde.');
-                console.error("Error fetching incident details:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchIncidente();
+    // State for resolution modal
+    const [showModal, setShowModal] = useState(false);
+    const [resolucionDescripcion, setResolucionDescripcion] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [resolutionError, setResolutionError] = useState('');
+    const [resolutionSuccess, setResolutionSuccess] = useState('');
+
+    const fetchIncidente = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const response = await getIncidenteAgrupadoPorId(id);
+            setIncidente(response.data);
+            setError('');
+        } catch (err) {
+            setError('No se pudo cargar el detalle del incidente. Inténtalo de nuevo más tarde.');
+            console.error("Error fetching incident details:", err);
+        } finally {
+            setIsLoading(false);
+        }
     }, [id]);
 
+    useEffect(() => {
+        fetchIncidente();
+    }, [fetchIncidente]);
+
     const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setResolucionDescripcion('');
+        setResolutionError('');
+        setResolutionSuccess('');
+    };
+
+    const postResolution = async (descripcion) => {
+        const body = {
+            grupo_incidente: incidente?.grupo_incidente,
+            descripcion: descripcion,
+        };
+        await createResolucion(body);
+    };
 
     if (isLoading) {
         return <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando detalle del incidente...</div>;
@@ -36,6 +57,55 @@ const DetalleIncidente = () => {
     if (error) {
         return <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>;
     }
+
+    const handleResolutionSubmit = async (e) => {
+        e.preventDefault();
+        setResolutionError('');
+        setResolutionSuccess('');
+    
+        if (!resolucionDescripcion.trim()) {
+            setResolutionError('La descripción de la resolución es obligatoria.');
+            return;
+        }
+    
+        setIsSubmitting(true);
+        try {
+            await postResolution(resolucionDescripcion);
+            setResolutionSuccess('Resolución guardada con éxito. El incidente ha sido cerrado.');
+            await fetchIncidente();
+            setTimeout(handleCloseModal, 2000);
+        } catch (err) {
+            setResolutionError('Error al guardar la resolución. Inténtalo de nuevo.');
+            console.error("Error creating resolution:", err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleCerrarIncidente = async (e) => {
+        e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+        setResolutionError('');
+        setResolutionSuccess('');
+
+        if (!resolucionDescripcion.trim()) {
+            setResolutionError('La descripción es obligatoria para cerrar el incidente.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            // Usar la descripción del textarea
+            await postResolution(resolucionDescripcion);
+            setResolutionSuccess('El incidente ha sido cerrado con éxito.');
+            await fetchIncidente();
+            setTimeout(handleCloseModal, 2000);
+        } catch (err) {
+            setResolutionError('Error al cerrar el incidente. Inténtalo de nuevo.');
+            console.error("Error closing incident:", err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -170,14 +240,24 @@ const DetalleIncidente = () => {
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registrar Resolución de Incidente</h2>
                                 <button onClick={handleCloseModal} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"><X size={24} /></button>
                             </div>
-                            <form className="mt-6 space-y-4">
+
+                            {resolutionSuccess && <div className="mt-4 flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-900/20 p-4 text-sm text-green-700 dark:text-green-300"><CheckCircle className="h-5 w-5" /><p>{resolutionSuccess}</p></div>}
+                            {resolutionError && <div className="mt-4 flex items-center gap-3 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-700 dark:text-red-300"><AlertTriangle className="h-5 w-5" /><p>{resolutionError}</p></div>}
+
+                            <form onSubmit={handleResolutionSubmit} className="mt-6 space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción de la Resolución</label>
-                                    <textarea rows="4" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white"></textarea>
+                                    <textarea 
+                                        rows="4" 
+                                        value={resolucionDescripcion}
+                                        onChange={(e) => setResolucionDescripcion(e.target.value)}
+                                        required
+                                        className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white focus:border-red-500 focus:ring-red-500"
+                                    ></textarea>
                                 </div>
                                 <div className="pt-4 flex flex-col sm:flex-row justify-end gap-3">
-                                    <button type="button" onClick={handleCloseModal} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">Solo Cerrar Incidente</button>
-                                    <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"><ShieldPlus size={16} />Guardar y Aplicar Sanción</button>
+                                    <button type="button" onClick={handleCerrarIncidente} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Cerrar Incidente</button>
+                                    <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 disabled:bg-red-400"><ShieldPlus size={16} />{isSubmitting ? 'Guardando...' : 'Guardar y Sancionar'}</button>
                                 </div>
                             </form>
                         </div>
