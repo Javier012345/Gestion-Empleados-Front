@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
 import { getIncidenteAgrupadoPorId, createResolucion } from '../../services/api';
+import AplicarSancionIncidente from './AplicarSancionIncidente';
 
 const DetalleIncidente = () => {
     const { id } = useParams();
@@ -15,6 +16,10 @@ const DetalleIncidente = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [resolutionError, setResolutionError] = useState('');
     const [resolutionSuccess, setResolutionSuccess] = useState('');
+
+    // State for sanction form
+    const [showSancionForm, setShowSancionForm] = useState(false);
+    const [localResolucion, setLocalResolucion] = useState(null);
 
     const fetchIncidente = useCallback(async () => {
         try {
@@ -58,28 +63,21 @@ const DetalleIncidente = () => {
         return <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>;
     }
 
-    const handleResolutionSubmit = async (e) => {
+    const handleResolutionSubmit = (e) => {
         e.preventDefault();
         setResolutionError('');
-        setResolutionSuccess('');
     
         if (!resolucionDescripcion.trim()) {
             setResolutionError('La descripción de la resolución es obligatoria.');
             return;
         }
     
-        setIsSubmitting(true);
-        try {
-            await postResolution(resolucionDescripcion);
-            setResolutionSuccess('Resolución guardada con éxito. El incidente ha sido cerrado.');
-            await fetchIncidente();
-            setTimeout(handleCloseModal, 2000);
-        } catch (err) {
-            setResolutionError('Error al guardar la resolución. Inténtalo de nuevo.');
-            console.error("Error creating resolution:", err);
-        } finally {
-            setIsSubmitting(false);
-        }
+        setLocalResolucion({
+            descripcion: resolucionDescripcion,
+        });
+        
+        setShowSancionForm(true);
+        handleCloseModal();
     };
 
     const handleCerrarIncidente = async (e) => {
@@ -106,6 +104,10 @@ const DetalleIncidente = () => {
             setIsSubmitting(false);
         }
     };
+
+    if (showSancionForm) {
+        return <AplicarSancionIncidente incidente={incidente} resolucion={localResolucion} onVolver={() => setShowSancionForm(false)} />;
+    }
 
     return (
         <div className="max-w-2xl mx-auto">

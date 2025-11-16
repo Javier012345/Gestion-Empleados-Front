@@ -138,5 +138,21 @@ export const createResolucion = (resolucionData) => {
     return apiClient.post('resoluciones/', resolucionData);
 };
 
+export const getTiposSancion = () => {
+    return apiClient.get('sanciones/');
+};
+
+export const aplicarSancionEmpleado = (sancionData) => {
+    return apiClient.post('sanciones-empleados/', sancionData);
+};
+
+export const getSancionesEmpleados = () => {
+    return apiClient.get('sanciones-empleados/');
+};
+
+export const getSancionById = (id) => {
+    return apiClient.get(`sanciones-empleados/${id}/`);
+};
+
 
 export default apiClient;
