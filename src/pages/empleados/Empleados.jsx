@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users, AlertCircle, Loader } from 'lucide-react';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import { getEmpleados } from '../../services/api'; // Importar la función de la API
+import { getEmpleados, deleteEmpleado } from '../../services/api'; // Importar la función de la API
 
 const estado_choices = [
     ['Activo', 'Activo'],
@@ -135,11 +135,22 @@ const Empleados = () => {
         setSelectedEmployee(null);
     };
 
-    const handleConfirmDelete = () => {
-        // Aquí iría la lógica para eliminar el empleado a través de la API
-        console.log('Eliminando empleado:', selectedEmployee.id);
-        setEmpleados(empleados.filter(e => e.id !== selectedEmployee.id));
-        handleCloseModal();
+    const handleConfirmDelete = async () => {
+        if (!selectedEmployee) return;
+
+        try {
+            await deleteEmpleado(selectedEmployee.id);
+            // Actualizar el estado del empleado en la lista a 'Inactivo'
+            setEmpleados(empleados.map(e => 
+                e.id === selectedEmployee.id ? { ...e, estado: 'Inactivo' } : e
+            ));
+            handleCloseModal();
+        } catch (err) {
+            // Aquí podrías mostrar una notificación de error al usuario
+            console.error('Error al inactivar el empleado:', err);
+            alert('No se pudo inactivar al empleado. Intente de nuevo.');
+            handleCloseModal();
+        }
     };
 
     const filteredEmpleados = empleados.filter(empleado => {
@@ -297,6 +308,9 @@ const Empleados = () => {
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
                 employeeName={selectedEmployee ? `${selectedEmployee.nombre} ${selectedEmployee.apellido}` : ''}
+                title="Confirmar Inactivación"
+                message="¿Estás seguro de que quieres cambiar el estado de este empleado a 'Inactivo'? Esta acción se puede revertir editando el perfil del empleado."
+                confirmText="Sí, inactivar"
             />
         </div>
     );

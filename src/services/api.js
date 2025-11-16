@@ -67,6 +67,10 @@ export const updateEmpleado = (id, empleadoData) => {
     });
 };
 
+export const deleteEmpleado = (id) => {
+    return apiClient.delete(`empleados/${id}/`);
+};
+
 export const getRecibosByDni = (dni) => {
     return apiClient.get(`recibos/por-dni/${dni}/`);
 };
@@ -128,6 +132,26 @@ export const createIncidenteEmpleado = (incidenteData) => {
 
 export const corregirIncidente = (id, incidenteData) => {
     return apiClient.post(`incidentes-agrupados/${id}/corregir/`, incidenteData);
+};
+
+export const createResolucion = (resolucionData) => {
+    return apiClient.post('resoluciones/', resolucionData);
+};
+
+export const getTiposSancion = () => {
+    return apiClient.get('sanciones/');
+};
+
+export const aplicarSancionEmpleado = (sancionData) => {
+    return apiClient.post('sanciones-empleados/', sancionData);
+};
+
+export const getSancionesEmpleados = () => {
+    return apiClient.get('sanciones-empleados/');
+};
+
+export const getSancionById = (id) => {
+    return apiClient.get(`sanciones-empleados/${id}/`);
 };
 
 
