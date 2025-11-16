@@ -90,20 +90,21 @@ const AsignarHorario = () => {
     };
 
     return (
+        <div className="p-4 sm:p-6 md:p-8 bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100">
         <form onSubmit={handleSubmit}>
             <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Asignar Empleados a un Horario</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Selecciona un horario y arrastra los empleados para asignarlos.</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Asignar Empleados a un Horario</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Selecciona un horario y arrastra los empleados para asignarlos.</p>
             </div>
 
             {success && (
-                <div className="mb-4 flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-900/20 p-4 text-sm text-green-700 dark:text-green-300">
+                <div className="mb-4 flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-900/20 p-4 text-sm text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700">
                     <CheckCircle className="h-5 w-5" />
                     <p>{success}</p>
                 </div>
             )}
             {error && (
-                <div className="mb-4 flex items-center gap-3 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-700 dark:text-red-300">
+                <div className="mb-4 flex items-center gap-3 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700">
                     <AlertTriangle className="h-5 w-5" />
                     <p>{error}</p>
                 </div>
@@ -111,12 +112,12 @@ const AsignarHorario = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-1">
-                    <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">1. Seleccionar Horario</label>
+                    <label className="block text-sm font-medium mb-2 text-gray-800 dark:text-gray-200">1. Seleccionar Horario</label>
                     <select 
                         value={selectedScheduleId}
                         onChange={handleScheduleChange}
                         disabled={isLoading || isSaving}
-                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white"
+                        className="w-full rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white"
                     >
                         <option value="">Seleccionar...</option>
                         {allHorarios.map(horario => (
@@ -129,27 +130,27 @@ const AsignarHorario = () => {
 
                 {selectedScheduleId && (
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">2. Asignar Empleados</label>
+                        <label className="block text-sm font-medium mb-2 text-gray-800 dark:text-gray-200">2. Asignar Empleados</label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-sm font-semibold mb-3 text-gray-900 dark:text-white">Empleados Disponibles</h4>
-                                <div className="bg-white dark:bg-gray-800 rounded-lg p-2 min-h-[20rem] max-h-[20rem] overflow-y-auto border dark:border-gray-600">
+                            <div className="bg-white dark:bg-gray-800/50 rounded-lg p-4 border border-gray-300 dark:border-gray-700">
+                                <h4 className="text-sm font-semibold mb-3 text-gray-800 dark:text-gray-200">Empleados Disponibles</h4>
+                                <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-2 min-h-[20rem] max-h-[20rem] overflow-y-auto border border-gray-400 dark:border-gray-600">
                                     {availableEmployees.map(emp => (
-                                        <div key={emp.id} onClick={() => !isSaving && assignEmployee(emp)} className={`flex items-center gap-3 p-2 rounded-md ${isSaving ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
-                                            <span className="text-sm font-medium text-gray-900 dark:text-white">{emp.nombre} {emp.apellido}</span>
+                                        <div key={emp.id} onClick={() => !isSaving && assignEmployee(emp)} className={`flex items-center gap-3 p-2 rounded-md mb-2 ${isSaving ? 'cursor-not-allowed opacity-60' : 'cursor-pointer bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 shadow-sm border border-gray-300 dark:border-gray-700'}`}>
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{emp.nombre} {emp.apellido}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                             
-                            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-sm font-semibold mb-3 text-gray-900 dark:text-white">
+                            <div className="bg-white dark:bg-gray-800/50 rounded-lg p-4 border border-gray-300 dark:border-gray-700">
+                                <h4 className="text-sm font-semibold mb-3 text-gray-800 dark:text-gray-200">
                                     Empleados Asignados ({assignedEmployees.length})
                                 </h4>
-                                <div className="bg-white dark:bg-gray-800 rounded-lg p-2 min-h-[20rem] max-h-[20rem] overflow-y-auto border dark:border-gray-600">
+                                <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-2 min-h-[20rem] max-h-[20rem] overflow-y-auto border border-gray-400 dark:border-gray-600">
                                     {assignedEmployees.map(emp => (
-                                        <div key={emp.id} onClick={() => !isSaving && unassignEmployee(emp)} className={`flex items-center gap-3 p-2 rounded-md ${isSaving ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
-                                            <span className="text-sm font-medium text-gray-900 dark:text-white">{emp.nombre} {emp.apellido}</span>
+                                        <div key={emp.id} onClick={() => !isSaving && unassignEmployee(emp)} className={`flex items-center gap-3 p-2 rounded-md mb-2 ${isSaving ? 'cursor-not-allowed opacity-60' : 'cursor-pointer bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 shadow-sm border border-gray-300 dark:border-gray-700'}`}>
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{emp.nombre} {emp.apellido}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -165,6 +166,7 @@ const AsignarHorario = () => {
                 )}
             </div>
         </form>
+    </div>
     );
 };
 
