@@ -38,16 +38,16 @@ const HistorialHorarios = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50">
+        <div className="space-y-6 text-gray-900 dark:text-gray-100">
+            <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/50 rounded-xl border border-gray-300 dark:border-gray-700 overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-gray-300 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50">
                     <div className="flex items-center gap-3">
                         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/20">
                             <Filter className="h-5 w-5 text-red-600 dark:text-red-400" />
                         </span>
                         <div>
                             <h3 className="font-semibold text-gray-900 dark:text-white">Filtros del Historial</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Utiliza los filtros para encontrar registros específicos</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Utiliza los filtros para encontrar registros específicos</p>
                         </div>
                     </div>
                 </div>
@@ -60,7 +60,7 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <User className="w-5 h-5" />
                                 </span>
-                                <input type="text" className="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
+                                <input type="text" className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
                             </div>
                         </div>
 
@@ -70,7 +70,7 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <Search className="w-5 h-5" />
                                 </span>
-                                <input type="text" className="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
+                                <input type="text" className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
                             </div>
                         </div>
 
@@ -80,7 +80,7 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <ToggleLeft className="w-5 h-5" />
                                 </span>
-                                <select className="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 text-gray-900 dark:text-white">
+                                <select className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 text-gray-900 dark:text-white">
                                     <option value="">Todos</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -95,7 +95,7 @@ const HistorialHorarios = () => {
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                         <Calendar className="w-4 h-4" />
                                     </span>
-                                    <select className="pl-9 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
+                                    <select className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
                                         <option value="">Mes</option>
                                         {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                                     </select>
@@ -104,7 +104,7 @@ const HistorialHorarios = () => {
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                         <Calendar className="w-4 h-4" />
                                     </span>
-                                    <select className="pl-9 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
+                                    <select className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
                                         <option value="">Año</option>
                                         {[2023, 2024, 2025].map(year => <option key={year} value={year}>{year}</option>)}
                                     </select>
@@ -122,17 +122,17 @@ const HistorialHorarios = () => {
                 </form>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden">
                 {isLoading && (
-                    <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando historial...</div>
+                    <div className="flex justify-center items-center p-8 text-gray-800 dark:text-gray-200"><Loader className="animate-spin mr-2" /> Cargando historial...</div>
                 )}
                 {error && (
-                    <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>
+                    <div className="flex justify-center items-center p-8 text-red-600 dark:text-red-400"><AlertTriangle className="mr-2" /> {error}</div>
                 )}
 
                 {!isLoading && !error && (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700/50">
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
@@ -163,9 +163,9 @@ const HistorialHorarios = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                             {historial.map(item => (
-                                <tr key={item.id}>
+                                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{item.empleado}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'}`}>
                                             {item.estado ? 'Activo' : 'Inactivo'}
