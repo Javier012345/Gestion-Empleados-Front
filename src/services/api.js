@@ -28,9 +28,15 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
+        // Adjunta el token de autenticación si existe
         const token = getCookie('token');
         if (token) {
             config.headers['Authorization'] = `Token ${token}`;
+        }
+        // Adjunta el token CSRF para las peticiones que no son seguras (POST, PUT, etc.)
+        if (!['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(config.method.toUpperCase())) {
+            const csrftoken = getCookie('csrftoken');
+            config.headers['X-CSRFToken'] = csrftoken;
         }
         return config;
     },
@@ -154,5 +160,61 @@ export const getSancionById = (id) => {
     return apiClient.get(`sanciones-empleados/${id}/`);
 };
 
+/**
+ * Obtiene la lista de empleados que aún no tienen un rostro registrado.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const getEmpleadosSinRostro = () => {
+    return apiClient.get('empleados-sin-rostro/');
+};
+
+/**
+ * Registra el rostro de un empleado.
+ * @param {number} empleadoId - El ID del empleado.
+ * @param {string} image - La imagen en formato base64.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const registrarRostro = (empleadoId, image) => {
+    const payload = { empleado_id: empleadoId, image: image };
+    return apiClient.post('rostro/', payload);
+};
+
+/**
+ * Obtiene la lista de empleados que ya tienen un rostro registrado.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const getEmpleadosConRostro = () => {
+    return apiClient.get('empleados-con-rostro/');
+};
+
+/**
+ * Modifica el rostro de un empleado existente.
+ * @param {number} empleadoId - El ID del empleado.
+ * @param {string} image - La nueva imagen en formato base64.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const modificarRostro = (empleadoId, image) => {
+    const payload = { empleado_id: empleadoId, image: image };
+    return apiClient.put('rostro/', payload);
+};
+
+/**
+ * Marca la asistencia de un empleado mediante reconocimiento facial.
+ * @param {string} image - La imagen en formato base64.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const marcarAsistencia = (image) => {
+    const payload = { image: image };
+    return apiClient.post('marcar/', payload);
+};
+
+/**
+ * Obtiene el historial de asistencias para un empleado específico.
+ * @param {number} empleadoId - El ID del empleado.
+ * @returns {Promise} La promesa de la petición de Axios.
+ */
+export const getAsistenciasByEmpleadoId = (empleadoId, page = 1) => {
+    return apiClient.get(`asistencias-empleado/${empleadoId}/`, { params: { page } });
+};
 
 export default apiClient;
