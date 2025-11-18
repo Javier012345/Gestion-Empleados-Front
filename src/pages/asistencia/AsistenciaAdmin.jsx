@@ -5,7 +5,7 @@ import RegistrarRostroTab from './RegistrarRostroTab';
 import VerAsistenciasTab from './VerAsistenciasTab';
 
 const AsistenciaAdmin = () => {
-    const [activeTab, setActiveTab] = useState('register-attendance');
+    const [activeTab, setActiveTab] = useState('registrar-asistencia');
 
     const handleTabClick = (tabId) => {
         setActiveTab(tabId);
@@ -18,46 +18,46 @@ const AsistenciaAdmin = () => {
                 <div className="border-b border-gray-200 dark:border-gray-600">
                     <nav className="-mb-px flex space-x-6 px-6 overflow-x-auto" aria-label="Tabs">
                         <a
-                            href="#register-face"
-                            onClick={() => handleTabClick('register-face')}
-                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'register-face' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
+                            href="#registrar-rostro"
+                            onClick={() => handleTabClick('registrar-rostro')}
+                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'registrar-rostro' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
                         >
                             Registrar Rostro
                         </a>
                         <a
-                            href="#modify-face"
-                            onClick={() => handleTabClick('modify-face')}
-                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'modify-face' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
+                            href="#modificar-rostro"
+                            onClick={() => handleTabClick('modificar-rostro')}
+                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'modificar-rostro' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
                         >
                             Modificar Rostro
                         </a>
                         <a
-                            href="#register-attendance"
-                            onClick={() => handleTabClick('register-attendance')}
-                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'register-attendance' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
+                            href="#registrar-asistencia"
+                            onClick={() => handleTabClick('registrar-asistencia')}
+                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'registrar-asistencia' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
                         >
                             Registrar Asistencia
                         </a>
                         <a
-                            href="#view-attendances"
-                            onClick={() => handleTabClick('view-attendances')}
-                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'view-attendances' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
+                            href="#ver-asistencias"
+                            onClick={() => handleTabClick('ver-asistencias')}
+                            className={`attendance-tab tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'ver-asistencias' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}
                         >
                             Ver Asistencias
                         </a>
                     </nav>
                 </div>
                 <div className="p-6">
-                    <div id="register-attendance-tab" className={`attendance-tab-content ${activeTab !== 'register-attendance' ? 'hidden' : ''}`}>
+                    <div id="registrar-asistencia-tab" className={`attendance-tab-content ${activeTab !== 'registrar-asistencia' ? 'hidden' : ''}`}>
                         <MarcarAsistenciaTab />
                     </div>
-                    <div id="register-face-tab" className={`attendance-tab-content ${activeTab !== 'register-face' ? 'hidden' : ''}`}>
+                    <div id="registrar-rostro-tab" className={`attendance-tab-content ${activeTab !== 'registrar-rostro' ? 'hidden' : ''}`}>
                         <RegistrarRostroTab />
                     </div>
-                    <div id="modify-face-tab" className={`attendance-tab-content ${activeTab !== 'modify-face' ? 'hidden' : ''}`}>
+                    <div id="modificar-rostro-tab" className={`attendance-tab-content ${activeTab !== 'modificar-rostro' ? 'hidden' : ''}`}>
                         <ModificarRostroTab />
                     </div>
-                    <div id="view-attendances-tab" className={`attendance-tab-content ${activeTab !== 'view-attendances' ? 'hidden' : ''}`}>
+                    <div id="ver-asistencias-tab" className={`attendance-tab-content ${activeTab !== 'ver-asistencias' ? 'hidden' : ''}`}>
                         <VerAsistenciasTab />
                     </div>
                 </div>
