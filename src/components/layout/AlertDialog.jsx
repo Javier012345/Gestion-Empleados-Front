@@ -1,38 +1,55 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ShieldAlert } from 'lucide-react';
 
-const AlertDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
+const AlertDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText, cancelText, icon: Icon, iconColor, confirmButton, autoClose }) => {
+    useEffect(() => {
+        if (isOpen && autoClose) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, autoClose);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, autoClose, onClose]);
+
+    const bgColor = iconColor ? `bg-${iconColor}-100` : 'bg-red-100';
+    const textColor = iconColor ? `text-${iconColor}-600` : 'text-red-600';
+    const darkBgColor = iconColor ? `dark:bg-${iconColor}-900/30` : 'dark:bg-red-900/30';
+    const darkTextColor = iconColor ? `dark:text-${iconColor}-400` : 'dark:text-red-400';
+    const confirmButtonClassName = confirmButton?.className || 'bg-red-600 hover:bg-red-700';
+
     return (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${
                 isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
-            <div className="fixed inset-0 bg-black bg-opacity-60" onClick={onClose}></div>
+            <div className="fixed inset-0 bg-black bg-opacity-60" onClick={!autoClose ? onClose : undefined}></div>
             <div
                 className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-transform duration-300 w-full max-w-md m-4 ${
                     isOpen ? 'scale-100' : 'scale-95'
                 }`}>
                 <div className="p-8 text-center">
-                    <div className="flex justify-center items-center w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full">
-                        <ShieldAlert className="w-8 h-8 text-red-600 dark:text-red-400" />
+                    <div className={`flex justify-center items-center w-16 h-16 mx-auto ${bgColor} ${darkBgColor} rounded-full`}>
+                        {Icon ? <Icon className={`w-8 h-8 ${textColor} ${darkTextColor}`} /> : <ShieldAlert className={`w-8 h-8 ${textColor} ${darkTextColor}`} />}
                     </div>
                     <h3 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">{title}</h3>
                     <p className="mt-3 text-base text-gray-600 dark:text-gray-300">{message}</p>
                 </div>
-                <div className="flex gap-4 bg-gray-50 dark:bg-gray-700/50 px-8 py-5 rounded-b-2xl">
-                    <button
-                        onClick={onClose}
-                        className="w-full px-4 py-3 font-semibold text-gray-800 bg-gray-200 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        className="w-full px-4 py-3 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Cerrar Sesión
-                    </button>
-                </div>
+                {!autoClose && (
+                    <div className="flex gap-4 bg-gray-50 dark:bg-gray-700/50 px-8 py-5 rounded-b-2xl">
+                        <button
+                            onClick={onClose}
+                            className="w-full px-4 py-3 font-semibold text-gray-800 bg-gray-200 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                        >
+                            {cancelText || 'Cancelar'}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className={`w-full px-4 py-3 font-semibold text-white rounded-lg transition-colors ${confirmButtonClassName}`}
+                        >
+                            {confirmText || 'Confirmar'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
