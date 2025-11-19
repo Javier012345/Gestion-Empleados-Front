@@ -53,6 +53,11 @@ export const getEmpleados = () => {
     return apiClient.get('empleados/');
 };
 
+export const getEmpleadoPerfil = () => {
+    return apiClient.get('/empleados/perfil/');
+};
+
+
 export const getEmpleadoById = (id) => {
     return apiClient.get(`empleados/${id}/`);
 };
@@ -158,6 +163,26 @@ export const getSancionesEmpleados = () => {
 
 export const getSancionById = (id) => {
     return apiClient.get(`sanciones-empleados/${id}/`);
+};
+
+export const getMisRecibos = () => {
+    return apiClient.get('mis-recibos/');
+};
+
+export const getMisHorarios = () => {
+    return apiClient.get('mis-horarios/');
+};
+
+export const getMisSanciones = () => {
+    return apiClient.get('mis-sanciones/');
+};
+
+export const getMisIncidentes = () => {
+    return apiClient.get('mis-incidentes/');
+};
+
+export const getMisAsistencias = () => {
+    return apiClient.get('mis-asistencias/');
 };
 
 /**

@@ -1,23 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
-
-// Mock data que simula la respuesta de la API
-const mockApiResponse = {
-    total_records: 15, // Aumentado para probar paginación
-    records: Array.from({ length: 15 }, (_, i) => ({
-        id_incidente: { 
-            id: i + 1, 
-            tipo_incid: ['Llegada Tarde', 'Ausencia Injustificada', 'Conflicto Laboral', 'Incumplimiento'][(i % 4)],
-            descripcion_incid: `Descripción del incidente número ${i + 1}.`
-        },
-        fecha_ocurrencia: new Date(2024, 9 - (i % 3), 25 - i).toISOString().split('T')[0], // Fechas variadas
-        estado: i % 2 === 0 ? 'ABIERTO' : 'CERRADO',
-    }))
-};
+import { AlertTriangle, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import { getMisIncidentes } from '../../services/api';
 
 const MisIncidentes = () => {
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [allIncidentes, setAllIncidentes] = useState([]);
     const [filters, setFilters] = useState({ month: '', year: '', status: '' });
     const [recordsPerPage, setRecordsPerPage] = useState(9);
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,26 +19,22 @@ const MisIncidentes = () => {
     }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [filters, recordsPerPage, currentPage]);
-
-    const fetchData = () => {
-        setLoading(true);
-        // --- SIMULACIÓN DE LLAMADA Y FILTRADO EN EL FRONTEND ---
-        setTimeout(() => {
-            const filtered = mockApiResponse.records.filter(inc => {
+        const fetchAndFilterData = () => {
+            if (loading) return; // No filtrar si los datos iniciales no han cargado
+    
+            const filtered = allIncidentes.filter(inc => {
                 const date = new Date(inc.fecha_ocurrencia);
                 const monthMatch = filters.month ? (date.getMonth() + 1) === parseInt(filters.month) : true;
                 const yearMatch = filters.year ? date.getFullYear() === parseInt(filters.year) : true;
                 const statusMatch = filters.status ? inc.estado === filters.status : true;
                 return monthMatch && yearMatch && statusMatch;
             });
-
+    
             const totalRecords = filtered.length;
             const totalPages = Math.ceil(totalRecords / recordsPerPage);
             const startIndex = (currentPage - 1) * recordsPerPage;
             const paginatedRecords = filtered.slice(startIndex, startIndex + recordsPerPage);
-
+    
             setPagedData({
                 data: paginatedRecords,
                 total_records: totalRecords,
@@ -57,10 +42,26 @@ const MisIncidentes = () => {
                 start_index: startIndex + 1,
                 end_index: startIndex + paginatedRecords.length
             });
-            setLoading(false);
-        }, 300);
-        // --- FIN DE LA SIMULACIÓN ---
-    };
+        };
+        fetchAndFilterData();
+    }, [filters, recordsPerPage, currentPage, allIncidentes, loading]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const response = await getMisIncidentes();
+                setAllIncidentes(response.data);
+                setError(null);
+            } catch (err) {
+                setError("No se pudieron cargar tus incidentes.");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -76,7 +77,6 @@ const MisIncidentes = () => {
     const handleFilterSubmit = (e) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchData();
     };
 
     const clearFilters = () => {
@@ -139,12 +139,14 @@ const MisIncidentes = () => {
             </form>
 
             {loading ? (
-                <div className="text-center py-10 dark:text-white">Cargando...</div>
+                <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando tus incidentes...</div>
+            ) : error ? (
+                <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>
             ) : pagedData.data.length > 0 ? (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {pagedData.data.map(incidente => (
-                            <div key={incidente.id_incidente.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex flex-col">
+                            <div key={incidente.grupo_incidente} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex flex-col">
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-white">{incidente.id_incidente.tipo_incid}</h3>
@@ -152,11 +154,11 @@ const MisIncidentes = () => {
                                             {new Date(incidente.fecha_ocurrencia).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">{incidente.id_incidente.descripcion_incid}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">{incidente.descripcion}</p>
                                 </div>
                                 <div className="border-t dark:border-gray-700 pt-4 flex justify-between items-center">
                                     <div></div>
-                                    <Link to={`/incidentes/${incidente.id_incidente.id}`} className="text-sm font-semibold text-red-600 hover:underline">
+                                    <Link to={`/incidentes/${incidente.grupo_incidente}`} className="text-sm font-semibold text-red-600 hover:underline">
                                         Ver Detalle
                                     </Link>
                                 </div>
