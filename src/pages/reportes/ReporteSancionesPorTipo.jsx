@@ -20,13 +20,16 @@ ChartJS.register(
     Legend
 );
 
-const ReporteSancionesPorTipo = () => {
+const ReporteSancionesPorTipo = ({ data: chartData }) => {
+    if (!chartData) {
+        return <p>No hay datos disponibles.</p>;
+    }
     const data = {
-        labels: ['Leve', 'Moderada', 'Grave'],
+        labels: chartData.labels,
         datasets: [
             {
                 label: 'Cantidad de Sanciones',
-                data: [8, 4, 1],
+                data: chartData.values,
                 backgroundColor: 'rgba(255, 159, 64, 0.7)',
                 borderColor: 'rgba(255, 159, 64, 1)',
                 borderWidth: 1,

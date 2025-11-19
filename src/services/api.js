@@ -204,8 +204,25 @@ export const modificarRostro = (empleadoId, image) => {
  * @returns {Promise} La promesa de la petición de Axios.
  */
 export const marcarAsistencia = (image) => {
-    const payload = { image: image };
+    // Limpiamos la imagen para asegurar la compatibilidad con el backend de Django.
+    // 1. Quitamos el prefijo "data:image/jpeg;base64,"
+    let base64Image = image.split(',')[1];
+
+    // 2. Aseguramos que el padding sea correcto para el decodificador de Python.
+    if (base64Image.length % 4 !== 0) {
+        base64Image += '='.repeat(4 - base64Image.length % 4);
+    }
+    const payload = { image: base64Image };
     return apiClient.post('marcar/', payload);
+};
+
+// --- Dashboard ---
+export const getDashboardData = () => {
+    return apiClient.get('dashboard-data/');
+};
+
+export const getResumenDiario = () => {
+    return apiClient.get('resumen-diario/');
 };
 
 /**
