@@ -5,13 +5,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const ReporteIncidentesPorTipo = () => {
+const ReporteIncidentesPorTipo = ({ data: chartData }) => {
+    if (!chartData) {
+        return <p>No hay datos disponibles.</p>;
+    }
     const data = {
-        labels: ['Conducta', 'Seguridad', 'Operativo'],
+        labels: chartData.labels,
         datasets: [
             {
                 label: 'Cantidad de Incidentes',
-                data: [5, 2, 3],
+                data: chartData.values,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.7)',
                     'rgba(54, 162, 235, 0.7)',

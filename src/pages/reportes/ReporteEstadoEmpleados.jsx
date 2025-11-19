@@ -5,13 +5,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const ReporteEstadoEmpleados = () => {
+const ReporteEstadoEmpleados = ({ data: chartData }) => {
+    if (!chartData) {
+        return <p>No hay datos disponibles.</p>;
+    }
     const data = {
-        labels: ['Activo', 'Inactivo', 'Licencia'],
+        labels: chartData.labels,
         datasets: [
             {
                 label: 'Cantidad de Empleados',
-                data: [12, 5, 2],
+                data: chartData.values,
                 backgroundColor: [
                     'rgba(75, 192, 192, 0.7)',
                     'rgba(255, 99, 132, 0.7)',

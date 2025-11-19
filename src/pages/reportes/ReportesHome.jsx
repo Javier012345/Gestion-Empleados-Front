@@ -1,22 +1,91 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import * as api from '../../services/api';
 import ReporteEstadoEmpleados from './ReporteEstadoEmpleados';
 import ReporteSancionesPorTipo from './ReporteSancionesPorTipo';
 import ReporteIncidentesPorTipo from './ReporteIncidentesPorTipo';
 
 const ReportesHome = () => {
     const [selectedReport, setSelectedReport] = useState('estado_empleados');
+    const [sancionesData, setSancionesData] = useState(null);
+    const [incidentesData, setIncidentesData] = useState(null);
+    const [empleadosData, setEmpleadosData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const [sancionesRes, incidentesRes, empleadosRes] = await Promise.all([
+                    api.getSancionesEmpleados(),
+                    api.getIncidentesAgrupados(),
+                    api.getEmpleadosBasico()
+                ]);
+
+                console.log('Datos de Sanciones recibidos:', sancionesRes.data);
+                console.log('Datos de Incidentes recibidos:', incidentesRes.data);
+                console.log('Datos de Empleados recibidos:', empleadosRes.data);
+
+                // Procesar sanciones por tipo
+                const sancionesCounts = sancionesRes.data.reduce((acc, sancion) => {
+                    const tipo = sancion.id_sancion?.tipo || 'Sin Tipo';
+                    acc[tipo] = (acc[tipo] || 0) + 1;
+                    return acc;
+                }, {});
+                setSancionesData({
+                    labels: Object.keys(sancionesCounts),
+                    values: Object.values(sancionesCounts)
+                });
+
+                // Procesar incidentes por tipo
+                const incidentesCounts = incidentesRes.data.reduce((acc, incidente) => {
+                    // Usamos encadenamiento opcional (?.) para evitar errores si id_incidente no existe.
+                    const tipo = incidente.incidente?.tipo_incid || 'Sin Tipo';
+                    acc[tipo] = (acc[tipo] || 0) + 1;
+                    return acc;
+                }, {});
+                setIncidentesData({
+                    labels: Object.keys(incidentesCounts),
+                    values: Object.values(incidentesCounts)
+                });
+
+                // Procesar empleados por estado
+                const empleadosCounts = empleadosRes.data.reduce((acc, empleado) => {
+                    const estado = empleado?.estado || 'Sin Estado';
+                    acc[estado] = (acc[estado] || 0) + 1;
+                    return acc;
+                }, {});
+                setEmpleadosData({
+                    labels: Object.keys(empleadosCounts),
+                    values: Object.values(empleadosCounts)
+                });
+
+            } catch (err) {
+                setError('Error al cargar los datos para los reportes.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const renderReport = () => {
+        if (loading) return <p className="text-gray-400">Cargando datos...</p>;
+        if (error) return <p className="text-red-500">{error}</p>;
+
         switch (selectedReport) {
             case 'estado_empleados':
-                return <ReporteEstadoEmpleados />;
+                return <ReporteEstadoEmpleados data={empleadosData} />;
             case 'sanciones_tipo':
-                return <ReporteSancionesPorTipo />;
+                return <ReporteSancionesPorTipo data={sancionesData} />;
             case 'incidentes_tipo':
-                return <ReporteIncidentesPorTipo />;
+                return <ReporteIncidentesPorTipo data={incidentesData} />;
             default:
-                return <ReporteEstadoEmpleados />;
+                return <ReporteEstadoEmpleados data={empleadosData} />;
         }
     };
 
