@@ -14,6 +14,7 @@ const getGroupColorClasses = (groupName) => {
 const VerEmpleado = () => {
     const { id } = useParams();
     const [empleado, setEmpleado] = useState(null);
+    const [requisitos, setRequisitos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -33,6 +34,21 @@ const VerEmpleado = () => {
         };
 
         fetchEmpleado();
+
+        setRequisitos([
+            { id: 1, nombre_doc: 'DNI (frente)', obligatorio: false },
+            { id: 2, nombre_doc: 'DNI (dorso)', obligatorio: false },
+            { id: 3, nombre_doc: 'Constancia de CUIL', obligatorio: false },
+            { id: 4, nombre_doc: 'Alta en AFIP (Formulario 931)', obligatorio: false },
+            { id: 5, nombre_doc: 'Contrato de trabajo (firmado)', obligatorio: false },
+            { id: 6, nombre_doc: 'Examen preocupacional/Certificado de aptitud laboral', obligatorio: false },
+            { id: 7, nombre_doc: 'Certificado de antecedentes penales', obligatorio: false },
+            { id: 8, nombre_doc: 'Constancia de inscripción en la ART', obligatorio: false },
+            { id: 9, nombre_doc: 'Afiliación a obra social', obligatorio: false },
+            { id: 10, nombre_doc: 'Declaración jurada de cargas de familia', obligatorio: false },
+            { id: 11, nombre_doc: 'Copia de la libreta de asignaciones familiares', obligatorio: false },
+            { id: 12, nombre_doc: 'Títulos académicos o certificados de estudios', obligatorio: false },
+        ]);
     }, [id]);
 
     if (loading) {
@@ -52,6 +68,11 @@ const VerEmpleado = () => {
     }
 
     const documentos = empleado.legajo ? empleado.legajo.documento_set : [];
+
+    const getRequisitoNombre = (id_requisito) => {
+        const requisito = requisitos.find(r => r.id === id_requisito);
+        return requisito ? requisito.nombre_doc : `ID de Requisito: ${id_requisito}`;
+    };
 
     const statusColor = empleado.estado === 'Activo'
         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -140,8 +161,7 @@ const VerEmpleado = () => {
                                 {documentos.map(doc => (
                                     <li key={doc.id} className="flex items-center justify-between py-3">
                                         <div>
-                                            {/* Nota: La API no devuelve el nombre del requisito, solo el ID. */}
-                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Documento Requisito ID: {doc.id_requisito}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{getRequisitoNombre(doc.id_requisito)}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
                                         </div>
                                         <div>

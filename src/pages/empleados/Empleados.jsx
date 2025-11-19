@@ -16,9 +16,9 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
     };
 
     return (
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto flex-grow">
-                <div className="relative w-full sm:max-w-xs group">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-3">
+                <div className="relative w-full md:max-w-xs group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors group-hover:text-red-500" />
                     <input 
                         type="text" 
@@ -28,24 +28,24 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
                         className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                     />
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
+                <div className="w-full md:w-auto flex flex-col sm:flex-row gap-2">
                     <select 
                         value={estadoFilter}
                         onChange={onEstadoChange}
-                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
+                        className="w-full sm:w-auto py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
                         <option value="">Todos los Estados</option>
                         {estado_choices.map(([value, display]) => <option key={value} value={value}>{display}</option>)}
                     </select>
                     <select 
                         value={cargoFilter}
                         onChange={onCargoChange}
-                        className="py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
+                        className="w-full sm:w-auto py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
                         <option value="">Todos los Cargos</option>
                         {cargos.map(cargo => <option key={cargo} value={cargo}>{cargo}</option>)}
                     </select>
                 </div>
             </div>
-            <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
                 <button 
                     onClick={handlePrint}
                     className="w-full sm:w-auto flex-shrink-0 bg-gray-600 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm font-medium transition-all duration-200 hover:shadow-lg hover:scale-105">
@@ -62,7 +62,7 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
 };
 
 // --- Componente de Acciones ---
-const EmployeeActions = ({ empleado, onDeleteClick }) => {
+const EmployeeActions = ({ empleado, onDeactivateClick }) => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
@@ -78,7 +78,7 @@ const EmployeeActions = ({ empleado, onDeleteClick }) => {
                     <Link to={`/empleados/editar/${empleado.id}`} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                         <Edit2 size={16} />Editar
                     </Link>
-                    <button onClick={() => onDeleteClick(empleado)} className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/50 w-full text-left">
+                    <button onClick={() => onDeactivateClick(empleado)} className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/50 w-full text-left">
                         <Trash2 size={16} />Eliminar
                     </button>
                 </div>
@@ -223,55 +223,95 @@ const Empleados = () => {
                 cargos={cargos}
             />
 
-            {/* --- Lista de Empleados --- */}
-            {currentItems.length > 0 ? (
-                <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 dark:bg-gray-700/50">
-                            <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
-                                <th className="px-6 py-4">Foto</th>
-                                <th className="px-6 py-4">Nombre</th>
-                                <th className="px-6 py-4">DNI</th>
-                                <th className="px-6 py-4">Email</th>
-                                <th className="px-6 py-4">Cargo</th>
-                                <th className="px-6 py-4">Estado</th>
-                                <th className="px-6 py-4">Acciones</th>
+            {/* --- Lista de Empleados (Tabla para md y superior) --- */}
+            <div className="hidden md:block overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-700/50">
+                        <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+                            <th className="px-6 py-4">Foto</th>
+                            <th className="px-6 py-4">Nombre</th>
+                            <th className="px-6 py-4 hidden lg:table-cell">DNI</th>
+                            <th className="px-6 py-4 hidden lg:table-cell">Email</th>
+                            <th className="px-6 py-4">Cargo</th>
+                            <th className="px-6 py-4">Estado</th>
+                            <th className="px-6 py-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {currentItems.map(empleado => (
+                            <tr key={empleado.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                                <td className="px-6 py-4">
+                                    {empleado.ruta_foto ? (
+                                        <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-10 w-10 rounded-full object-cover" />
+                                    ) : (
+                                        <span className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500">
+                                            {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="px-6 py-4 font-medium text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell">{empleado.dni}</td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell">{empleado.email}</td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
+                                        {empleado.grupo || '-'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColorClasses(empleado.estado)}`}>
+                                        {empleado.estado}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+    <EmployeeActions empleado={empleado} onDeactivateClick={handleOpenModal} />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {currentItems.map(empleado => (
-                                <tr key={empleado.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200">
-                                    <td className="px-6 py-4">
-                                        {empleado.ruta_foto ? (
-                                            <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-10 w-10 rounded-full object-cover" />
-                                        ) : (
-                                            <span className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500">
-                                                {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 font-medium text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</td>
-                                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{empleado.dni}</td>
-                                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{empleado.email}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
-                                            {empleado.grupo || '-'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColorClasses(empleado.estado)}`}>
-                                            {empleado.estado}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <EmployeeActions empleado={empleado} onDeleteClick={handleOpenModal} />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* --- Lista de Empleados (Tarjetas para móvil) --- */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                {currentItems.map(empleado => (
+                    <div key={empleado.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center">
+                                {empleado.ruta_foto ? (
+                                    <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-12 w-12 rounded-full object-cover" />
+                                ) : (
+                                    <span className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-xl">
+                                        {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
+                                    </span>
+                                )}
+                                <div className="ml-4">
+                                    <p className="font-bold text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">DNI: {empleado.dni}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{empleado.email}</p>
+                                </div>
+                            </div>
+                            <EmployeeActions empleado={empleado} onDeleteClick={handleOpenModal} />
+                        </div>
+                        
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-auto">
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-sm text-gray-500 dark:text-gray-400">Cargo:</span>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
+                                    {empleado.grupo || '-'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColorClasses(empleado.estado)}`}>
+                                    {empleado.estado}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            
+            {currentItems.length === 0 && (
                 <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                     <Users size={48} className="mx-auto text-gray-400 mb-4" />
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white">No se encontraron empleados</h3>
@@ -281,14 +321,14 @@ const Empleados = () => {
 
             {/* --- Paginación --- */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6 mt-6">
-                    <div>
+                <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6 mt-6">
+                    <div className="w-full sm:w-auto text-center sm:text-left mb-2 sm:mb-0">
                         <p className="text-sm text-gray-700 dark:text-gray-300">
                             Mostrando <span className="font-medium">{indexOfFirstItem + 1}</span> a <span className="font-medium">{Math.min(indexOfLastItem, filteredEmpleados.length)}</span> de <span className="font-medium">{filteredEmpleados.length}</span> resultados
                         </p>
                     </div>
-                    <div>
-                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <div className="w-full sm:w-auto">
+                        <nav className="relative z-0 inline-flex justify-center sm:justify-end w-full rounded-md shadow-sm -space-x-px">
                             <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
                                 <ChevronLeft size={20} />
                             </button>
@@ -309,7 +349,7 @@ const Empleados = () => {
                 onConfirm={handleConfirmDelete}
                 employeeName={selectedEmployee ? `${selectedEmployee.nombre} ${selectedEmployee.apellido}` : ''}
                 title="Confirmar Inactivación"
-                message="¿Estás seguro de que quieres cambiar el estado de este empleado a 'Inactivo'? Esta acción se puede revertir editando el perfil del empleado."
+                message="¿Estás seguro de que quieres cambiar el estado de {employeeName} a 'Inactivo'? Esta acción se puede revertir editando el perfil del empleado."
                 confirmText="Sí, inactivar"
             />
         </div>

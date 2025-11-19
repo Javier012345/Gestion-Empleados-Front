@@ -18,12 +18,18 @@ const empleado = {
 };
 
 const documentos_status = [
-    { nombre: 'CV', entregado: true, url: '#' },
-    { nombre: 'DNI (frente y dorso)', entregado: true, url: '#' },
-    { nombre: 'Constancia de CUIL', entregado: true, url: '#' },
+    { nombre: 'DNI (frente)', entregado: false, url: null },
+    { nombre: 'DNI (dorso)', entregado: false, url: null },
+    { nombre: 'Constancia de CUIL', entregado: false, url: null },
+    { nombre: 'Alta en AFIP (Formulario 931)', entregado: false, url: null },
+    { nombre: 'Contrato de trabajo (firmado)', entregado: false, url: null },
+    { nombre: 'Examen preocupacional/Certificado de aptitud laboral', entregado: false, url: null },
     { nombre: 'Certificado de antecedentes penales', entregado: false, url: null },
-    { nombre: 'Título secundario/universitario', entregado: true, url: '#' },
-    { nombre: 'Certificado de estudios en curso', entregado: false, url: null },
+    { nombre: 'Constancia de inscripción en la ART', entregado: false, url: null },
+    { nombre: 'Afiliación a obra social', entregado: false, url: null },
+    { nombre: 'Declaración jurada de cargas de familia', entregado: false, url: null },
+    { nombre: 'Copia de la libreta de asignaciones familiares', entregado: false, url: null },
+    { nombre: 'Títulos académicos o certificados de estudios', entregado: false, url: null },
 ];
 
 const PerfilEmpleado = () => {
