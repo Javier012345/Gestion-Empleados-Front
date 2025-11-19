@@ -109,6 +109,9 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
                 onConfirm={handleConfirmLogout}
                 title="Confirmar Cierre de Sesión"
                 message="¿Estás seguro de que quieres cerrar sesión?"
+                confirmText="Cerrar Sesión"
+                cancelText="Cancelar"
+                icon={LogOut}
             />
         </>
     );

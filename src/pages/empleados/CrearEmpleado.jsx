@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEmpleado } from '../../services/api';
+import AlertDialog from '../../components/layout/AlertDialog';
+import { UserPlus, AlertTriangle } from 'lucide-react';
 
 // --- Validation logic ---
 const validationRules = {
@@ -110,6 +112,9 @@ const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error,
 const CrearEmpleado = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
+    const [isConfirmOpen, setConfirmOpen] = useState(false);
+    const [isSuccessOpen, setSuccessOpen] = useState(false);
+    const [isCancelConfirmOpen, setCancelConfirmOpen] = useState(false);
     const [formData, setFormData] = useState({
         nombre: '', 
         apellido: '', 
@@ -199,9 +204,12 @@ const CrearEmpleado = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleFinalSubmit = () => {
+        setConfirmOpen(true);
+    };
 
+    const handleSubmit = async () => {
+        setConfirmOpen(false);
         // Validación completa del formulario antes de enviarlo.
         const formErrors = {};
         let firstErrorStep = null;
@@ -243,8 +251,7 @@ const CrearEmpleado = () => {
 
         try {
             await createEmpleado(postData);
-            alert('Empleado creado con éxito.');
-            navigate('/empleados');
+            setSuccessOpen(true);
         } catch (error) {
             console.error('Error al crear el empleado:', error.response?.data || error.message);
             if (error.response && error.response.data) {
@@ -262,89 +269,120 @@ const CrearEmpleado = () => {
 
     return (
         <div className="p-4 sm:p-6">
-            <form onSubmit={handleSubmit} noValidate encType="multipart/form-data">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm max-w-4xl mx-auto">
-                    <Stepper currentStep={currentStep} />
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm max-w-4xl mx-auto">
+                <Stepper currentStep={currentStep} />
 
-                    {currentStep === 1 && (
-                        <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">1. Datos Personales</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} />
-                                <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} />
-                                <FormField label="DNI" name="dni" type="text" value={formData.dni} onChange={handleChange} onBlur={handleBlur} error={errors.dni} />
-                                <FormField label="Fecha de Nacimiento" name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur} error={errors.fecha_nacimiento} />
-                                <FormField label="Género" name="genero" value={formData.genero} onChange={handleChange} onBlur={handleBlur} error={errors.genero}>
-                                    <select>
-                                        <option value="">Seleccionar...</option>
-                                        <option value="F">Femenino</option>
-                                        <option value="M">Masculino</option>
-                                        <option value="O">Otro</option>
-                                    </select>
-                                </FormField>
-                                <FormField label="Estado Civil" name="estado_civil" value={formData.estado_civil} onChange={handleChange} onBlur={handleBlur} error={errors.estado_civil}>
-                                    <select>
-                                        <option value="">Seleccionar...</option>
-                                        <option value="Soltero">Soltero/a</option>
-                                        <option value="Casado">Casado/a</option>
-                                        <option value="Divorciado">Divorciado/a</option>
-                                        <option value="Viudo">Viudo/a</option>
-                                    </select>
-                                </FormField>
-                                <FormField label="Cargo" name="grupo_input" value={formData.grupo_input} onChange={handleChange} onBlur={handleBlur} error={errors.grupo_input}><select><option value="">Seleccionar Cargo...</option>{grupos.map(g => <option key={g.name} value={g.name}>{g.name}</option>)}</select></FormField>
-                                <FormField label="Estado" name="estado" value={formData.estado} onChange={handleChange} onBlur={handleBlur} error={errors.estado}><select><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select></FormField>
-                            </div>
-                        </div>
-                    )}
-
-                    {currentStep === 2 && (
-                        <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">2. Datos de Contacto</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} />
-                                <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} />
-                            </div>
-                        </div>
-                    )}
-
-                    {currentStep === 3 && (
-                        <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">3. Foto del Empleado</h3>
-                            <FormField label="Foto de perfil" name="ruta_foto" type="file" onChange={handleFileChange} error={errors.ruta_foto} accept="image/*" />
-                            {formData.ruta_foto && <img src={URL.createObjectURL(formData.ruta_foto)} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
-                        </div>
-                    )}
-
-                    {currentStep === 4 && (
-                        <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">4. Documentación Requerida</h3>
-                            <div className="space-y-3">
-                                {requisitos.map(req => (
-                                    <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
-                                        <input type="file" name={`documento_${req.id}`} onChange={handleFileChange} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"/>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-between items-center">
-                        <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Anterior</button>
-                        <div>
-                            <button type="button" onClick={() => navigate('/empleados')} className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">Cancelar</button>
-                            
-                            {/* Lógica de botones corregida */}
-                            <button type="button" onClick={handleNext} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? 'hidden' : ''}`}>
-                                Siguiente
-                            </button>
-                            <button type="submit" className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? '' : 'hidden'}`}>
-                                Finalizar
-                            </button>
+                {currentStep === 1 && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">1. Datos Personales</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} />
+                            <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} />
+                            <FormField label="DNI" name="dni" type="text" value={formData.dni} onChange={handleChange} onBlur={handleBlur} error={errors.dni} />
+                            <FormField label="Fecha de Nacimiento" name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur} error={errors.fecha_nacimiento} />
+                            <FormField label="Género" name="genero" value={formData.genero} onChange={handleChange} onBlur={handleBlur} error={errors.genero}>
+                                <select>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="O">Otro</option>
+                                </select>
+                            </FormField>
+                            <FormField label="Estado Civil" name="estado_civil" value={formData.estado_civil} onChange={handleChange} onBlur={handleBlur} error={errors.estado_civil}>
+                                <select>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Soltero">Soltero/a</option>
+                                    <option value="Casado">Casado/a</option>
+                                    <option value="Divorciado">Divorciado/a</option>
+                                    <option value="Viudo">Viudo/a</option>
+                                </select>
+                            </FormField>
+                            <FormField label="Cargo" name="grupo_input" value={formData.grupo_input} onChange={handleChange} onBlur={handleBlur} error={errors.grupo_input}><select><option value="">Seleccionar Cargo...</option>{grupos.map(g => <option key={g.name} value={g.name}>{g.name}</option>)}</select></FormField>
+                            <FormField label="Estado" name="estado" value={formData.estado} onChange={handleChange} onBlur={handleBlur} error={errors.estado}><select><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select></FormField>
                         </div>
                     </div>
+                )}
+
+                {currentStep === 2 && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">2. Datos de Contacto</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} />
+                            <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} />
+                        </div>
+                    </div>
+                )}
+
+                {currentStep === 3 && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">3. Foto del Empleado</h3>
+                        <FormField label="Foto de perfil" name="ruta_foto" type="file" onChange={handleFileChange} error={errors.ruta_foto} accept="image/*" />
+                        {formData.ruta_foto && <img src={URL.createObjectURL(formData.ruta_foto)} alt="Preview" className="mt-4 h-32 w-32 rounded-full object-cover"/>}
+                    </div>
+                )}
+
+                {currentStep === 4 && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">4. Documentación Requerida</h3>
+                        <div className="space-y-3">
+                            {requisitos.map(req => (
+                                <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
+                                    <input type="file" name={`documento_${req.id}`} onChange={handleFileChange} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"/>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-between items-center">
+                    <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Anterior</button>
+                    <div>
+                        <button type="button" onClick={() => setCancelConfirmOpen(true)} className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">Cancelar</button>
+                        
+                        <button type="button" onClick={handleNext} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? 'hidden' : ''}`}>
+                            Siguiente
+                        </button>
+                        <button type="button" onClick={handleFinalSubmit} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? '' : 'hidden'}`}>
+                            Finalizar
+                        </button>
+                    </div>
                 </div>
-            </form>
+            </div>
+            <AlertDialog
+                isOpen={isConfirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={handleSubmit}
+                title="Confirmar Registro"
+                message="¿Estás seguro de que quieres registrar a este empleado?"
+                confirmText="Aceptar"
+                cancelText="Cancelar"
+                icon={UserPlus}
+            />
+            <AlertDialog
+                isOpen={isSuccessOpen}
+                onClose={() => navigate('/empleados')}
+                onConfirm={() => navigate('/empleados')}
+                title="Empleado Creado"
+                message="El empleado ha sido creado exitosamente."
+                confirmText="Aceptar"
+                cancelText="Aceptar"
+                icon={UserPlus}
+                iconColor="green"
+                confirmButton={{
+                    className: "bg-green-600 hover:bg-green-700",
+                }}
+            />
+            <AlertDialog
+                isOpen={isCancelConfirmOpen}
+                onClose={() => setCancelConfirmOpen(false)}
+                onConfirm={() => navigate('/empleados')}
+                title="Confirmar Cancelación"
+                message="Si cancelas, se perderán todos los datos ingresados. ¿Estás seguro?"
+                confirmText="Sí, cancelar"
+                cancelText="No, continuar"
+                icon={AlertTriangle}
+            />
         </div>
     );
 };
