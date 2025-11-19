@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEmpleado } from '../../services/api';
 import AlertDialog from '../../components/layout/AlertDialog';
-import { UserPlus, AlertTriangle } from 'lucide-react';
+import { UserPlus, AlertTriangle, CheckCircle } from 'lucide-react';
 
 // --- Validation logic ---
 const validationRules = {
@@ -136,6 +136,16 @@ const CrearEmpleado = () => {
     const [requisitos, setRequisitos] = useState([]);
     useEffect(() => {
         setGrupos([ { id: 1, name: 'Administrador' }, { id: 2, name: 'Empleado' } ]);
+        if (isSuccessOpen) {
+            const timer = setTimeout(() => {
+                setSuccessOpen(false);
+                navigate('/empleados');
+            }, 3000); // 3 segundos
+
+            return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
+        }
+
+
         setRequisitos([
             { id: 1, nombre_doc: 'DNI (frente)', obligatorio: false },
             { id: 2, nombre_doc: 'DNI (dorso)', obligatorio: false },
@@ -150,7 +160,7 @@ const CrearEmpleado = () => {
             { id: 11, nombre_doc: 'Copia de la libreta de asignaciones familiares', obligatorio: false },
             { id: 12, nombre_doc: 'Títulos académicos o certificados de estudios', obligatorio: false },
         ]);
-    }, []);
+    }, [isSuccessOpen, navigate]);
 
     const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
     const handlePrev = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -359,20 +369,22 @@ const CrearEmpleado = () => {
                 cancelText="Cancelar"
                 icon={UserPlus}
             />
-            <AlertDialog
-                isOpen={isSuccessOpen}
-                onClose={() => navigate('/empleados')}
-                onConfirm={() => navigate('/empleados')}
-                title="Empleado Creado"
-                message="El empleado ha sido creado exitosamente."
-                confirmText="Aceptar"
-                cancelText="Aceptar"
-                icon={UserPlus}
-                iconColor="green"
-                confirmButton={{
-                    className: "bg-green-600 hover:bg-green-700",
-                }}
-            />
+            {/* Diálogo de éxito simple sin botones */}
+            {isSuccessOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center transform transition-all duration-300 scale-100">
+                        <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
+                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-4">
+                            Empleado Creado
+                        </h3>
+                        <div className="mt-2">
+                            <p className="text-sm text-gray-500 dark:text-gray-300">
+                                El empleado ha sido creado exitosamente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
             <AlertDialog
                 isOpen={isCancelConfirmOpen}
                 onClose={() => setCancelConfirmOpen(false)}
