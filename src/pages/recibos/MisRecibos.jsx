@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, FileText, Image, Receipt } from 'lucide-react';
-
-// --- Mock Data ---
-const mockMisRecibos = [
-    { id: 1, fecha_emision: "2023-10-15", periodo: "2023-09", ruta_pdf: "/recibos/mi_recibo_09_2023.pdf", ruta_imagen: null },
-    { id: 2, fecha_emision: "2023-09-15", periodo: "2023-08", ruta_pdf: "/recibos/mi_recibo_08_2023.pdf", ruta_imagen: "/recibos/mi_recibo_08_2023.jpg" },
-    { id: 3, fecha_emision: "2023-08-15", periodo: "2023-07", ruta_pdf: "/recibos/mi_recibo_07_2023.pdf", ruta_imagen: null },
-    { id: 4, fecha_emision: "2022-12-15", periodo: "2022-11", ruta_pdf: "/recibos/mi_recibo_11_2022.pdf", ruta_imagen: null },
-    { id: 5, fecha_emision: "2023-11-15", periodo: "2023-10", ruta_pdf: "/recibos/mi_recibo_10_2023.pdf", ruta_imagen: null },
-];
+import { Filter, FileText, Image, Receipt, Loader, AlertCircle } from 'lucide-react';
+import { getMisRecibos } from '../../services/api';
 
 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 // --- Componente: Mis Recibos ---
 const MisRecibos = () => {
     const [recibos, setRecibos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [filteredRecibos, setFilteredRecibos] = useState([]);
     const [selectedFilters, setSelectedFilters] = useState({ mes: '', anio: '' });
     const [activeFilters, setActiveFilters] = useState({ mes: '', anio: '' });
@@ -22,19 +16,36 @@ const MisRecibos = () => {
 
     // Cargar datos iniciales y calcular años disponibles
     useEffect(() => {
-        setRecibos(mockMisRecibos);
-        const years = [...new Set(mockMisRecibos.map(r => new Date(r.fecha_emision).getFullYear()))];
-        const sortedYears = years.sort((a, b) => b - a);
-        setAvailableYears(sortedYears);
-        if (sortedYears.length > 0) {
-            const latestYear = sortedYears[0].toString();
-            setSelectedFilters({ mes: '', anio: latestYear });
-            setActiveFilters({ mes: '', anio: latestYear });
-        }
+        const fetchRecibos = async () => {
+            try {
+                setLoading(true);
+                const response = await getMisRecibos();
+                setRecibos(response.data);
+
+                const years = [...new Set(response.data.map(r => new Date(r.fecha_emision).getFullYear()))];
+                const sortedYears = years.sort((a, b) => b - a);
+                setAvailableYears(sortedYears);
+
+                if (sortedYears.length > 0) {
+                    const latestYear = sortedYears[0].toString();
+                    setSelectedFilters({ mes: '', anio: latestYear });
+                    setActiveFilters({ mes: '', anio: latestYear });
+                }
+                setError(null);
+            } catch (err) {
+                setError("No se pudieron cargar tus recibos. Inténtalo de nuevo más tarde.");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRecibos();
     }, []);
 
     // Aplicar filtros cuando activeFilters cambia
     useEffect(() => {
+        if (loading) return; // No filtrar mientras se carga
         const filtered = recibos.filter(r => {
             const fecha = new Date(r.fecha_emision);
             const mesMatch = activeFilters.mes ? (fecha.getMonth() + 1) === parseInt(activeFilters.mes) : true;
@@ -42,7 +53,7 @@ const MisRecibos = () => {
             return mesMatch && anioMatch;
         });
         setFilteredRecibos(filtered);
-    }, [activeFilters, recibos]);
+    }, [activeFilters, recibos, loading]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -53,6 +64,24 @@ const MisRecibos = () => {
         e.preventDefault();
         setActiveFilters(selectedFilters);
     };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center p-10 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                <Loader className="animate-spin text-red-600" size={48} />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-64 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-lg p-6">
+                <AlertCircle size={48} className="mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Error</h2>
+                <p>{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
