@@ -17,7 +17,18 @@ const HistorialHorarios = () => {
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters(prev => ({ ...prev, [name]: value }));
+
+        if (name === 'dni') {
+            if (/^[0-9]*$/.test(value)) {
+                setFilters(prev => ({ ...prev, [name]: value }));
+            }
+        } else if (name === 'nombreApellido') {
+            if (/^[a-zA-Z\u00C0-\u017F\sñÑ]*$/.test(value)) {
+                setFilters(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFilters(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     useEffect(() => {
@@ -115,8 +126,6 @@ const HistorialHorarios = () => {
                                     name="dni"
                                     value={filters.dni}
                                     onChange={handleFilterChange}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
                                     className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" 
                                 />
                             </div>
