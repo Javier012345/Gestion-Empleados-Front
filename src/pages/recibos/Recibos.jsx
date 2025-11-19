@@ -35,7 +35,12 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        if (name === 'periodo') {
+            const filteredValue = value.replace(/[^0-9-]/g, '');
+            setFormData(prev => ({ ...prev, [name]: filteredValue }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleFileChange = (e) => {
@@ -156,7 +161,12 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        if (name === 'periodo') {
+            const filteredValue = value.replace(/[^0-9-]/g, '');
+            setFormData(prev => ({ ...prev, [name]: filteredValue }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleFileChange = (e) => {

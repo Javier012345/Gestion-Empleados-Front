@@ -130,7 +130,7 @@ const PresetForm = ({ isSubmitting, setIsSubmitting, setError, setSuccess }) => 
 
                 <div>
                     <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">Cantidad de Personal Requerida</label>
-                    <input type="number" value={cantidad} onChange={(e) => setCantidad(e.target.value)} required className="w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                    <input type="text" inputMode="numeric" pattern="[0-9]*" value={cantidad} onChange={(e) => setCantidad(e.target.value.replace(/[^0-9]/g, ''))} required min="1" className="w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
                 </div>
                 <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-4 disabled:bg-red-400">
                     {isSubmitting ? 'Creando...' : 'Crear Horario'}
@@ -157,10 +157,18 @@ const CustomForm = ({ isSubmitting, setIsSubmitting, setError, setSuccess }) => 
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        if (name === 'cantidad_personal_requerida') {
+            const numericValue = value.replace(/[^0-9]/g, '');
+            setFormData(prev => ({
+                ...prev,
+                [name]: numericValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -216,7 +224,7 @@ const CustomForm = ({ isSubmitting, setIsSubmitting, setError, setSuccess }) => 
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">Cantidad de Personal Requerida</label>
-                    <input type="number" name="cantidad_personal_requerida" value={formData.cantidad_personal_requerida} onChange={handleInputChange} required className="w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
+                    <input type="text" inputMode="numeric" pattern="[0-9]*" name="cantidad_personal_requerida" value={formData.cantidad_personal_requerida} onChange={handleInputChange} required min="1" className="w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-gray-900 dark:text-white" />
                 </div>
                 <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-400">
                     {isSubmitting ? 'Guardando...' : 'Guardar Horario Personalizado'}
