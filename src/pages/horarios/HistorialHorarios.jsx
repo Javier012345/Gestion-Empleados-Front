@@ -4,8 +4,21 @@ import { getHistorialAsignacionesDetallado } from '../../services/api';
 
 const HistorialHorarios = () => {
     const [historial, setHistorial] = useState([]);
+    const [filteredHistorial, setFilteredHistorial] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [filters, setFilters] = useState({
+        dni: '',
+        nombreApellido: '',
+        estado: '',
+        mes: '',
+        año: ''
+    });
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -14,13 +27,7 @@ const HistorialHorarios = () => {
                 setError('');
 
                 const response = await getHistorialAsignacionesDetallado();
-
-                const historialProcesado = response.data.map(item => ({
-                    ...item,
-                    empleado: `${item.id_empl.nombre} ${item.id_empl.apellido}`,
-                    horario: item.id_horario.nombre,
-                }));
-                setHistorial(historialProcesado);
+                setHistorial(response.data);
 
             } catch (err) {
                 setError('Error al cargar el historial. Inténtalo de nuevo.');
@@ -32,6 +39,49 @@ const HistorialHorarios = () => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        let filteredData = historial;
+
+        if (filters.dni) {
+            filteredData = filteredData.filter(item =>
+                String(item.id_empl.dni).includes(filters.dni)
+            );
+        }
+
+        if (filters.nombreApellido) {
+            filteredData = filteredData.filter(item =>
+                `${item.id_empl.nombre} ${item.id_empl.apellido}`.toLowerCase().includes(filters.nombreApellido.toLowerCase())
+            );
+        }
+
+        if (filters.estado) {
+            const estadoActivo = filters.estado === 'activo';
+            filteredData = filteredData.filter(item => item.estado === estadoActivo);
+        }
+
+        if (filters.mes) {
+            filteredData = filteredData.filter(item => {
+                const itemMonth = new Date(item.fecha_asignacion).getUTCMonth() + 1;
+                return itemMonth === parseInt(filters.mes);
+            });
+        }
+
+        if (filters.año) {
+            filteredData = filteredData.filter(item => {
+                const itemYear = new Date(item.fecha_asignacion).getUTCFullYear();
+                return itemYear === parseInt(filters.año);
+            });
+        }
+
+        const historialProcesado = filteredData.map(item => ({
+            ...item,
+            empleado: `${item.id_empl.nombre} ${item.id_empl.apellido}`,
+            horario: item.id_horario.nombre,
+        }));
+
+        setFilteredHistorial(historialProcesado);
+    }, [filters, historial]);
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('es-AR', { timeZone: 'UTC' });
@@ -60,7 +110,15 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <User className="w-5 h-5" />
                                 </span>
-                                <input type="text" className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
+                                <input 
+                                    type="text" 
+                                    name="dni"
+                                    value={filters.dni}
+                                    onChange={handleFilterChange}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" 
+                                />
                             </div>
                         </div>
 
@@ -70,7 +128,13 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <Search className="w-5 h-5" />
                                 </span>
-                                <input type="text" className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" />
+                                <input 
+                                    type="text" 
+                                    name="nombreApellido"
+                                    value={filters.nombreApellido}
+                                    onChange={handleFilterChange}
+                                    className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-900 dark:text-white" 
+                                />
                             </div>
                         </div>
 
@@ -80,7 +144,11 @@ const HistorialHorarios = () => {
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                     <ToggleLeft className="w-5 h-5" />
                                 </span>
-                                <select className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 text-gray-900 dark:text-white">
+                                <select 
+                                    name="estado"
+                                    value={filters.estado}
+                                    onChange={handleFilterChange}
+                                    className="pl-10 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 text-gray-900 dark:text-white">
                                     <option value="">Todos</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -95,8 +163,11 @@ const HistorialHorarios = () => {
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                         <Calendar className="w-4 h-4" />
                                     </span>
-                                    <select className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
-                                        <option value="">Mes</option>
+                                    <select 
+                                        name="mes"
+                                        value={filters.mes}
+                                        onChange={handleFilterChange}
+                                        className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
                                         {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                                     </select>
                                 </div>
@@ -104,7 +175,11 @@ const HistorialHorarios = () => {
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
                                         <Calendar className="w-4 h-4" />
                                     </span>
-                                    <select className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
+                                    <select 
+                                        name="año"
+                                        value={filters.año}
+                                        onChange={handleFilterChange}
+                                        className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
                                         <option value="">Año</option>
                                         {[2023, 2024, 2025].map(year => <option key={year} value={year}>{year}</option>)}
                                     </select>
@@ -162,7 +237,7 @@ const HistorialHorarios = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {historial.map(item => (
+                            {filteredHistorial.map(item => (
                                 <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{item.empleado}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
