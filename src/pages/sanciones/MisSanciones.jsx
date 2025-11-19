@@ -1,28 +1,40 @@
-import React from 'react';
-import { ShieldAlert, Filter, RotateCw, Calendar, CalendarCheck, ArrowRight, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldAlert, Filter, RotateCw, Calendar, CalendarCheck, ArrowRight, Shield, Loader } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getMisSanciones } from '../../services/api';
 
 const MisSanciones = () => {
-    const sanciones = [
-        {
-            id: 1,
-            nombre: 'Amonestación por Retraso',
-            tipo: 'Leve',
-            motivo: 'Llegada tarde injustificada de 15 minutos.',
-            fecha_inicio: '15/10/2025',
-            fecha_fin: null,
-            activa: true,
-        },
-        {
-            id: 2,
-            nombre: 'Suspensión por Ausencia',
-            tipo: 'Grave',
-            motivo: 'Falta injustificada al trabajo durante un día completo.',
-            fecha_inicio: '12/10/2025',
-            fecha_fin: '13/10/2025',
-            activa: false,
-        },
-    ];
+    const [sanciones, setSanciones] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchSanciones = async () => {
+            try {
+                setLoading(true);
+                const response = await getMisSanciones();
+                setSanciones(response.data);
+                setError(null);
+            } catch (err) {
+                setError("No se pudieron cargar tus sanciones.");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSanciones();
+    }, []);
+
+    const formatDate = (dateString) => {
+        if (!dateString) return null;
+        return new Date(dateString).toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'UTC'
+        });
+    };
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">
@@ -81,34 +93,42 @@ const MisSanciones = () => {
                 </div>
             </form>
 
-            {sanciones.length > 0 ? (
+            {loading ? (
+                <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando tus sanciones...</div>
+            ) : error ? (
+                <div className="flex justify-center items-center p-8 text-red-500"><ShieldAlert className="mr-2" /> {error}</div>
+            ) : sanciones.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {sanciones.map(sancion => (
                         <div key={sancion.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 flex flex-col border dark:border-gray-700 hover:shadow-xl hover:border-red-500/20 transition-all duration-300">
                             <div className="flex-1">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-lg text-gray-800 dark:text-white group-hover:text-red-600">{sancion.nombre}</h3>
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${sancion.tipo === 'Leve' ? 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300' : sancion.tipo === 'Moderada' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-red-800 bg-red-200 dark:bg-red-900 dark:text-red-300'}`}>
-                                        {sancion.tipo}
+                                    <h3 className="font-bold text-lg text-gray-800 dark:text-white group-hover:text-red-600">{sancion.id_sancion.nombre}</h3>
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                        sancion.id_sancion.tipo === 'Leve' ? 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300' : 
+                                        sancion.id_sancion.tipo === 'Moderada' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 
+                                        'text-red-800 bg-red-200 dark:bg-red-900 dark:text-red-300'
+                                    }`}>
+                                        {sancion.id_sancion.tipo}
                                     </span>
                                 </div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{sancion.motivo}</p>
                                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
                                     <div className="flex items-center gap-2">
                                         <Calendar size={16} />
-                                        <span>{sancion.fecha_inicio}</span>
+                                        <span>{formatDate(sancion.fecha_inicio)}</span>
                                     </div>
                                     {sancion.fecha_fin && (
                                         <div className="flex items-center gap-2">
                                             <CalendarCheck size={16} />
-                                            <span>{sancion.fecha_fin}</span>
+                                            <span>{formatDate(sancion.fecha_fin)}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="border-t dark:border-gray-700 pt-4 flex justify-between items-center">
-                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${sancion.activa ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'}`}>
-                                    {sancion.activa ? 'Activa' : 'Finalizada'}
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${sancion.id_sancion.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'}`}>
+                                    {sancion.id_sancion.estado ? 'Activa' : 'Finalizada'}
                                 </span>
                                 <Link to={`/sanciones/${sancion.id}`} className="text-sm font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-2 group">
                                     <span>Ver Detalle</span>

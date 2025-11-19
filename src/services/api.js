@@ -53,6 +53,11 @@ export const getEmpleados = () => {
     return apiClient.get('empleados/');
 };
 
+export const getEmpleadoPerfil = () => {
+    return apiClient.get('/empleados/perfil/');
+};
+
+
 export const getEmpleadoById = (id) => {
     return apiClient.get(`empleados/${id}/`);
 };
@@ -160,6 +165,26 @@ export const getSancionById = (id) => {
     return apiClient.get(`sanciones-empleados/${id}/`);
 };
 
+export const getMisRecibos = () => {
+    return apiClient.get('mis-recibos/');
+};
+
+export const getMisHorarios = () => {
+    return apiClient.get('mis-horarios/');
+};
+
+export const getMisSanciones = () => {
+    return apiClient.get('mis-sanciones/');
+};
+
+export const getMisIncidentes = () => {
+    return apiClient.get('mis-incidentes/');
+};
+
+export const getMisAsistencias = () => {
+    return apiClient.get('mis-asistencias/');
+};
+
 /**
  * Obtiene la lista de empleados que aún no tienen un rostro registrado.
  * @returns {Promise} La promesa de la petición de Axios.
@@ -204,8 +229,25 @@ export const modificarRostro = (empleadoId, image) => {
  * @returns {Promise} La promesa de la petición de Axios.
  */
 export const marcarAsistencia = (image) => {
-    const payload = { image: image };
+    // Limpiamos la imagen para asegurar la compatibilidad con el backend de Django.
+    // 1. Quitamos el prefijo "data:image/jpeg;base64,"
+    let base64Image = image.split(',')[1];
+
+    // 2. Aseguramos que el padding sea correcto para el decodificador de Python.
+    if (base64Image.length % 4 !== 0) {
+        base64Image += '='.repeat(4 - base64Image.length % 4);
+    }
+    const payload = { image: base64Image };
     return apiClient.post('marcar/', payload);
+};
+
+// --- Dashboard ---
+export const getDashboardData = () => {
+    return apiClient.get('dashboard-data/');
+};
+
+export const getResumenDiario = () => {
+    return apiClient.get('resumen-diario/');
 };
 
 /**
