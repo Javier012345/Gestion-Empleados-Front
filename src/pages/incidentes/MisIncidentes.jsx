@@ -98,34 +98,34 @@ const MisIncidentes = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6 dark:text-white">Mis Incidentes</h1>
+            <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Mis Incidentes</h1>
 
             <form onSubmit={handleFilterSubmit} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
                     <div className="md:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Periodo</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Periodo</label>
                         <div className="flex items-center gap-2">
-                            <select name="month" value={filters.month} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
+                            <select name="month" value={filters.month} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Mes</option>
                                 {Array.from({ length: 12 }, (_, i) => <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                             </select>
-                            <select name="year" value={filters.year} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
+                            <select name="year" value={filters.year} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Año</option>
                                 {years.map(y => <option key={y} value={y}>{y}</option>)}
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
-                        <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
+                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Estado</label>
+                        <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="">Todos</option>
                             <option value="ABIERTO">Abierto</option>
                             <option value="CERRADO">Cerrado</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registros</label>
-                        <select value={recordsPerPage} onChange={handleRecordsPerPageChange} className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500">
+                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Registros</label>
+                        <select value={recordsPerPage} onChange={handleRecordsPerPageChange} className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value={9}>9</option>
                             <option value={12}>12</option>
                             <option value={18}>18</option>
@@ -133,7 +133,7 @@ const MisIncidentes = () => {
                     </div>
                     <div className="flex items-end gap-2">
                         <button type="submit" className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Filtrar</button>
-                        <button type="button" onClick={clearFilters} className="w-full text-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">Limpiar</button>
+                        <button type="button" onClick={clearFilters} className="w-full text-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white">Limpiar</button>
                     </div>
                 </div>
             </form>
