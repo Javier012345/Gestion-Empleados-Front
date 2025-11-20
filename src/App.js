@@ -69,7 +69,7 @@ function App() {
             <Route path="/horarios/asignar" element={<RouteWithTitle title="Asignar Horario" element={<AsignarHorario />} />} />
             <Route path="/horarios/cargar" element={<RouteWithTitle title="Cargar Horario" element={<CargarHorario />} />} />
             <Route path="/horarios/historial" element={<RouteWithTitle title="Historial de Horarios" element={<HistorialHorarios />} />} />
-            <Route path="/horarios/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
+            <Route path="/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
             <Route path="/horarios/ver-asignados" element={<RouteWithTitle title="Ver Horarios Asignados" element={<VerHorariosAsignados />} />} />
             <Route path="/horarios/ver-empleado" element={<RouteWithTitle title="Ver Horarios de Empleado" element={<VerHorariosEmpleado />} />} />
             <Route path="/sanciones" element={<RouteWithTitle title="Sanciones" element={<Sanciones />} />} />
