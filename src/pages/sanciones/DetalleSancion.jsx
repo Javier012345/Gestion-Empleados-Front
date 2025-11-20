@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Printer, User, AlertTriangle, ArrowRight, Loader, ShieldAlert } from 'lucide-react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { getSancionById } from '../../services/api';
 
 const DetalleSancion = () => {
     const { id } = useParams();
     const [sancion, setSancion] = useState(null);
     const [loading, setLoading] = useState(true);
+    const location = useLocation();
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -38,7 +39,7 @@ const DetalleSancion = () => {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <Link to="/sanciones" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6">
+            <Link to={location.pathname.startsWith('/mis-sanciones') ? "/mis-sanciones" : "/sanciones"} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6">
                 <ArrowLeft size={16} /> Volver
             </Link>
 

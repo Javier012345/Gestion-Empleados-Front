@@ -130,7 +130,7 @@ const MisSanciones = () => {
                                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${sancion.id_sancion.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'}`}>
                                     {sancion.id_sancion.estado ? 'Activa' : 'Finalizada'}
                                 </span>
-                                <Link to={`/sanciones/${sancion.id}`} className="text-sm font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-2 group">
+                                <Link to={`/mis-sanciones/${sancion.id}`} className="text-sm font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-2 group">
                                     <span>Ver Detalle</span>
                                     <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                                 </Link>

@@ -158,7 +158,7 @@ const MisIncidentes = () => {
                                 </div>
                                 <div className="border-t dark:border-gray-700 pt-4 flex justify-between items-center">
                                     <div></div>
-                                    <Link to={`/incidentes/${incidente.grupo_incidente}`} className="text-sm font-semibold text-red-600 hover:underline">
+                                    <Link to={`/mis-incidentes/${incidente.id}`} className="text-sm font-semibold text-red-600 hover:underline">
                                         Ver Detalle
                                     </Link>
                                 </div>

@@ -157,6 +157,10 @@ export const getIncidenteAgrupadoPorId = (id) => {
     return apiClient.get(`incidentes-agrupados/${id}/`);
 };
 
+export const getIncidenteEmpleadoPorId = (id) => {
+    return apiClient.get(`incidente-empleado/${id}/`);
+};
+
 export const getTiposIncidente = () => {
     return apiClient.get('incidentes/');
 };
