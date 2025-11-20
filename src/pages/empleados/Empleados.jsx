@@ -125,7 +125,8 @@ const Empleados = () => {
             try {
                 setLoading(true);
                 const response = await getEmpleados();
-                setEmpleados(response.data);
+                const sortedEmpleados = response.data.sort((a, b) => b.id - a.id);
+                setEmpleados(sortedEmpleados);
                 // Establecer los cargos de forma estática
                 setCargos(['Administrador', 'Empleado']);
                 setError(null);

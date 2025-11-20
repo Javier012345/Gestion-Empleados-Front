@@ -162,7 +162,34 @@ const CrearEmpleado = () => {
         ]);
     }, [isSuccessOpen, navigate]);
 
-    const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
+    const handleNext = () => {
+        const fieldsToValidate = {
+            1: ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'genero', 'estado_civil', 'grupo_input'],
+            2: ['telefono', 'email'],
+        }[currentStep];
+
+        if (!fieldsToValidate) {
+            setCurrentStep(prev => Math.min(prev + 1, 4));
+            return;
+        }
+
+        let stepErrors = {};
+        let isStepValid = true;
+
+        fieldsToValidate.forEach(fieldName => {
+            const error = validateField(fieldName, formData[fieldName]);
+            if (error) {
+                stepErrors[fieldName] = error;
+                isStepValid = false;
+            }
+        });
+
+        setErrors(prevErrors => ({ ...prevErrors, ...stepErrors }));
+
+        if (isStepValid) {
+            setCurrentStep(prev => Math.min(prev + 1, 4));
+        }
+    };
     const handlePrev = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
     const handleChange = (e) => {
