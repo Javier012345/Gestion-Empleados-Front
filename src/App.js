@@ -76,6 +76,7 @@ function App() {
             <Route path="/sanciones/agregar" element={<RouteWithTitle title="Agregar Sanción" element={<AgregarSancion />} />} />
             <Route path="/sanciones/aplicar-masiva" element={<RouteWithTitle title="Aplicar Sanción Masiva" element={<AplicarSancionMasiva />} />} />
             <Route path="/sanciones/:id" element={<RouteWithTitle title="Detalle de Sanción" element={<DetalleSancion />} />} />
+            <Route path="/mis-sanciones/:id" element={<RouteWithTitle title="Detalle de Sanción" element={<DetalleSancion />} />} />
             <Route path="/mis-sanciones" element={<RouteWithTitle title="Mis Sanciones" element={<MisSanciones />} />} />
             <Route path="/sanciones/pdf/:id" element={<RouteWithTitle title="Sanción PDF" element={<SancionPDF />} />} />
             <Route path="/sanciones/empleado/:id" element={<RouteWithTitle title="Sanciones de Empleado" element={<SancionesEmpleado />} />} />
@@ -84,6 +85,7 @@ function App() {
             <Route path="/incidentes/:id" element={<RouteWithTitle title="Detalle de Incidente" element={<DetalleIncidente />} />} />
             <Route path="/incidentes/pdf/:id" element={<RouteWithTitle title="Incidente PDF" element={<IncidentePDF />} />} />
             <Route path="/mis-incidentes" element={<RouteWithTitle title="Mis Incidentes" element={<MisIncidentes />} />} />
+            <Route path="/mis-incidentes/:id" element={<RouteWithTitle title="Detalle de Incidente" element={<DetalleIncidente />} />} />
             <Route path="/incidentes/registrar" element={<RouteWithTitle title="Registrar Incidente" element={<RegistrarIncidente />} />} />
             <Route path="/incidentes/empleado/:id" element={<RouteWithTitle title="Incidentes de Empleado" element={<VerIncidentesEmpleado />} />} />
             <Route path="/asistencia/*" element={<RouteWithTitle title="Asistencia" element={<AsistenciaAdmin />} />} />

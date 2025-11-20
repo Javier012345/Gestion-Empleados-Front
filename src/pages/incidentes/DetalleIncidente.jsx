@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
-import { getIncidenteAgrupadoPorId, createResolucion } from '../../services/api';
+import { getIncidenteAgrupadoPorId, createResolucion, getIncidenteEmpleadoPorId } from '../../services/api';
 import AplicarSancionIncidente from './AplicarSancionIncidente';
 
 const DetalleIncidente = () => {
     const { id } = useParams();
     const [incidente, setIncidente] = useState(null);
+    const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -21,11 +22,35 @@ const DetalleIncidente = () => {
     const [showSancionForm, setShowSancionForm] = useState(false);
     const [localResolucion, setLocalResolucion] = useState(null);
 
+    const isMyIncidentRoute = location.pathname.startsWith('/mis-incidentes');
+
     const fetchIncidente = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await getIncidenteAgrupadoPorId(id);
-            setIncidente(response.data);
+            const response = isMyIncidentRoute
+                ? await getIncidenteEmpleadoPorId(id)
+                : await getIncidenteAgrupadoPorId(id);
+            
+            let incidenteData = response.data;
+            if (isMyIncidentRoute && incidenteData.id_incidente) {
+                // Normalizamos la propiedad del tipo de incidente
+                incidenteData.incidente = incidenteData.id_incidente;
+
+                // Normalizamos la estructura de los descargos
+                if (Array.isArray(incidenteData.descargos)) {
+                    incidenteData.descargos_del_grupo = incidenteData.descargos.map(descargo => ({
+                        empleado: descargo.autor,
+                        descargo: {
+                            fecha_descargo: descargo.fecha_descargo,
+                            contenido_descargo: descargo.contenido_descargo,
+                            ruta_archivo_descargo: descargo.ruta_archivo_descargo
+                        }
+                    }));
+                }
+            }
+
+            console.log('Datos del incidente recibidos:', incidenteData);
+            setIncidente(incidenteData);
             setError('');
         } catch (err) {
             setError('No se pudo cargar el detalle del incidente. Inténtalo de nuevo más tarde.');
@@ -33,7 +58,7 @@ const DetalleIncidente = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [id]);
+    }, [id, isMyIncidentRoute]);
 
     useEffect(() => {
         fetchIncidente();
@@ -111,7 +136,7 @@ const DetalleIncidente = () => {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <Link to="/incidentes" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6">
+            <Link to={location.pathname.startsWith('/mis-incidentes') ? "/mis-incidentes" : "/incidentes"} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6">
                 <ArrowLeft size={16} /> Volver
             </Link>
 
@@ -140,26 +165,28 @@ const DetalleIncidente = () => {
                     <div><h4 className="text-sm font-semibold text-gray-500">Fecha</h4><p className="text-gray-900 dark:text-white">{new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</p></div>
                     <div><h4 className="text-sm font-semibold text-gray-500">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente?.descripcion}</p></div>
                     
-                    <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
-                        <div className="space-y-2">
-                            {incidente?.empleados_involucrados.map((involucrado, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
-                                    <div className="flex items-center gap-3">
-                                        <div>
-                                            <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.nombre} {involucrado.apellido}</p>
-                                            <p className="text-xs text-gray-500">DNI: {involucrado.dni}</p>
+                    {!isMyIncidentRoute && (
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
+                            <div className="space-y-2">
+                                {Array.isArray(incidente?.empleados_involucrados) && incidente.empleados_involucrados.map((involucrado, index) => (
+                                    <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
+                                        <div className="flex items-center gap-3">
+                                            <div>
+                                                <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.nombre} {involucrado.apellido}</p>
+                                                <p className="text-xs text-gray-500">DNI: {involucrado.dni}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
+                                                {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
-                                            {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 <h4 className="text-sm font-semibold text-gray-500 mt-6 mb-3">Historial del Caso</h4>
