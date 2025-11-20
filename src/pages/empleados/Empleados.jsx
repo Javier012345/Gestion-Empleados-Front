@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users, AlertCircle, Loader } from 'lucide-react';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
@@ -64,14 +64,29 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
 // --- Componente de Acciones ---
 const EmployeeActions = ({ empleado, onDeactivateClick }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [menuPositionClass, setMenuPositionClass] = useState('top-full');
+    const buttonRef = useRef(null);
+
+    const handleMouseEnter = () => {
+        if (buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            if (spaceBelow < 130) { // Approx height of the menu
+                setMenuPositionClass('bottom-full');
+            } else {
+                setMenuPositionClass('top-full');
+            }
+        }
+        setMenuOpen(true);
+    };
 
     return (
         <div className="relative" onMouseLeave={() => setMenuOpen(false)}>
-            <button onMouseEnter={() => setMenuOpen(true)} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button ref={buttonRef} onMouseEnter={handleMouseEnter} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <MoreHorizontal className="text-gray-500 dark:text-gray-400" />
             </button>
             {menuOpen && (
-                <div className="absolute top-full right-0 w-48 bg-white dark:bg-gray-900 rounded-md shadow-lg z-50 border dark:border-gray-700 py-1">
+                <div className={`absolute ${menuPositionClass} right-0 w-48 bg-white dark:bg-gray-900 rounded-md shadow-lg z-50 border dark:border-gray-700 py-1`}>
                     <Link to={`/empleados/${empleado.id}`} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                         <Eye size={16} />Ver Perfil
                     </Link>
@@ -224,7 +239,7 @@ const Empleados = () => {
             />
 
             {/* --- Lista de Empleados (Tabla para md y superior) --- */}
-            <div className="hidden md:block overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-700/50">
                         <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
@@ -279,7 +294,7 @@ const Empleados = () => {
                             <div className="flex items-center">
                                 {empleado.ruta_foto ? (
                                     <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-12 w-12 rounded-full object-cover" />
-                                ) : (
+                                 ) : (
                                     <span className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-xl">
                                         {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
                                     </span>
