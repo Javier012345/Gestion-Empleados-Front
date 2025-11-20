@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Upload, User, FileText, Image, Edit, X } from 'lucide-react';
 import { getRecibosByDni, getEmpleadoById, createRecibo, getEmpleadosBasico, updateRecibo } from '../../services/api';
 
@@ -249,7 +249,6 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
 
 // --- Componente Principal: Recibos ---
 const Recibos = () => {
-    const [dni, setDni] = useState('');
     const [searchedDni, setSearchedDni] = useState('');
     const [empleado, setEmpleado] = useState(null);
     const [recibos, setRecibos] = useState([]);
@@ -260,9 +259,19 @@ const Recibos = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [reciboToEdit, setReciboToEdit] = useState(null);
     const [allEmpleados, setAllEmpleados] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedEmpleado, setSelectedEmpleado] = useState(null);
+
 
     const [filters, setFilters] = useState({ mes: '', anio: '' });
     const [availableYears, setAvailableYears] = useState([]);
+
+    const filteredEmpleados = useMemo(() => {
+        if (!searchTerm) return [];
+        return (allEmpleados || []).filter(emp => 
+            emp.dni.toString().startsWith(searchTerm)
+        ).slice(0, 5); // Mostramos solo los primeros 5 resultados
+    }, [searchTerm, allEmpleados]);
 
     useEffect(() => {
         const fetchAllEmpleados = async () => {
@@ -284,7 +293,7 @@ const Recibos = () => {
     const handleUpdateSuccess = () => {
         setEditModalOpen(false);
         setReciboToEdit(null);
-        if (searchedDni) handleSearch();
+        if (searchedDni) handleSearch(searchedDni);
     };
 
     const handleOpenEditModal = (recibo) => {
@@ -292,8 +301,14 @@ const Recibos = () => {
         setEditModalOpen(true);
     };
 
-    const handleSearch = async () => {
-        if (!dni) {
+    const handleSelectEmpleado = async (empleado) => {
+        setSelectedEmpleado(empleado);
+        setSearchTerm(''); // Limpia la búsqueda
+        await handleSearch(empleado.dni);
+    };
+
+    const handleSearch = async (searchDni) => {
+        if (!searchDni) {
             setError('Por favor, ingresa un DNI para buscar.');
             return;
         }
@@ -302,10 +317,10 @@ const Recibos = () => {
         setEmpleado(null);
         setRecibos([]);
         setFilteredRecibos([]);
-        setSearchedDni(dni);
+        setSearchedDni(searchDni);
 
         try {
-            const recibosResponse = await getRecibosByDni(dni);
+            const recibosResponse = await getRecibosByDni(searchDni);
             const recibosData = recibosResponse.data;
 
             if (recibosData && recibosData.length > 0) {
@@ -343,6 +358,8 @@ const Recibos = () => {
                 return mesMatch && anioMatch;
             });
             setFilteredRecibos(filtered);
+        } else {
+            setFilteredRecibos([]);
         }
     }, [filters, recibos]);
 
@@ -352,33 +369,42 @@ const Recibos = () => {
             {/* Barra de búsqueda y botón */}
             <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="relative flex-1 max-w-sm">
+                    <label htmlFor="search-dni" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Buscar Empleado por DNI
+                    </label>
                     <div className="relative">
-                        <input 
-                            type="text" 
-                            inputMode="numeric" 
-                            pattern="[0-9]*" 
-                            placeholder="Buscar por DNI..." 
-                            maxLength="8"
-                            value={dni}
-                            onChange={(e) => setDni(e.target.value.replace(/[^0-9]/g, ''))}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="block w-full pl-10 pr-12 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
+                        <input
+                            id="search-dni"
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Comience a escribir el DNI..."
+                            className="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <button 
-                            onClick={handleSearch}
-                            className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
-                        >
-                            <Search className="w-5 h-5" />
-                        </button>
                     </div>
+                    {filteredEmpleados.length > 0 && (
+                        <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
+                            {filteredEmpleados.map(emp => (
+                                <li
+                                    key={emp.id}
+                                    onClick={() => handleSelectEmpleado(emp)}
+                                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-gray-900 dark:text-gray-200"
+                                >
+                                    {`${emp.nombre} ${emp.apellido}`} - {emp.dni}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
-                <button onClick={() => setUploadModalOpen(true)} className="flex-shrink-0 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
-                    <Upload className="w-5 h-5" />
-                    <span>Cargar Recibo</span>
-                </button>
+                <div className="flex-shrink-0 self-end">
+                    <button onClick={() => setUploadModalOpen(true)} className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                        <Upload className="w-5 h-5" />
+                        <span>Cargar Recibo</span>
+                    </button>
+                </div>
             </div>
 
             {/* Contenedor de resultados */}
@@ -415,7 +441,7 @@ const Recibos = () => {
                 </div>
             )}
 
-            {!isLoading && !searchedDni && (
+            {!isLoading && !selectedEmpleado && (
                  <div className="py-12 px-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="max-w-sm mx-auto text-center">
                         <div className="inline-flex p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
