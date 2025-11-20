@@ -197,9 +197,9 @@ const Empleados = () => {
         // Puedes expandir esto con más roles si es necesario
         switch (groupName) {
             case 'Administrador':
-                return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+                return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
             case 'Empleado':
-                return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300';
+                return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
             default:
                 return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
         }
