@@ -45,6 +45,30 @@ apiClient.interceptors.request.use(
     }
 );
 
+// Interceptor para manejar respuestas con errores (como token expirado)
+apiClient.interceptors.response.use(
+    // Si la respuesta es exitosa, simplemente la retornamos
+    (response) => response,
+    // Si hay un error en la respuesta
+    (error) => {
+        // Verificamos si el error es por token inválido o expirado (status 401)
+        if (error.response && error.response.status === 401) {
+            console.log("Token expirado o inválido. Cerrando sesión.");
+
+            // 1. Eliminar la cookie del token
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            
+            // 2. Eliminar los datos del usuario del localStorage
+            localStorage.removeItem('user');
+
+            // 3. Redirigir al login
+            window.location.href = '/login';
+        }
+        // Para cualquier otro error, simplemente lo rechazamos para que sea manejado por el `catch` de la llamada original
+        return Promise.reject(error);
+    }
+);
+
 export const getEmpleadosBasico = () => {
     return apiClient.get('empleados-basico/');
 };
@@ -183,6 +207,10 @@ export const getMisIncidentes = () => {
 
 export const getMisAsistencias = () => {
     return apiClient.get('mis-asistencias/');
+};
+
+export const getMisNotificaciones = () => {
+    return apiClient.get('mis-notificaciones/');
 };
 
 /**
