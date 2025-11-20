@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, Sun, Moon, Bell, UserCog, User } from 'lucide-react';
+import { getMisNotificaciones } from '../../services/api';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const Header = ({ 
     onOpenMobileMenu, 
@@ -12,9 +16,25 @@ const Header = ({
 }) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
-    // Datos de ejemplo para notificaciones
-    const notifications_count = 3;
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response = await getMisNotificaciones();
+                setNotifications(response.data);
+            } catch (error) {
+                console.error("Error al obtener las notificaciones:", error);
+            }
+        };
+
+        fetchNotifications();
+    }, []);
+
+    const unreadNotificationsCount = notifications.filter(n => !n.leida).length;
+
+    // TODO: Implementar la función para marcar notificaciones como leídas
+    const handleMarkAllAsRead = () => console.log("Marcar todas como leídas");
 
     return (
         <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
@@ -35,11 +55,11 @@ const Header = ({
                 <div className="relative">
                     <button onClick={() => setNotificationsOpen(!notificationsOpen)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                         <Bell size={20} />
-                        {notifications_count > 0 && (
+                        {unreadNotificationsCount > 0 && (
                             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[10px] text-white font-medium items-center justify-center">
-                                    {notifications_count}
+                                    {unreadNotificationsCount}
                                 </span>
                             </span>
                         )}
@@ -47,18 +67,23 @@ const Header = ({
                     {notificationsOpen && (
                         <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-700 z-20">
                             <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-                                <h3 className="font-semibold text-gray-900 dark:text-white">Notificaciones ({notifications_count})</h3>
-                                <button className="text-sm text-red-600 hover:underline">Marcar como leídas</button>
+                                <h3 className="font-semibold text-gray-900 dark:text-white">Notificaciones ({unreadNotificationsCount})</h3>
+                                <button onClick={handleMarkAllAsRead} className="text-sm text-red-600 hover:underline">Marcar como leídas</button>
                             </div>
                             <div className="max-h-96 overflow-y-auto divide-y dark:divide-gray-700">
-                                {/* Aquí iría la lista de notificaciones */}
-                                <a href="#" className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Ejemplo de notificación</p>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">hace 5 minutos</span>
-                                </a>
+                                {notifications.length > 0 ? notifications.map(notif => (
+                                    <Link to={notif.enlace || '#'} key={notif.id} className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                        <p className={`text-sm font-medium ${!notif.leida ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>{notif.mensaje}</p>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                            {formatDistanceToNow(new Date(notif.fecha_creacion), { addSuffix: true, locale: es })}
+                                        </span>
+                                    </Link>
+                                )) : (
+                                    <p className="p-4 text-sm text-center text-gray-500 dark:text-gray-400">No tienes notificaciones nuevas.</p>
+                                )}
                             </div>
                             <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 text-center">
-                                <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Ver todas</a>
+                                <Link to="/notificaciones" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Ver todas</Link>
                             </div>
                         </div>
                     )}

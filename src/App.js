@@ -35,6 +35,7 @@ import VerIncidentesEmpleado from './pages/incidentes/VerIncidentesEmpleado';
 import AsistenciaAdmin from './pages/asistencia/AsistenciaAdmin';
 import MisAsistencias from './pages/asistencia/MisAsistencias';
 import VerAsistencias from './pages/asistencia/VerAsistencias';
+import Notificaciones from './pages/notificaciones/Notificaciones';
 import ReportesHome from './pages/reportes/ReportesHome';
 import PrivateRoute from './components/route/PrivateRoute';
 import { ThemeProvider } from './context/ThemeContext';
@@ -68,7 +69,7 @@ function App() {
             <Route path="/horarios/asignar" element={<RouteWithTitle title="Asignar Horario" element={<AsignarHorario />} />} />
             <Route path="/horarios/cargar" element={<RouteWithTitle title="Cargar Horario" element={<CargarHorario />} />} />
             <Route path="/horarios/historial" element={<RouteWithTitle title="Historial de Horarios" element={<HistorialHorarios />} />} />
-            <Route path="/horarios/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
+            <Route path="/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
             <Route path="/horarios/ver-asignados" element={<RouteWithTitle title="Ver Horarios Asignados" element={<VerHorariosAsignados />} />} />
             <Route path="/horarios/ver-empleado" element={<RouteWithTitle title="Ver Horarios de Empleado" element={<VerHorariosEmpleado />} />} />
             <Route path="/sanciones" element={<RouteWithTitle title="Sanciones" element={<Sanciones />} />} />
@@ -89,6 +90,7 @@ function App() {
             <Route path="/mis-asistencias" element={<RouteWithTitle title="Mis Asistencias" element={<MisAsistencias />} />} />
             <Route path="/asistencia/empleado/:id" element={<RouteWithTitle title="Asistencias de Empleado" element={<VerAsistencias />} />} />
             <Route path="/reportes" element={<RouteWithTitle title="Reportes" element={<ReportesHome />} />} />
+            <Route path="/notificaciones" element={<RouteWithTitle title="Notificaciones" element={<Notificaciones />} />} />
           </Route>
         </Routes>
       </Router>

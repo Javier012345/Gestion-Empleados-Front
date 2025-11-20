@@ -112,7 +112,7 @@ const Home = () => {
                     .sort((a, b) => new Date(b.fecha_ingreso) - new Date(a.fecha_ingreso))
                     .slice(0, 3)
                     .map(e => ({
-                        id: `emp-${e.id}`,
+                        id: e.id,
                         tipo: 'NUEVA_CONTRATACION',
                         mensaje: `¡Bienvenido, ${e.nombre} ${e.apellido}!`,
                         fecha: new Date(e.fecha_ingreso)
@@ -122,7 +122,7 @@ const Home = () => {
                     .sort((a, b) => new Date(b.fecha_sancion) - new Date(a.fecha_sancion))
                     .slice(0, 3)
                     .map(s => ({
-                        id: `san-${s.id}`,
+                        id: s.id,
                         tipo: 'NUEVA_SANCION',
                         mensaje: `Se aplicó una sanción a ${s.id_empl.nombre} ${s.id_empl.apellido}.`,
                         fecha: new Date(s.fecha_sancion)
@@ -273,7 +273,7 @@ const Home = () => {
                                         <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{incidente.tipo}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Involucra a: {incidente.empleado}</p>
                                     </div>
-                                    <a href="#" className="text-xs font-semibold px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-300">Ver</a>
+                                    <Link to={`/incidentes/${incidente.id}`} className="text-xs font-semibold px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-300">Ver</Link>
                                 </li>
                             ))}
                         </ul>
@@ -291,17 +291,19 @@ const Home = () => {
                         <h2 className="text-lg font-bold mb-6 text-green-500">Actividad Reciente</h2>
                         <ul className="space-y-4">
                             {dashboardData.actividad_reciente.map(actividad => (
-                                <li key={actividad.id} className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700 transition duration-300 hover:border-green-300 dark:hover:border-green-600">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg">
-                                        {getActivityIcon(actividad.tipo)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-gray-900 dark:text-gray-100 truncate">{actividad.mensaje}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            {formatDistanceToNow(actividad.fecha, { addSuffix: true, locale: es })}
-                                        </p>
-                                    </div>
-                                </li>
+                                <Link to={actividad.tipo === 'NUEVA_CONTRATACION' ? `/empleados/${actividad.id}` : `/sanciones/${actividad.id}`} key={actividad.id}>
+                                    <li className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700 transition duration-300 hover:border-green-300 dark:hover:border-green-600">
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg">
+                                            {getActivityIcon(actividad.tipo)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm text-gray-900 dark:text-gray-100 truncate">{actividad.mensaje}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                {formatDistanceToNow(actividad.fecha, { addSuffix: true, locale: es })}
+                                            </p>
+                                        </div>
+                                    </li>
+                                </Link>
                             ))}
                         </ul>
                     </div>
