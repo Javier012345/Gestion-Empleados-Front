@@ -77,7 +77,7 @@ const VerAsistenciasTab = () => {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto">
             <h2 className="text-2xl font-bold mb-4">Ver Asistencias por Empleado</h2>
 
             {/* Buscador de Empleados */}
@@ -91,15 +91,15 @@ const VerAsistenciasTab = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Comience a escribir el DNI..."
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
                 />
                 {filteredEmpleados.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-gray-800 border border-gray-700 rounded-md mt-1 max-h-60 overflow-y-auto">
+                    <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
                         {filteredEmpleados.map(emp => (
                             <li
                                 key={emp.id}
                                 onClick={() => handleSelectEmpleado(emp)}
-                                className="p-2 hover:bg-gray-700 cursor-pointer"
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-gray-800 dark:text-gray-200"
                             >
                                 {`${emp.nombre} ${emp.apellido}`} - {emp.dni}
                             </li>
@@ -112,24 +112,24 @@ const VerAsistenciasTab = () => {
             {selectedEmpleado ? (
                 <div>
                     <h3 className="text-xl font-semibold mb-3">
-                        Asistencias de: <span className="text-blue-400">{selectedEmpleado.nombre_completo}</span>
+                        Asistencias de: <span className="text-blue-600 dark:text-blue-400">{selectedEmpleado.nombre_completo}</span>
                     </h3>
-                    {loading && <p>Cargando asistencias...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
+                    {loading && <p className="text-gray-600 dark:text-gray-400">Cargando asistencias...</p>}
+                    {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
                     {!loading && asistencias.length > 0 ? (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full bg-gray-800 border border-gray-700">
-                                <thead className="bg-gray-900">
+                            <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <thead className="bg-gray-50 dark:bg-gray-900">
                                     <tr>
-                                        <th className="p-3 text-left text-sm font-semibold text-gray-300">Fecha</th>
-                                        <th className="p-3 text-left text-sm font-semibold text-gray-300">Hora de Entrada</th>
-                                        <th className="p-3 text-left text-sm font-semibold text-gray-300">Minutos de Retraso</th>
+                                        <th className="p-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Fecha</th>
+                                        <th className="p-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Hora de Entrada</th>
+                                        <th className="p-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Minutos de Retraso</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {asistencias.map(asistencia => (
-                                        <tr key={asistencia.id} className="border-b border-gray-700 hover:bg-gray-700">
-                                            <td className="p-3">{new Date(asistencia.fecha_hora).toLocaleDateString('es-ES')}</td>
+                                        <tr key={asistencia.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td className="p-3 text-gray-700 dark:text-gray-300">{new Date(asistencia.fecha_hora).toLocaleDateString('es-ES')}</td>
                                             <td className="p-3">{new Date(asistencia.fecha_hora).toLocaleTimeString('es-ES', {
                                                 hour: '2-digit',
                                                 minute: '2-digit',
@@ -144,7 +144,7 @@ const VerAsistenciasTab = () => {
                             </table>
                         </div>
                     ) : (
-                        !loading && !error && <p className="text-gray-400">No se encontraron registros de asistencia para este empleado.</p>
+                        !loading && !error && <p className="text-gray-500 dark:text-gray-400">No se encontraron registros de asistencia para este empleado.</p>
                     )}
 
                     {/* Controles de Paginación */}
@@ -153,17 +153,17 @@ const VerAsistenciasTab = () => {
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={!pagination.has_previous}
-                                className="flex items-center px-4 py-2 bg-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
                             >
                                 <ChevronLeft size={16} className="mr-2" /> Anterior
                             </button>
-                            <span className="text-sm text-gray-400">
+                            <span className="text-sm text-gray-700 dark:text-gray-400">
                                 Página {pagination.number} de {pagination.num_pages}
                             </span>
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={!pagination.has_next}
-                                className="flex items-center px-4 py-2 bg-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
                             >
                                 Siguiente <ChevronRight size={16} className="ml-2" />
                             </button>
@@ -171,9 +171,9 @@ const VerAsistenciasTab = () => {
                     )}
                 </div>
             ) : (
-                <div className="text-center py-10 bg-gray-800 rounded-xl shadow-sm border border-gray-700">
-                    <h3 className="mt-2 text-sm font-semibold text-white">Buscar asistencias de empleado</h3>
-                    <p className="mt-1 text-sm text-gray-400">Ingresa un DNI para ver las asistencias de un empleado.</p>
+                <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Buscar asistencias de empleado</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Ingresa un DNI para ver las asistencias de un empleado.</p>
                 </div>
             )}
         </div>
