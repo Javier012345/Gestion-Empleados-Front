@@ -43,7 +43,7 @@ const MisHorarios = () => {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando tus horarios...</div>;
+        return <div className="flex justify-center items-center p-8 text-gray-800 dark:text-gray-200"><Loader className="animate-spin mr-2" /> Cargando tus horarios...</div>;
     }
 
     if (error) {
