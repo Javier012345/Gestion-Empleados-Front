@@ -7,6 +7,12 @@ const Sanciones = () => {
     const [sanciones, setSanciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({
+        searchQuery: '',
+        mes: '',
+        anio: '',
+        tipo: ''
+    });
 
     useEffect(() => {
         const fetchSanciones = async () => {
@@ -24,31 +30,74 @@ const Sanciones = () => {
         fetchSanciones();
     }, []);
 
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        // Validación para el campo de búsqueda
+        if (name === 'searchQuery') {
+            if (/^[a-zA-Z\s\u00C0-\u017F0-9]*$/.test(value)) {
+                setFilters(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFilters(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const resetFilters = () => {
+        setFilters({
+            searchQuery: '',
+            mes: '',
+            anio: '',
+            tipo: ''
+        });
+    };
+
+    const filteredSanciones = sanciones.filter(sancion => {
+        const searchLower = filters.searchQuery.toLowerCase();
+        const empleado = sancion.id_empl;
+        const fullName = `${empleado.nombre} ${empleado.apellido}`.toLowerCase();
+        const dni = String(empleado.dni);
+
+        const searchMatch = fullName.includes(searchLower) || dni.includes(searchLower);
+        
+        const fechaSancion = new Date(sancion.fecha_inicio);
+        const mesMatch = filters.mes ? (fechaSancion.getUTCMonth() + 1) === parseInt(filters.mes) : true;
+        const anioMatch = filters.anio ? fechaSancion.getUTCFullYear() === parseInt(filters.anio) : true;
+
+        const tipoMatch = filters.tipo ? sancion.id_sancion.tipo === filters.tipo : true;
+
+        return searchMatch && mesMatch && anioMatch && tipoMatch;
+    });
 
     return (
         <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sanciones</h1>
-                <a href="/sanciones/agregar" className="w-full sm:w-auto flex-shrink-0 bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700">
+            <div className="flex justify-end mb-4">
+                <a href="/sanciones/agregar" className="w-full sm:w-auto flex-shrink-0 bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 font-medium transition-all duration-200 hover:shadow-lg hover:scale-105">
                     <Plus size={20} />
                     <span>Aplicar Sanción Directa</span>
                 </a>
             </div>
 
-            <form className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm mb-6">
+            <form className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm mb-6 border border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
-                    <div>
+                    <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar por Empleado</label>
-                        <input type="text" placeholder="Nombre o DNI..." className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
+                        <input 
+                            type="text" 
+                            name="searchQuery"
+                            placeholder="Nombre o DNI..." 
+                            value={filters.searchQuery}
+                            onChange={handleFilterChange}
+                            className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" 
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Periodo</label>
                         <div className="flex gap-2 mt-1">
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select name="mes" value={filters.mes} onChange={handleFilterChange} className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                 <option value="">Mes</option>
                                 {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                             </select>
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select name="anio" value={filters.anio} onChange={handleFilterChange} className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                 <option value="">Año</option>
                                 {[2023, 2024, 2025].map(year => <option key={year} value={year}>{year}</option>)}
                             </select>
@@ -56,28 +105,17 @@ const Sanciones = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
-                        <select className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
+                        <select name="tipo" value={filters.tipo} onChange={handleFilterChange} className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                             <option value="">Todos</option>
                             <option value="Leve">Leve</option>
                             <option value="Moderada">Moderada</option>
                             <option value="Grave">Grave</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registros</label>
-                        <select className="w-full mt-1 px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white">
-                            <option value="9">9</option>
-                            <option value="12">12</option>
-                            <option value="18">18</option>
-                        </select>
-                    </div>
-                    <div className="flex gap-2 ">
-                        <button type="submit" className="w-full bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700">
-                            <Filter size={16} /><span>Filtrar</span>
-                        </button>
-                        <a href="/sanciones" className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500">
+                    <div className="flex gap-2">
+                        <button type="button" onClick={resetFilters} className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500">
                             <RotateCw size={16} /><span>Limpiar</span>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </form>
@@ -92,9 +130,9 @@ const Sanciones = () => {
                     <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Error al cargar</h3>
                     <p className="mt-1 text-sm text-gray-500">{error}</p>
                 </div>
-            ) : sanciones.length > 0 ? (
+            ) : filteredSanciones.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sanciones.map(sancion => (
+                    {filteredSanciones.map(sancion => (
                         <div key={sancion.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 flex flex-col border dark:border-gray-700 group hover:shadow-xl hover:border-red-500/20 transition-all duration-300 hover:-translate-y-1">
                             <div className="flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-2">

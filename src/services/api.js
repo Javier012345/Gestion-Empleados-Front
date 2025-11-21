@@ -217,6 +217,10 @@ export const getMisNotificaciones = () => {
     return apiClient.get('mis-notificaciones/');
 };
 
+export const marcarNotificacionesLeidas = () => {
+    return apiClient.post('notificaciones/marcar-todas-leidas/');
+};
+
 /**
  * Obtiene la lista de empleados que aún no tienen un rostro registrado.
  * @returns {Promise} La promesa de la petición de Axios.

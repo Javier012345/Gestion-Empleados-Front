@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users, AlertCircle, Loader } from 'lucide-react';
+import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users, AlertCircle, Loader, Mail, Phone } from 'lucide-react';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import { getEmpleados, deleteEmpleado } from '../../services/api'; // Importar la función de la API
+import { getEmpleadosBasico, deleteEmpleado } from '../../services/api'; // Importar la función de la API
 
 const estado_choices = [
     ['Activo', 'Activo'],
@@ -10,7 +10,7 @@ const estado_choices = [
 ];
 
 // --- Componente de Controles ---
-const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoChange, cargoFilter, onCargoChange, cargos }) => {
+const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoChange, cargoFilter, onCargoChange, cargos, itemsPerPage, onItemsPerPageChange }) => {
     const handlePrint = () => {
         window.print();
     };
@@ -28,7 +28,7 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
                         className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                     />
                 </div>
-                <div className="w-full md:w-auto flex flex-col sm:flex-row gap-2">
+                <div className="w-full md:w-auto flex flex-col sm:flex-row items-center gap-2">
                     <select 
                         value={estadoFilter}
                         onChange={onEstadoChange}
@@ -42,6 +42,16 @@ const EmployeeControls = ({ searchTerm, onSearchChange, estadoFilter, onEstadoCh
                         className="w-full sm:w-auto py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50">
                         <option value="">Todos los Cargos</option>
                         {cargos.map(cargo => <option key={cargo} value={cargo}>{cargo}</option>)}
+                    </select>
+                    <select 
+                        value={itemsPerPage}
+                        onChange={onItemsPerPageChange}
+                        className="w-full sm:w-auto py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50"
+                    >
+                        <option value={10}>10 por página</option>
+                        <option value={20}>20 por página</option>
+                        <option value={30}>30 por página</option>
+                        <option value={50}>50 por página</option>
                     </select>
                 </div>
             </div>
@@ -118,13 +128,13 @@ const Empleados = () => {
 
     // Estado para la paginación
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
         const fetchEmpleados = async () => {
             try {
                 setLoading(true);
-                const response = await getEmpleados();
+                const response = await getEmpleadosBasico();
                 const sortedEmpleados = response.data.sort((a, b) => b.id - a.id);
                 setEmpleados(sortedEmpleados);
                 // Establecer los cargos de forma estática
@@ -167,6 +177,19 @@ const Empleados = () => {
             alert('No se pudo inactivar al empleado. Intente de nuevo.');
             handleCloseModal();
         }
+    };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        // Permite solo letras (con acentos), números y espacios
+        if (/^[a-zA-Z\s\u00C0-\u017F0-9]*$/.test(value)) {
+            setSearchTerm(value);
+        }
+    };
+
+    const handleItemsPerPageChange = (e) => {
+        setItemsPerPage(Number(e.target.value));
+        setCurrentPage(1); // Reset to first page
     };
 
     const filteredEmpleados = empleados.filter(empleado => {
@@ -231,17 +254,19 @@ const Empleados = () => {
         <div className="p-4 sm:p-6">
             <EmployeeControls 
                 searchTerm={searchTerm}
-                onSearchChange={e => setSearchTerm(e.target.value)}
+                onSearchChange={handleSearchChange}
                 estadoFilter={estadoFilter}
                 onEstadoChange={e => setEstadoFilter(e.target.value)}
                 cargoFilter={cargoFilter}
                 onCargoChange={e => setCargoFilter(e.target.value)}
-                cargos={cargos}
+                cargos={cargos} 
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={handleItemsPerPageChange}
             />
 
             {/* --- Lista de Empleados (Tabla para md y superior) --- */}
             <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <table className="w-full">
+                <table className="w-full" data-testid="employee-table">
                     <thead className="bg-gray-50 dark:bg-gray-700/50">
                         <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
                             <th className="px-6 py-4">Foto</th>
@@ -290,38 +315,44 @@ const Empleados = () => {
             {/* --- Lista de Empleados (Tarjetas para móvil) --- */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
                 {currentItems.map(empleado => (
-                    <div key={empleado.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
+                    <div key={empleado.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                        <div className="p-4">
+                            <div className="flex items-center gap-4 mb-4">
                                 {empleado.ruta_foto ? (
-                                    <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-12 w-12 rounded-full object-cover" />
-                                 ) : (
-                                    <span className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-xl">
+                                    <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-16 w-16 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600" />
+                                ) : (
+                                    <span className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-2xl">
                                         {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
                                     </span>
                                 )}
-                                <div className="ml-4">
-                                    <p className="font-bold text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</p>
+                                <div className="flex-1">
+                                    <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">DNI: {empleado.dni}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{empleado.email}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
+                                            {empleado.grupo || '-'}
+                                        </span>
+                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColorClasses(empleado.estado)}`}>
+                                            {empleado.estado}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <EmployeeActions empleado={empleado} onDeleteClick={handleOpenModal} />
+                            <div className="space-y-2 text-sm">
+                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Mail size={14} />
+                                    <span>{empleado.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Phone size={14} />
+                                    <span>{empleado.telefono || 'No disponible'}</span>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-auto">
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Cargo:</span>
-                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
-                                    {empleado.grupo || '-'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
-                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColorClasses(empleado.estado)}`}>
-                                    {empleado.estado}
-                                </span>
-                            </div>
+                        <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-2 flex justify-end items-center gap-1">
+                            <Link to={`/empleados/${empleado.id}`} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"><Eye size={18} /></Link>
+                            <Link to={`/empleados/editar/${empleado.id}`} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"><Edit2 size={18} /></Link>
+                            <button onClick={() => handleOpenModal(empleado)} className="p-2 rounded-md hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-500 transition-colors"><Trash2 size={18} /></button>
                         </div>
                     </div>
                 ))}
@@ -337,14 +368,14 @@ const Empleados = () => {
 
             {/* --- Paginación --- */}
             {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6 mt-6">
-                    <div className="w-full sm:w-auto text-center sm:text-left mb-2 sm:mb-0">
+                <div className="flex flex-col md:flex-row items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6 mt-6 gap-4">
+                    <div className="w-full md:w-auto text-center">
                         <p className="text-sm text-gray-700 dark:text-gray-300">
                             Mostrando <span className="font-medium">{indexOfFirstItem + 1}</span> a <span className="font-medium">{Math.min(indexOfLastItem, filteredEmpleados.length)}</span> de <span className="font-medium">{filteredEmpleados.length}</span> resultados
                         </p>
                     </div>
-                    <div className="w-full sm:w-auto">
-                        <nav className="relative z-0 inline-flex justify-center sm:justify-end w-full rounded-md shadow-sm -space-x-px">
+                    <div className="w-full md:w-auto">
+                        <nav className="relative z-0 inline-flex justify-center md:justify-end w-full rounded-md shadow-sm -space-x-px">
                             <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
                                 <ChevronLeft size={20} />
                             </button>

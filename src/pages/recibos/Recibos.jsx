@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Upload, User, FileText, Image, Edit, X } from 'lucide-react';
+import { Search, Upload, User, FileText, Image, Edit, X, Loader, AlertCircle } from 'lucide-react';
 import { getRecibosByDni, getEmpleadoById, createRecibo, getEmpleadosBasico, updateRecibo } from '../../services/api';
 
 
@@ -367,12 +367,19 @@ const Recibos = () => {
     return (
         <>
             {/* Barra de búsqueda y botón */}
-            <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <div className="relative flex-1 md:max-w-sm">
                     <label htmlFor="search-dni" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Buscar Empleado por DNI
                     </label>
                     <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            {isLoading ? (
+                                <Loader className="w-5 h-5 text-gray-400 animate-spin" />
+                            ) : (
+                                <Search className="w-5 h-5 text-gray-400" />
+                            )}
+                        </div>
                         <input
                             id="search-dni"
                             type="text"
@@ -381,9 +388,6 @@ const Recibos = () => {
                             placeholder="Comience a escribir el DNI..."
                             className="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
                         />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                        </div>
                     </div>
                     {filteredEmpleados.length > 0 && (
                         <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
@@ -408,13 +412,26 @@ const Recibos = () => {
             </div>
 
             {/* Contenedor de resultados */}
-            {isLoading && <div className="text-center p-8 text-gray-600 dark:text-gray-300">Buscando...</div>}
-            {error && <div className="text-center p-8 text-red-500">{error}</div>}
+            {isLoading && (
+                <div className="flex justify-center items-center p-10">
+                    <Loader className="animate-spin text-red-500" size={48} />
+                </div>
+            )}
+
+            {error && !isLoading && (
+                <div className="flex flex-col items-center justify-center h-64 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-lg p-6">
+                    <AlertCircle size={48} className="mb-4" />
+                    <h2 className="text-xl font-semibold mb-2">Error</h2>
+                    <p>{error}</p>
+                </div>
+            )}
             
             {!isLoading && !error && empleado && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in">
                     <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Resultados para {empleado.nombre} {empleado.apellido}</h2>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                            Recibos de <span className="text-red-600">{empleado.nombre} {empleado.apellido}</span>
+                        </h2>
                     </div>
                     {/* Filtros */}
                     <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
@@ -441,14 +458,14 @@ const Recibos = () => {
                 </div>
             )}
 
-            {!isLoading && !selectedEmpleado && (
-                 <div className="py-12 px-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            {!isLoading && !empleado && !error && (
+                 <div className="py-12 px-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mt-6">
                     <div className="max-w-sm mx-auto text-center">
                         <div className="inline-flex p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
                             <Search className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Buscar recibos de sueldo</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Ingresa un DNI para ver los recibos de un empleado.</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Busca un empleado</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Utiliza la barra de búsqueda para encontrar los recibos de sueldo por DNI.</p>
                     </div>
                 </div>
             )}

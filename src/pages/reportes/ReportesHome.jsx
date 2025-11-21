@@ -104,7 +104,7 @@ const ReportesHome = () => {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 text-gray-900 dark:text-white">
-            <h1 className="text-2xl font-bold">Dashboard de Reportes Dinámico</h1>
+            
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 lg:order-1">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3">Seleccionar Reporte</h2>

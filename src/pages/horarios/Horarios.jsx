@@ -33,7 +33,7 @@ const Horarios = () => {
     return (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800">
             <div className="border-b border-gray-300 dark:border-gray-700">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto hide-scrollbar py-1">
                     <nav className="-mb-px flex space-x-6 px-4 sm:px-6" aria-label="Tabs">
                         {tabs.map(tab => (
                             <button
