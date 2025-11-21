@@ -139,7 +139,7 @@ const MisIncidentes = () => {
             </form>
 
             {loading ? (
-                <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando tus incidentes...</div>
+                <div className="flex justify-center items-center p-8 text-gray-800 dark:text-gray-200"><Loader className="animate-spin mr-2" /> Cargando tus incidentes...</div>
             ) : error ? (
                 <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>
             ) : pagedData.data.length > 0 ? (

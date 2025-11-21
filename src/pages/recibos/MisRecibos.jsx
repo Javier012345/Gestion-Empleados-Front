@@ -91,7 +91,7 @@ const MisRecibos = () => {
                     <div className="w-32">
                         <label htmlFor="mes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Mes</label>
                         <select name="mes" id="mes" value={selectedFilters.mes} onChange={handleFilterChange}
-                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
+                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
                             <option value="">Todos</option>
                             {meses.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                         </select>
@@ -99,7 +99,7 @@ const MisRecibos = () => {
                     <div className="w-28">
                         <label htmlFor="anio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Año</label>
                         <select name="anio" id="anio" value={selectedFilters.anio} onChange={handleFilterChange}
-                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
+                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer transition-all duration-200 hover:border-red-500/50 text-sm py-2">
                             {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
                     </div>
@@ -154,7 +154,7 @@ const MisRecibos = () => {
                                                 <Receipt className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                                             </div>
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">No se encontraron recibos</h3>
-                                            <p className="text-sm text-gray-500">Prueba con otros filtros o revisa si tienes recibos cargados.</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Prueba con otros filtros o revisa si tienes recibos cargados.</p>
                                         </div>
                                     </div>
                                 </td>
