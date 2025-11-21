@@ -23,12 +23,13 @@ const employeeLinks = [
     { icon: <Camera size={20} />, name: 'Mis Asistencias', path: '/mis-asistencias' },
 ];
 
-const NavLinks = ({ links }) => (
+const NavLinks = ({ links, onLinkClick }) => (
     <nav className="flex-1 px-4 py-6 space-y-1.5">
         {links.map(link => (
             <NavLink
                 key={link.name}
                 to={link.path}
+                onClick={onLinkClick}
                 className={({ isActive }) =>
                     `group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white transition-all duration-200 ` +
                     (isActive ? 'bg-red-600 text-white' : '')
@@ -95,7 +96,7 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
                         <X size={24} />
                     </button>
                 </div>
-                <NavLinks links={links} />
+                <NavLinks links={links} onLinkClick={onClose} />
                  <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
                     <button onClick={handleLogoutClick} className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-600 hover:text-white w-full">
                         <LogOut size={20} />

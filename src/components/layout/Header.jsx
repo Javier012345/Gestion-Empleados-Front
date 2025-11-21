@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Sun, Moon, Bell, UserCog, User } from 'lucide-react';
-import { getMisNotificaciones } from '../../services/api';
+import { getMisNotificaciones, marcarNotificacionesLeidas } from '../../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -33,8 +33,19 @@ const Header = ({
 
     const unreadNotificationsCount = notifications.filter(n => !n.leida).length;
 
-    // TODO: Implementar la función para marcar notificaciones como leídas
-    const handleMarkAllAsRead = () => console.log("Marcar todas como leídas");
+    const handleMarkAllAsRead = async () => {
+        try {
+            await marcarNotificacionesLeidas();
+            // Actualiza el estado local para reflejar que todas están leídas
+            const updatedNotifications = notifications.map(n => ({ ...n, leida: true }));
+            setNotifications(updatedNotifications);
+            // Opcional: cerrar el dropdown de notificaciones
+            setNotificationsOpen(false);
+        } catch (error) {
+            console.error("Error al marcar las notificaciones como leídas:", error);
+            // Aquí podrías mostrar una notificación de error al usuario
+        }
+    };
 
     return (
         <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">

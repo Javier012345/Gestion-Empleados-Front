@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ThemeContext } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import { getEmpleadosBasico, getSancionesEmpleados, getIncidentesAgrupados, getResumenDiario } from '../../services/api';
-import { Users, UserCheck, ShieldAlert, UserPlus, Wrench, FileWarning, Bell, LogIn } from 'lucide-react';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Users, UserCheck, ShieldAlert, UserPlus, Wrench, FileWarning, Bell, Loader, ArrowRight, Activity } from 'lucide-react';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -30,6 +30,32 @@ ChartJS.register(
     Legend,
     Filler,
     ArcElement
+);
+
+// --- Componentes de UI Senior ---
+
+const StatCard = ({ title, value, icon, link, colorClass }) => (
+    <Link to={link} className={`bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border-l-4 ${colorClass} hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group`}>
+        <div className="flex items-center justify-between">
+            <div>
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">{title}</h3>
+                <p className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{value}</p>
+            </div>
+            <div className={`p-3 rounded-full bg-opacity-10 ${colorClass.replace('border-', 'bg-')}`}>
+                {icon}
+            </div>
+        </div>
+    </Link>
+);
+
+const InfoCard = ({ title, icon, children, footerLink, footerText }) => (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+        <div className="flex items-center gap-3 mb-4">
+            {icon}
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">{title}</h2>
+        </div>
+        <div className="flex-grow">{children}</div>
+    </div>
 );
 
 const Home = () => {
@@ -206,107 +232,93 @@ const Home = () => {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen"><p>Cargando datos del dashboard...</p></div>;
+        return (
+            <div className="flex justify-center items-center h-[calc(100vh-8rem)]">
+                <Loader className="animate-spin text-red-500" size={48} />
+            </div>
+        );
     }
 
     return (
-        <div className="p-6 bg-transparent min-h-screen"> {/* Cambiado a bg-transparent */}
+        <div className="p-4 sm:p-6 space-y-8">
 
             {/* Tarjetas de Estadísticas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Link to="/empleados" className="relative overflow-hidden bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-white">Total Empleados</h3>
-                            <div className="p-2 bg-white/20 rounded-lg"><Users className="w-6 h-6 text-white" /></div>
-                        </div>
-                        <p className="text-4xl font-bold text-white">{dashboardData.total_empleados}</p>
-                    </div>
-                </Link>
-                 <a href="#" className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-white">Asistencia Hoy</h3>
-                            <div className="p-2 bg-white/20 rounded-lg"><UserCheck className="w-6 h-6 text-white" /></div>
-                        </div>
-                        <p className="text-4xl font-bold text-white">{dashboardData.asistencia_hoy} / {dashboardData.total_empleados_activos}</p>
-                    </div>
-                </a>
-                <a href="#" className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-white">Sanciones Mes</h3>
-                            <div className="p-2 bg-white/20 rounded-lg"><ShieldAlert className="w-6 h-6 text-white" /></div>
-                        </div>
-                        <p className="text-4xl font-bold text-white">{dashboardData.sanciones_mes}</p>
-                    </div>
-                </a>
-                <a href="#" className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-white">Contrataciones (Mes)</h3>
-                            <div className="p-2 bg-white/20 rounded-lg"><UserPlus className="w-6 h-6 text-white" /></div>
-                        </div>
-                        <p className="text-4xl font-bold text-white">{dashboardData.contrataciones_mes}</p>
-                    </div>
-                </a>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title="Total Empleados" value={dashboardData.total_empleados} icon={<Users className="w-6 h-6 text-blue-500" />} link="/empleados" colorClass="border-blue-500" />
+                <StatCard title="Asistencia Hoy" value={`${dashboardData.asistencia_hoy} / ${dashboardData.total_empleados_activos}`} icon={<UserCheck className="w-6 h-6 text-green-500" />} link="/asistencia" colorClass="border-green-500" />
+                <StatCard title="Sanciones (Mes)" value={dashboardData.sanciones_mes} icon={<ShieldAlert className="w-6 h-6 text-yellow-500" />} link="/sanciones" colorClass="border-yellow-500" />
+                <StatCard title="Contrataciones (Mes)" value={dashboardData.contrataciones_mes} icon={<UserPlus className="w-6 h-6 text-red-500" />} link="/empleados" colorClass="border-red-500" />
             </div>
 
             {/* Grid para Gráficos y Listas */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"> {/* Añadido dark mode */}
-                        <h2 className="text-lg font-bold mb-6 text-blue-500">Contrataciones en los últimos 6 meses</h2>
-                        <div className="bg-white dark:bg-gray-700/50 p-4 rounded-xl">
+                    <InfoCard title="Contrataciones Recientes" icon={<Users className="text-red-500" />}>
+                        <div className="relative h-auto" style={{ aspectRatio: '2 / 1' }}>
                             <Line options={hiresChartOptions} data={hiresChartData} />
                         </div>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"> {/* Añadido dark mode */}
-                        <h2 className="text-lg font-bold mb-6 text-red-500">Últimos Incidentes Registrados</h2>
-                        <ul className="space-y-4">
-                            {dashboardData.ultimos_incidentes.map(incidente => (
-                                <li key={incidente.id} className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700 transition duration-300 hover:border-red-300 dark:hover:border-red-600">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg">
-                                        {getIncidentIcon(incidente.tipo)}
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{incidente.tipo}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Involucra a: {incidente.empleado}</p>
-                                    </div>
-                                    <Link to={`/incidentes/${incidente.id}`} className="text-xs font-semibold px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-300">Ver</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    </InfoCard>
+
+                    <InfoCard title="Últimos Incidentes" icon={<FileWarning className="text-red-500" />}>
+                        {dashboardData.ultimos_incidentes.length > 0 ? (
+                            <ul className="space-y-3">
+                                {dashboardData.ultimos_incidentes.map(incidente => (
+                                    <li key={incidente.id}>
+                                        <Link to={`/incidentes/${incidente.id}`} className="flex items-center gap-4 p-3 rounded-xl transition duration-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-red-100 dark:bg-red-900/50 text-red-500">
+                                                {getIncidentIcon(incidente.tipo)}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{incidente.tipo}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">Involucra a: {incidente.empleado}</p>
+                                            </div>
+                                            <ArrowRight size={16} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="text-center py-10">
+                                <FileWarning size={32} className="mx-auto text-gray-400" />
+                                <p className="mt-2 text-sm text-gray-500">No hay incidentes recientes.</p>
+                            </div>
+                        )}
+                    </InfoCard>
                 </div>
 
                 <div className="lg:col-span-1 space-y-8">
-                    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"> {/* Añadido dark mode */}
-                        <h2 className="text-lg font-bold mb-6 text-purple-500">Empleados por Estado</h2>
-                        <div className="bg-white dark:bg-gray-700/50 p-4 rounded-xl">
+                    <InfoCard title="Distribución de Empleados" icon={<Users className="text-red-500" />}>
+                        <div className="h-64 flex items-center justify-center">
                             <Doughnut options={statusChartOptions} data={statusChartData} />
                         </div>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"> {/* Añadido dark mode */}
-                        <h2 className="text-lg font-bold mb-6 text-green-500">Actividad Reciente</h2>
-                        <ul className="space-y-4">
-                            {dashboardData.actividad_reciente.map(actividad => (
-                                <Link to={actividad.tipo === 'NUEVA_CONTRATACION' ? `/empleados/${actividad.id}` : `/sanciones/${actividad.id}`} key={actividad.id}>
-                                    <li className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700 transition duration-300 hover:border-green-300 dark:hover:border-green-600">
-                                        <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg">
-                                            {getActivityIcon(actividad.tipo)}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-gray-900 dark:text-gray-100 truncate">{actividad.mensaje}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                {formatDistanceToNow(actividad.fecha, { addSuffix: true, locale: es })}
-                                            </p>
-                                        </div>
+                    </InfoCard>
+
+                    <InfoCard title="Actividad Reciente" icon={<Activity className="text-red-500" />}>
+                        {dashboardData.actividad_reciente.length > 0 ? (
+                            <ul className="space-y-3">
+                                {dashboardData.actividad_reciente.map(actividad => (
+                                    <li key={`${actividad.tipo}-${actividad.id}`}>
+                                        <Link to={actividad.tipo === 'NUEVA_CONTRATACION' ? `/empleados/${actividad.id}` : `/sanciones/${actividad.id}`} className="flex items-start gap-4 p-3 rounded-xl transition duration-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400">
+                                                {getActivityIcon(actividad.tipo)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-gray-800 dark:text-gray-100">{actividad.mensaje}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                    {formatDistanceToNow(actividad.fecha, { addSuffix: true, locale: es })}
+                                                </p>
+                                            </div>
+                                        </Link>
                                     </li>
-                                </Link>
-                            ))}
-                        </ul>
-                    </div>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="text-center py-10">
+                                <Activity size={32} className="mx-auto text-gray-400" />
+                                <p className="mt-2 text-sm text-gray-500">No hay actividad reciente.</p>
+                            </div>
+                        )}
+                    </InfoCard>
                 </div>
             </div>
         </div>
