@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -10,6 +10,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { ThemeContext } from '../../context/ThemeContext';
 
 ChartJS.register(
     CategoryScale,
@@ -21,6 +22,7 @@ ChartJS.register(
 );
 
 const ReporteSancionesPorTipo = ({ data: chartData }) => {
+    const { theme } = useContext(ThemeContext);
     if (!chartData) {
         return <p>No hay datos disponibles.</p>;
     }
@@ -45,15 +47,19 @@ const ReporteSancionesPorTipo = ({ data: chartData }) => {
             legend: {
                 display: false,
             },
+            tooltip: {
+                titleColor: theme === 'dark' ? '#E5E7EB' : '#1F2937',
+                bodyColor: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+            },
         },
         scales: {
             x: {
                 beginAtZero: true,
-                ticks: { color: '#E5E7EB', stepSize: 1 },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                ticks: { color: theme === 'dark' ? '#E5E7EB' : '#374151', stepSize: 1 },
+                grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }
             },
             y: {
-                ticks: { color: '#E5E7EB' },
+                ticks: { color: theme === 'dark' ? '#E5E7EB' : '#374151' },
                 grid: { display: false }
             }
         }
