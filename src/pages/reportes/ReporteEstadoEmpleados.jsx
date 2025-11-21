@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { ThemeContext } from '../../context/ThemeContext';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ReporteEstadoEmpleados = ({ data: chartData }) => {
+    const { theme } = useContext(ThemeContext);
     if (!chartData) {
         return <p>No hay datos disponibles.</p>;
     }
@@ -37,8 +39,12 @@ const ReporteEstadoEmpleados = ({ data: chartData }) => {
             legend: {
                 position: 'top',
                 labels: {
-                    color: '#E5E7EB'
+                    color: theme === 'dark' ? '#E5E7EB' : '#1F2937',
                 }
+            },
+            tooltip: {
+                titleColor: theme === 'dark' ? '#E5E7EB' : '#1F2937',
+                bodyColor: theme === 'dark' ? '#D1D5DB' : '#4B5563',
             },
         },
     };
