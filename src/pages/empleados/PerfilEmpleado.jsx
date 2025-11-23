@@ -74,10 +74,17 @@ const PerfilEmpleado = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <div className="max-w-7xl mx-auto printable-area">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 no-print">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mi Perfil</h1>
-                <a href="#" target="_blank" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
+                <a 
+                    href="#"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.print();
+                    }}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm"
+                >
                     <Printer size={16} /> Imprimir Perfil
                 </a>
             </div>
