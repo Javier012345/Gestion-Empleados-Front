@@ -20,16 +20,20 @@ const MisRecibos = () => {
             try {
                 setLoading(true);
                 const response = await getMisRecibos();
-                setRecibos(response.data);
+                
+                // Verificamos si la respuesta es un array. Si no, usamos un array vacío.
+                const recibosData = Array.isArray(response.data) ? response.data : [];
+                setRecibos(recibosData);
 
-                const years = [...new Set(response.data.map(r => new Date(r.fecha_emision).getFullYear()))];
-                const sortedYears = years.sort((a, b) => b - a);
-                setAvailableYears(sortedYears);
-
-                if (sortedYears.length > 0) {
-                    const latestYear = sortedYears[0].toString();
-                    setSelectedFilters({ mes: '', anio: latestYear });
-                    setActiveFilters({ mes: '', anio: latestYear });
+                if (recibosData.length > 0) {
+                    const years = [...new Set(recibosData.map(r => new Date(r.fecha_emision).getFullYear()))];
+                    const sortedYears = years.sort((a, b) => b - a);
+                    setAvailableYears(sortedYears);
+                    if (sortedYears.length > 0) {
+                        const latestYear = sortedYears[0].toString();
+                        setSelectedFilters({ mes: '', anio: latestYear });
+                        setActiveFilters({ mes: '', anio: latestYear });
+                    }
                 }
                 setError(null);
             } catch (err) {

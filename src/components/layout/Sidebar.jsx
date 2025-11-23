@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Receipt, CalendarDays, ShieldAlert, AlertTriangle, Camera, ClipboardList, LogOut, X, User } from 'lucide-react';
 import AlertDialog from './AlertDialog';
+import { useAuth } from './AuthContext';
 
 const adminLinks = [
     { icon: <LayoutDashboard size={20} />, name: 'Inicio', path: '/' },
@@ -42,10 +43,12 @@ const NavLinks = ({ links, onLinkClick }) => (
     </nav>
 );
 
-const Sidebar = ({ isOpen, onClose, userRole }) => {
-    const links = userRole === 'admin' ? adminLinks : employeeLinks;
-    const navigate = useNavigate();
+const Sidebar = ({ isOpen, onClose }) => {
+    const { effectiveRole, logout } = useAuth();
     const [isAlertOpen, setAlertOpen] = useState(false);
+
+    // Determina qué enlaces mostrar.
+    const links = effectiveRole === 'admin' ? adminLinks : employeeLinks;
 
     const handleLogoutClick = () => {
         setAlertOpen(true);
@@ -56,12 +59,7 @@ const Sidebar = ({ isOpen, onClose, userRole }) => {
     };
 
     const handleConfirmLogout = () => {
-        // Eliminar la cookie del token
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        // Eliminar los datos del usuario del localStorage
-        localStorage.removeItem('user');
-        // Redirigir al login
-        navigate('/login');
+        logout();
         setAlertOpen(false);
     };
 

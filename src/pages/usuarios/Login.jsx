@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, AlertCircle, Loader } from 'lucide-react';
+import { useAuth } from '../../components/layout/AuthContext';
 import AuthLayout from '../../components/layout/AuthLayout';
 
 const Login = () => {
@@ -12,6 +13,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const setCookie = (name, value, days) => {
         let expires = "";
@@ -34,9 +36,15 @@ const Login = () => {
                 username,
                 password
             });
-            const { token, user, must_change_password } = response.data;
+            const { token, must_change_password, ...userData } = response.data;
             setCookie('token', token, 7); // Store token in cookie for 7 days
-            localStorage.setItem('user', JSON.stringify(user)); // Store user data in local storage
+            
+            // Usamos la función de login del contexto
+            login({
+                id: userData.user.id,
+                username: userData.user.username,
+                ...userData
+            });
 
             if (must_change_password) {
                 navigate('/cambiar-contrasena');

@@ -5,17 +5,17 @@ import { getMisNotificaciones, marcarNotificacionesLeidas } from '../../services
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import AlertDialog from './AlertDialog';
+import { useAuth } from './AuthContext';
+
 
 
 const Header = ({ 
-    onOpenMobileMenu, 
-    user, 
-    viewMode, 
-    theme, 
+    onOpenMobileMenu,
+    theme,
     toggleTheme, 
-    pageTitle, 
-    onToggleViewMode 
+    pageTitle
 }) => {
+    const { user, viewMode, toggleViewMode, logout } = useAuth();
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -30,9 +30,8 @@ const Header = ({
                 console.error("Error al obtener las notificaciones:", error);
             }
         };
-
         fetchNotifications();
-    }, []);
+    }, []); // Se ejecuta solo una vez al montar el componente
 
     const unreadNotificationsCount = notifications.filter(n => !n.leida).length;
 
@@ -60,12 +59,12 @@ const Header = ({
     };
 
     const handleConfirmLogout = () => {
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        localStorage.removeItem('user');
-        // Usamos window.location para asegurar una recarga completa y limpiar estados.
-        window.location.href = '/login';
-        setAlertOpen(false);
+        logout();
     };
+
+    if (!user) {
+        return null; // O un spinner de carga mientras se obtienen los datos del usuario
+    }
 
     return (
         <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
@@ -121,9 +120,9 @@ const Header = ({
                 </div>
 
                 {/* Role Switcher */}
-                {user && user.isAdmin && (
+                {user.grupo !== 'Empleado' && (
                     <button 
-                        onClick={onToggleViewMode}
+                        onClick={toggleViewMode}
                         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center gap-2 text-sm whitespace-nowrap"
                         title={viewMode === 'admin' ? 'Cambiar a Modo Empleado' : 'Cambiar a Modo Admin'}
                     >
