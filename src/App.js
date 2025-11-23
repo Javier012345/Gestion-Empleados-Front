@@ -37,9 +37,13 @@ import MisAsistencias from './pages/asistencia/MisAsistencias';
 import VerAsistencias from './pages/asistencia/VerAsistencias';
 import Notificaciones from './pages/notificaciones/Notificaciones';
 import ReportesHome from './pages/reportes/ReportesHome';
+import Ajustes from './pages/usuarios/Ajustes';
 import PrivateRoute from './components/route/PrivateRoute';
+import AuthLayout from './components/layout/AuthLayout';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
+import ConfirmPasswordReset from './pages/usuarios/ConfirmPasswordReset';
+import ResetPassword from './pages/usuarios/ResetPassword';
 
 const RouteWithTitle = ({ title, element }) => {
   return (
@@ -55,9 +59,15 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/cambiar-contrasena" element={
+            <AuthLayout><Ajustes forceChange={true} /></AuthLayout>
+          } />
+          <Route path="/restablecer-contrasena" element={<ResetPassword />} />
+          <Route path="/nueva-contrasena" element={<ConfirmPasswordReset />} />
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<RouteWithTitle title="Inicio" element={<Home />} />} />
             <Route path="/perfil" element={<RouteWithTitle title="Mi Perfil" element={<PerfilEmpleado />} />} />
+            <Route path="/ajustes" element={<RouteWithTitle title="Ajustes" element={<Ajustes />} />} />
             <Route path="/empleados" element={<RouteWithTitle title="Empleados" element={<Empleados />} />} />
             <Route path="/empleados/crear" element={<RouteWithTitle title="Crear Empleado" element={<CrearEmpleado />} />} />
             <Route path="/empleados/:id" element={<RouteWithTitle title="Ver Empleado" element={<VerEmpleado />} />} />

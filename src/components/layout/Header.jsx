@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Sun, Moon, Bell, UserCog, User } from 'lucide-react';
+import { Menu, Sun, Moon, Bell, UserCog, User, Settings, LogOut } from 'lucide-react';
 import { getMisNotificaciones, marcarNotificacionesLeidas } from '../../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import AlertDialog from './AlertDialog';
+
 
 const Header = ({ 
     onOpenMobileMenu, 
@@ -17,6 +19,7 @@ const Header = ({
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [isAlertOpen, setAlertOpen] = useState(false); // Para el logout
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -45,6 +48,23 @@ const Header = ({
             console.error("Error al marcar las notificaciones como leídas:", error);
             // Aquí podrías mostrar una notificación de error al usuario
         }
+    };
+
+    const handleLogoutClick = () => {
+        setProfileOpen(false); // Cierra el dropdown del perfil
+        setAlertOpen(true);
+    };
+
+    const handleCloseAlert = () => {
+        setAlertOpen(false);
+    };
+
+    const handleConfirmLogout = () => {
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        localStorage.removeItem('user');
+        // Usamos window.location para asegurar una recarga completa y limpiar estados.
+        window.location.href = '/login';
+        setAlertOpen(false);
     };
 
     return (
@@ -122,15 +142,43 @@ const Header = ({
                      {profileOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-700 z-20">
                             <div className="p-2">
-                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">Mi Perfil</a>
-                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">Ajustes</a>
+                                <Link 
+                                    to="/perfil" 
+                                    onClick={() => setProfileOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                >
+                                    <User size={16} />
+                                    <span>Mi Perfil</span>
+                                </Link>
+                                <Link 
+                                    to="/ajustes" 
+                                    onClick={() => setProfileOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                >
+                                    <Settings size={16} />
+                                    <span>Ajustes</span>
+                                </Link>
                                 <div className="my-1 h-px bg-gray-200 dark:bg-gray-600"></div>
-                                <a href="#" className="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">Cerrar Sesión</a>
+                                <button 
+                                    onClick={handleLogoutClick} 
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                                >
+                                    <LogOut size={16} />
+                                    <span>Cerrar Sesión</span>
+                                </button>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
+            {/* Mantenemos AlertDialog aquí para gestionar el logout desde el Header */}
+            <AlertDialog
+                isOpen={isAlertOpen}
+                onClose={handleCloseAlert}
+                onConfirm={handleConfirmLogout}
+                title="Confirmar Cierre de Sesión"
+                message="¿Estás seguro de que quieres cerrar sesión?"
+            />
         </header>
     );
 };

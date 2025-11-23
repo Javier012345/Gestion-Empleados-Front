@@ -295,4 +295,9 @@ export const getAsistenciasByEmpleadoId = (empleadoId, page = 1) => {
     return apiClient.get(`asistencias-empleado/${empleadoId}/`, { params: { page } });
 };
 
+
+export const changePassword = (passwordData) => {
+    return apiClient.post('change-password/', passwordData);
+};
+
 export default apiClient;

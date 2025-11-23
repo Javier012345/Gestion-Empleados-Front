@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, AlertCircle, Loader } from 'lucide-react';
+import AuthLayout from '../../components/layout/AuthLayout';
 
 const Login = () => {
     // --- ESTADO --- //
@@ -33,12 +34,18 @@ const Login = () => {
                 username,
                 password
             });
-            const { token, user } = response.data;
+            const { token, user, must_change_password } = response.data;
             setCookie('token', token, 7); // Store token in cookie for 7 days
             localStorage.setItem('user', JSON.stringify(user)); // Store user data in local storage
-            navigate('/'); // Redirect to home page after login
+
+            if (must_change_password) {
+                navigate('/cambiar-contrasena');
+            } else {
+                navigate('/'); // Redirect to home page after login
+            }
         } catch (err) {
-            setError('Usuario o contraseña incorrectos.');
+            const errorMessage = err.response?.data?.error || 'Usuario o contraseña incorrectos.';
+            setError(errorMessage);
             console.error('Login error:', err);
         } finally {
             setIsLoading(false);
@@ -52,10 +59,8 @@ const Login = () => {
     // --- RENDERIZADO --- //
 
     return (
-        <div className="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 m-4 border border-gray-200 dark:border-gray-700">
-                    <div className="text-center mb-8">
+        <AuthLayout>
+            <div className="text-center mb-8">
                         {/* Asumimos que el logo está en la carpeta `public/images` */}
                         <img src="/images/logo-nuevas-energias-v2.png" alt="Logo" className="mx-auto h-20 w-auto mb-4" />
                         <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
@@ -63,14 +68,14 @@ const Login = () => {
                         </h2>
                     </div>
 
-                    {error && (
+            {error && (
                         <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-500/50 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg relative mb-6 flex items-center gap-3" role="alert">
                             <AlertCircle className="w-5 h-5" />
                             <span className="block sm:inline text-sm">{error}</span>
                         </div>
                     )}
 
-                    <form method="post" noValidate className="space-y-6" onSubmit={handleSubmit}>
+            <form method="post" noValidate className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Nombre de usuario
@@ -133,7 +138,7 @@ const Login = () => {
                         </div>
                     </form>
 
-                    <div className="mt-6">
+            <div className="mt-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
@@ -146,14 +151,12 @@ const Login = () => {
                         </div>
 
                         <div className="mt-6 text-center text-sm">
-                            <a href="#" className="font-medium text-red-600 hover:text-red-500">
+                            <Link to="/restablecer-contrasena" className="font-medium text-red-600 hover:text-red-500">
                                 ¿Olvidaste tu contraseña?
-                            </a>
+                            </Link>
                         </div>
-                    </div>
-                </div>
             </div>
-        </div>
+        </AuthLayout>
     );
 };
 
