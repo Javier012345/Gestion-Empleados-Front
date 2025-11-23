@@ -55,11 +55,11 @@ const MisSanciones = () => {
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Periodo</label>
                         <div className="flex gap-2 mt-1">
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Mes</option>
                                 {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                             </select>
-                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                            <select className="w-full pl-4 pr-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Año</option>
                                 {[2023, 2024, 2025].map(year => <option key={year} value={year}>{year}</option>)}
                             </select>
@@ -67,7 +67,7 @@ const MisSanciones = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Sanción</label>
-                        <select className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                        <select className="mt-1 w-full pl-4 pr-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="">Todos</option>
                             <option value="Leve">Leve</option>
                             <option value="Moderada">Moderada</option>
@@ -76,7 +76,7 @@ const MisSanciones = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Registros</label>
-                        <select className="mt-1 w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white">
+                        <select className="mt-1 w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-900 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="9">9</option>
                             <option value="12">12</option>
                             <option value="18">18</option>
@@ -94,7 +94,7 @@ const MisSanciones = () => {
             </form>
 
             {loading ? (
-                <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando tus sanciones...</div>
+                <div className="flex justify-center items-center p-8 text-gray-800 dark:text-gray-200"><Loader className="animate-spin mr-2" /> Cargando tus sanciones...</div>
             ) : error ? (
                 <div className="flex justify-center items-center p-8 text-red-500"><ShieldAlert className="mr-2" /> {error}</div>
             ) : sanciones.length > 0 ? (
