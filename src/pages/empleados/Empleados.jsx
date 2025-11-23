@@ -251,7 +251,8 @@ const Empleados = () => {
     }
 
     return (
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 printable-area">
+            <div className="no-print">
             <EmployeeControls 
                 searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
@@ -263,6 +264,7 @@ const Empleados = () => {
                 itemsPerPage={itemsPerPage}
                 onItemsPerPageChange={handleItemsPerPageChange}
             />
+            </div>
 
             {/* --- Lista de Empleados (Tabla para md y superior) --- */}
             <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
