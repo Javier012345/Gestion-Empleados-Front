@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Función para obtener el valor de una cookie por su nombre
-const getCookie = (name) => {
+export const getCookie = (name) => {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -110,6 +110,10 @@ export const getRecibosByDni = (dni) => {
     return apiClient.get(`recibos/por-dni/${dni}/`);
 };
 
+export const getRecibosByEmpleadoId = (empleadoId) => {
+    return apiClient.get(`recibos/por-empleado/${empleadoId}/`);
+};
+
 export const getEmpleadoByDni = (dni) => {
     return apiClient.get(`empleados/por-dni/${dni}/`);
 };
@@ -145,6 +149,10 @@ export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
     return apiClient.post(`horarios/${horarioId}/sincronizar-empleados/`, data);
 };
 
+export const getHorariosByEmpleadoId = (empleadoId) => {
+    return apiClient.get(`horarios/por-empleado/${empleadoId}/`);
+};
+
 export const getHistorialAsignacionesDetallado = () => {
     return apiClient.get('historial-asignaciones/');
 };
@@ -169,6 +177,10 @@ export const createIncidenteEmpleado = (incidenteData) => {
     return apiClient.post('incidente-empleado/', incidenteData);
 };
 
+export const getIncidentesByEmpleadoId = (empleadoId) => {
+    return apiClient.get(`incidentes/empleado/${empleadoId}/`);
+};
+
 export const corregirIncidente = (id, incidenteData) => {
     return apiClient.post(`incidentes-agrupados/${id}/corregir/`, incidenteData);
 };
@@ -191,6 +203,10 @@ export const getSancionesEmpleados = () => {
 
 export const getSancionById = (id) => {
     return apiClient.get(`sanciones-empleados/${id}/`);
+};
+
+export const getSancionesByEmpleadoId = (empleadoId) => {
+    return apiClient.get(`sanciones/empleado/${empleadoId}/`);
 };
 
 export const getMisRecibos = () => {
@@ -291,8 +307,8 @@ export const getResumenDiario = () => {
  * @param {number} empleadoId - El ID del empleado.
  * @returns {Promise} La promesa de la petición de Axios.
  */
-export const getAsistenciasByEmpleadoId = (empleadoId, page = 1) => {
-    return apiClient.get(`asistencias-empleado/${empleadoId}/`, { params: { page } });
+export const getAsistenciasByEmpleadoId = (empleadoId, page = 1, filters = {}) => {
+    return apiClient.get(`asistencias-empleado/${empleadoId}/`, { params: { page, ...filters } });
 };
 
 

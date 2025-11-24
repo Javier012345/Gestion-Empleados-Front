@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, FileText, Image, Receipt, Loader, AlertCircle } from 'lucide-react';
+import { Filter, FileText, Image, Receipt, Loader, AlertCircle, CalendarClock } from 'lucide-react';
 import { getMisRecibos } from '../../services/api';
 
 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -88,7 +88,21 @@ const MisRecibos = () => {
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="space-y-6 text-gray-900 dark:text-gray-100">
+            <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/50 rounded-xl border border-gray-300 dark:border-gray-700 p-6">
+                <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/20">
+                        <Receipt className="h-5 w-5 text-red-600 dark:text-red-400" />
+                    </span>
+                    <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Mis Recibos de Sueldo</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Aquí puedes ver y descargar todos tus recibos.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
             {/* Filtros */}
             <div className="p-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50">
                 <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-end gap-4">
@@ -166,6 +180,7 @@ const MisRecibos = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     );

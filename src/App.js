@@ -20,21 +20,18 @@ import VerHorariosAsignados from './pages/horarios/VerHorariosAsignados';
 import VerHorariosEmpleado from './pages/horarios/VerHorariosEmpleado';
 import Sanciones from './pages/sanciones/Sanciones';
 import AgregarSancion from './pages/sanciones/AgregarSancion';
-import AplicarSancionMasiva from './pages/sanciones/AplicarSancionMasiva';
 import DetalleSancion from './pages/sanciones/DetalleSancion';
 import MisSanciones from './pages/sanciones/MisSanciones';
-import SancionPDF from './pages/sanciones/SancionPDF';
 import SancionesEmpleado from './pages/sanciones/SancionesEmpleado';
 import Incidentes from './pages/incidentes/Incidentes';
 import CorregirIncidente from './pages/incidentes/CorregirIncidente';
 import DetalleIncidente from './pages/incidentes/DetalleIncidente';
-import IncidentePDF from './pages/incidentes/IncidentePDF';
 import MisIncidentes from './pages/incidentes/MisIncidentes';
 import RegistrarIncidente from './pages/incidentes/RegistrarIncidente';
 import VerIncidentesEmpleado from './pages/incidentes/VerIncidentesEmpleado';
 import AsistenciaAdmin from './pages/asistencia/AsistenciaAdmin';
 import MisAsistencias from './pages/asistencia/MisAsistencias';
-import VerAsistencias from './pages/asistencia/VerAsistencias';
+import VerAsistenciasEmpleado from './pages/asistencia/VerAsistenciasEmpleado';
 import Notificaciones from './pages/notificaciones/Notificaciones';
 import ReportesHome from './pages/reportes/ReportesHome';
 import Ajustes from './pages/usuarios/Ajustes';
@@ -94,12 +91,17 @@ function App() {
               <Route path="/horarios/asignar" element={<RouteWithTitle title="Asignar Horario" element={<AsignarHorario />} />} />
               <Route path="/horarios/cargar" element={<RouteWithTitle title="Cargar Horario" element={<CargarHorario />} />} />
               <Route path="/horarios/historial" element={<RouteWithTitle title="Historial de Horarios" element={<HistorialHorarios />} />} />
+              <Route path="/horarios/empleado/:id" element={<RouteWithTitle title="Horarios del Empleado" element={<VerHorariosEmpleado />} />} />
               <Route path="/sanciones" element={<RouteWithTitle title="Sanciones" element={<Sanciones />} />} />
+              <Route path="/sanciones/:id" element={<RouteWithTitle title="Detalle Sancion" element={<DetalleSancion />} />} />
               <Route path="/sanciones/agregar" element={<RouteWithTitle title="Agregar Sanción" element={<AgregarSancion />} />} />
               <Route path="/sanciones/empleado/:id" element={<RouteWithTitle title="Sanciones de Empleado" element={<SancionesEmpleado />} />} />
               <Route path="/incidentes" element={<RouteWithTitle title="Incidentes" element={<Incidentes />} />} />
+              <Route path="/incidentes/:id" element={<RouteWithTitle title="Detalle Incidente" element={<DetalleIncidente />} />} />
+              <Route path="/incidentes/corregir/:id" element={<RouteWithTitle title="Corregir Incidente" element={<CorregirIncidente />} />} />
               <Route path="/incidentes/registrar" element={<RouteWithTitle title="Registrar Incidente" element={<RegistrarIncidente />} />} />
               <Route path="/incidentes/empleado/:id" element={<RouteWithTitle title="Incidentes de Empleado" element={<VerIncidentesEmpleado />} />} />
+              <Route path="/asistencias/empleado/:id" element={<RouteWithTitle title="Asistencias de Empleado" element={<VerAsistenciasEmpleado />} />} />
               <Route path="/asistencia/*" element={<RouteWithTitle title="Asistencia" element={<AsistenciaAdmin />} />} />
               <Route path="/reportes" element={<RouteWithTitle title="Reportes" element={<ReportesHome />} />} />
             </Route>
