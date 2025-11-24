@@ -77,37 +77,42 @@ const Stepper = ({ currentStep }) => {
 };
 
 // Componente para un campo de formulario genérico
-const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error, children, accept }) => (
-    <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
-        {children ? (
-            React.cloneElement(children, { 
-                id: name, 
-                name: name, 
-                value: value, 
-                onChange: onChange, 
-                onBlur: onBlur,
-                className: `mt-1 block w-full rounded-md border-2 border-gray-400 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm ${error ? 'border-red-500' : 'focus:border-red-500 focus:ring-red-500'}`
-            })
-        ) : (
-            <input 
-                type={type} 
-                id={name} 
-                name={name} 
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                accept={accept}
-                className={
-                    `${type === 'file' 
-                    ? 'mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600'
-                    : `mt-1 block w-full rounded-md border-2 border-gray-400 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-indigo-500 focus:ring-indigo-500'}`}`
-                }
-            />
-        )}
-        {/* El mensaje de error de texto se ha eliminado según la solicitud */}
-    </div>
-);
+const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error, children, accept }) => {
+    const inputClasses = `mt-1 block w-full rounded-md border-2 bg-white text-gray-900 dark:bg-gray-700 dark:text-white shadow-sm ${
+        error 
+        ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500' 
+        : 'border-gray-400 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500'
+    }`;
+
+    const fileInputClasses = 'mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600';
+
+    return (
+        <div>
+            <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
+            {children ? (
+                React.cloneElement(children, { 
+                    id: name, 
+                    name: name, 
+                    value: value, 
+                    onChange: onChange, 
+                    onBlur: onBlur,
+                    className: inputClasses
+                })
+            ) : (
+                <input 
+                    type={type} 
+                    id={name} 
+                    name={name} 
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    accept={accept}
+                    className={type === 'file' ? fileInputClasses : inputClasses}
+                />
+            )}
+        </div>
+    );
+};
 
 const CrearEmpleado = () => {
     const navigate = useNavigate();
@@ -115,6 +120,8 @@ const CrearEmpleado = () => {
     const [isConfirmOpen, setConfirmOpen] = useState(false);
     const [isSuccessOpen, setSuccessOpen] = useState(false);
     const [isCancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+    const [isErrorOpen, setErrorOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({
         nombre: '', 
         apellido: '', 
@@ -291,16 +298,40 @@ const CrearEmpleado = () => {
             setSuccessOpen(true);
         } catch (error) {
             console.error('Error al crear el empleado:', error.response?.data || error.message);
+            
+            const newErrors = { ...errors };
+            let firstErrorStep = null;
+            let message = 'Error al crear el empleado. Por favor, revise los campos e intente de nuevo.';
+
             if (error.response && error.response.data) {
-                // Mapea los errores del backend al estado de errores del frontend.
                 const backendErrors = error.response.data;
-                const newErrors = { ...errors };
+                const errorMessages = [];
                 for (const key in backendErrors) {
-                    newErrors[key] = backendErrors[key][0]; // Toma el primer mensaje de error.
+                    newErrors[key] = backendErrors[key][0];
+                    // Capitalize first letter and add a period.
+                    const friendlyMessage = backendErrors[key][0].charAt(0).toUpperCase() + backendErrors[key][0].slice(1) + '.';
+                    errorMessages.push(friendlyMessage);
+
+                    if (!firstErrorStep) {
+                        if (['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'genero', 'estado_civil', 'grupo_input'].includes(key)) {
+                            firstErrorStep = 1;
+                        } else if (['telefono', 'email'].includes(key)) {
+                            firstErrorStep = 2;
+                        }
+                    }
                 }
-                setErrors(newErrors);
+                if (errorMessages.length > 0) {
+                    message = `Por favor, corrija los siguientes errores: ${errorMessages.join(' ')}`;
+                }
             }
-            alert('Error al crear el empleado. Revisa los campos marcados en rojo.');
+            
+            setErrors(newErrors);
+            setErrorMessage(message);
+            setErrorOpen(true);
+
+            if (firstErrorStep) {
+                setCurrentStep(firstErrorStep);
+            }
         }
     };
 
@@ -412,7 +443,7 @@ const CrearEmpleado = () => {
                     </div>
                 </div>
             )}
-            <AlertDialog
+             <AlertDialog
                 isOpen={isCancelConfirmOpen}
                 onClose={() => setCancelConfirmOpen(false)}
                 onConfirm={() => navigate('/empleados')}
@@ -420,6 +451,15 @@ const CrearEmpleado = () => {
                 message="Si cancelas, se perderán todos los datos ingresados. ¿Estás seguro?"
                 confirmText="Sí, cancelar"
                 cancelText="No, continuar"
+                icon={AlertTriangle}
+            />
+            <AlertDialog
+                isOpen={isErrorOpen}
+                onClose={() => setErrorOpen(false)}
+                onConfirm={() => setErrorOpen(false)}
+                title="Error de Validación"
+                message={errorMessage}
+                confirmText="Entendido"
                 icon={AlertTriangle}
             />
         </div>
