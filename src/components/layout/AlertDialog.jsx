@@ -35,13 +35,15 @@ const AlertDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText, 
                     <p className="mt-3 text-base text-gray-600 dark:text-gray-300">{message}</p>
                 </div>
                 {!autoClose && (
-                    <div className="flex gap-4 bg-gray-50 dark:bg-gray-700/50 px-8 py-5 rounded-b-2xl">
-                        <button
-                            onClick={onClose}
-                            className="w-full px-4 py-3 font-semibold text-gray-800 bg-gray-200 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                        >
-                            {cancelText || 'Cancelar'}
-                        </button>
+                    <div className={`px-8 py-5 bg-gray-50 dark:bg-gray-700/50 rounded-b-2xl ${cancelText ? 'flex gap-4' : 'flex justify-center'}`}>
+                        {cancelText && (
+                            <button
+                                onClick={onClose}
+                                className="w-full px-4 py-3 font-semibold text-gray-800 bg-gray-200 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                            >
+                                {cancelText}
+                            </button>
+                        )}
                         <button
                             onClick={onConfirm}
                             className={`w-full px-4 py-3 font-semibold text-white rounded-lg transition-colors ${confirmButtonClassName}`}
