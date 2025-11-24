@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Printer, Loader, AlertCircle } from 'lucide-react';
+import { Printer, Loader, AlertCircle, X } from 'lucide-react';
 import { getEmpleadoPerfil } from '../../services/api'; // Asegúrate que la ruta es correcta
 
 // Lista de requisitos que se podrían obtener de la API en el futuro
@@ -22,6 +22,7 @@ const PerfilEmpleado = () => {
     const [empleado, setEmpleado] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isPhotoModalOpen, setPhotoModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchPerfil = async () => {
@@ -93,13 +94,22 @@ const PerfilEmpleado = () => {
                 {/* Columna de la izquierda: Info básica */}
                 <div className="lg:col-span-1">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm text-center">
-                        {empleado.ruta_foto ? (
-                            <img src={empleado.ruta_foto} className="h-32 w-32 rounded-full mx-auto mb-4 object-cover" alt="Foto de perfil" />
-                        ) : (
-                            <div className="h-32 w-32 rounded-full mx-auto mb-4 bg-red-600 flex items-center justify-center text-white text-5xl font-bold">
-                                {getIniciales(empleado.nombre, empleado.apellido)}
-                            </div>
-                        )}
+                        <button 
+                            type="button"
+                            onClick={() => empleado.ruta_foto && setPhotoModalOpen(true)}
+                            disabled={!empleado.ruta_foto}
+                            className="relative group disabled:cursor-default"
+                        >
+                            {empleado.ruta_foto ? (
+                                <img src={empleado.ruta_foto} className="h-32 w-32 rounded-full mx-auto mb-4 object-cover" alt="Foto de perfil" />
+                            ) : (
+                                <div className="h-32 w-32 rounded-full mx-auto mb-4 bg-red-600 flex items-center justify-center text-white text-5xl font-bold">
+                                    {getIniciales(empleado.nombre, empleado.apellido)}
+                                </div>
+                            )}
+                            {empleado.ruta_foto && <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all duration-300"><span className="text-white opacity-0 group-hover:opacity-100">Agrandar</span></div>}
+                        </button>
+
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</h2>
                         
                         <span className={`mt-4 inline-block px-3 py-1 text-sm font-semibold rounded-full 
@@ -128,10 +138,13 @@ const PerfilEmpleado = () => {
                     <ul className="divide-y dark:divide-gray-700 mt-4">
                         {REQUISITOS_LEGAJO.map((requisito) => {
                             const docEntregado = empleado.legajo?.documento_set.find(d => d.id_requisito === requisito.id);
+                            const nombreArchivo = docEntregado?.ruta_archivo?.split('/').pop() || '';
+                            const esValido = docEntregado && docEntregado.ruta_archivo && !nombreArchivo.startsWith('vacio_');
+
                             return (
                                 <li key={requisito.id} className="flex items-center justify-between py-3">
                                 <p className="text-sm text-gray-700 dark:text-gray-300">{requisito.nombre}</p>
-                                {docEntregado ? (
+                                {esValido ? (
                                     <a href={docEntregado.ruta_archivo} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-green-600 bg-green-100 dark:text-green-200 dark:bg-green-900 px-2 py-1 rounded-full hover:bg-green-200 dark:hover:bg-green-800">
                                         Ver Documento
                                     </a>
@@ -143,6 +156,19 @@ const PerfilEmpleado = () => {
                     </ul>
                 </div>
             </div>
+
+            {/* Modal para la foto */}
+            {isPhotoModalOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+                    onClick={() => setPhotoModalOpen(false)}
+                >
+                    <button onClick={() => setPhotoModalOpen(false)} className="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
+                        <X size={32} />
+                    </button>
+                    <img src={empleado.ruta_foto} alt="Foto de perfil ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
+                </div>
+            )}
         </div>
     );
 };

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileWarning, Loader } from 'lucide-react';
+import { ArrowLeft, Printer, UserCog, CalendarCheck, ShieldAlert, Clock, Receipt, FileWarning, Loader, X } from 'lucide-react';
 import { getEmpleadoById } from '../../services/api';
 
 const getGroupColorClasses = (groupName) => {
     switch (groupName) {
         case 'Administrador': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-        case 'Gerente': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+        case 'Empleado': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
         default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
 };
@@ -17,6 +17,7 @@ const VerEmpleado = () => {
     const [requisitos, setRequisitos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isPhotoModalOpen, setPhotoModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchEmpleado = async () => {
@@ -69,11 +70,6 @@ const VerEmpleado = () => {
 
     const documentos = empleado.legajo ? empleado.legajo.documento_set : [];
 
-    const getRequisitoNombre = (id_requisito) => {
-        const requisito = requisitos.find(r => r.id === id_requisito);
-        return requisito ? requisito.nombre_doc : `ID de Requisito: ${id_requisito}`;
-    };
-
     const statusColor = empleado.estado === 'Activo'
         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
@@ -95,11 +91,20 @@ const VerEmpleado = () => {
                 {/* Columna Izquierda */}
                 <div className="lg:col-span-1 space-y-8">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm text-center">
-                        <img
-                            src={empleado.ruta_foto || '/images/default-user.jpg'}
-                            alt={`Foto de ${empleado.nombre}`}
-                            className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
-                        />
+                        <button
+                            type="button"
+                            onClick={() => empleado.ruta_foto && setPhotoModalOpen(true)}
+                            disabled={!empleado.ruta_foto}
+                            className="relative group disabled:cursor-default"
+                        >
+                            <img
+                                src={empleado.ruta_foto || '/images/default-user.jpg'}
+                                alt={`Foto de ${empleado.nombre}`}
+                                className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
+                            />
+                            {empleado.ruta_foto && <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all duration-300"><span className="text-white opacity-0 group-hover:opacity-100">Agrandar</span></div>}
+                        </button>
+
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</h2>
                         {empleado.grupo &&
                             <span className={`mt-2 inline-block px-3 py-1 text-sm font-semibold rounded-full ${groupColor}`}>
@@ -116,7 +121,7 @@ const VerEmpleado = () => {
                                 <span className="font-medium ">Editar Datos Personales</span>
                                 <UserCog size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
-                            <Link to={`/asistencia/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                            <Link to={`/asistencias/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Ver Asistencias</span>
                                 <CalendarCheck size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
@@ -124,7 +129,7 @@ const VerEmpleado = () => {
                                 <span className="font-medium ">Administrar Sanciones</span>
                                 <ShieldAlert size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
-                            <Link to={`/horarios/ver-empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                            <Link to={`/horarios/empleado/${empleado.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
                                 <span className="font-medium ">Administrar Horarios</span>
                                 <Clock size={20} className="text-gray-500 dark:text-gray-400" />
                             </Link>
@@ -158,26 +163,40 @@ const VerEmpleado = () => {
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
                             <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Documentación del Legajo</h3>
                             <ul className="divide-y dark:divide-gray-700 mt-4">
-                                {documentos.map(doc => (
-                                    <li key={doc.id} className="flex items-center justify-between py-3">
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{getRequisitoNombre(doc.id_requisito)}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">Subido: {new Date(doc.fecha_hora_subida).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            {doc.ruta_archivo ? (
-                                                <a href={doc.ruta_archivo} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-600 bg-blue-100 dark:text-blue-200 dark:bg-blue-900 px-3 py-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800">Ver Archivo</a>
+                                {requisitos.map(requisito => {
+                                    const docEntregado = documentos.find(d => d.id_requisito === requisito.id);
+                                    const nombreArchivo = docEntregado?.ruta_archivo?.split('/').pop() || '';
+                                    const esValido = docEntregado && docEntregado.ruta_archivo && !nombreArchivo.startsWith('vacio_');
+
+                                    return (
+                                        <li key={requisito.id} className="flex items-center justify-between py-3">
+                                            <p className="text-sm text-gray-700 dark:text-gray-300">{requisito.nombre_doc}</p>
+                                            {esValido ? (
+                                                <a href={docEntregado.ruta_archivo} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-green-600 bg-green-100 dark:text-green-200 dark:bg-green-900 px-2 py-1 rounded-full hover:bg-green-200 dark:hover:bg-green-800">Ver Archivo</a>
                                             ) : (
-                                                <span className="text-xs font-semibold text-yellow-600 bg-yellow-100 dark:text-yellow-200 dark:bg-yellow-900 px-3 py-1.5 rounded-full">Pendiente</span>
+                                                <span className="text-xs font-semibold text-red-600 bg-red-100 dark:text-red-200 dark:bg-red-900 px-2 py-1 rounded-full">Pendiente</span>
                                             )}
-                                        </div>
-                                    </li>
-                                ))}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Modal para la foto */}
+            {isPhotoModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+                    onClick={() => setPhotoModalOpen(false)}
+                >
+                    <button onClick={() => setPhotoModalOpen(false)} className="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
+                        <X size={32} />
+                    </button>
+                    <img src={empleado.ruta_foto} alt="Foto de perfil ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
+                </div>
+            )}
         </div>
     );
 };

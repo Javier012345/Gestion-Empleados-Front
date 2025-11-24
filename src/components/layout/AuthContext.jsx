@@ -1,19 +1,32 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCookie } from '../../services/api'; // Importamos la función para leer cookies
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // 1. Añadimos el estado de carga
     const [viewMode, setViewMode] = useState('employee'); // Por defecto, modo empleado
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            login(parsedUser);
+        // 2. Verificamos la sesión al cargar la app
+        const initializeAuth = () => {
+            const token = getCookie('token');
+            const storedUser = localStorage.getItem('user');
+
+            if (token && storedUser) {
+                // Si hay token y usuario, lo restauramos
+                const parsedUser = JSON.parse(storedUser);
+                setUser(parsedUser); // Usamos setUser directamente para no causar bucles
+                if (parsedUser.grupo !== 'Empleado') {
+                    setViewMode('admin');
+                }
+            }
+            setLoading(false); // 3. Marcamos que la carga ha terminado
         }
+        initializeAuth();
     }, []);
 
     const login = (userData) => {
@@ -57,6 +70,7 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         user,
+        loading, // 4. Exponemos el estado de carga
         viewMode,
         login,
         logout,
@@ -68,7 +82,8 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            {/* 5. No renderizamos los hijos hasta que la verificación inicial haya terminado */}
+            {!loading && children}
         </AuthContext.Provider>
     );
 };

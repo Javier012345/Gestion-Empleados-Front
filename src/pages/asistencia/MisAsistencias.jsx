@@ -65,8 +65,19 @@ const MisAsistencias = () => {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mis Asistencias</h1>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/50 rounded-xl border border-gray-300 dark:border-gray-700 p-6">
+                <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/20">
+                        <CalendarDays className="h-5 w-5 text-red-600 dark:text-red-400" />
+                    </span>
+                    <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Mis Asistencias</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Aquí puedes ver todo tu historial de asistencias.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                 {/* Filter Form */}
                 <form onSubmit={handleFilterSubmit} className="mb-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
