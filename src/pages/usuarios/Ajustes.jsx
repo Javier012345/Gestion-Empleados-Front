@@ -123,7 +123,7 @@ const Ajustes = ({ forceChange = false }) => {
                         {!forceChange && (
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Cambiar Contraseña</h3>
                         )}
-                        <form onSubmit={handleSubmit} className="mt-4 space-y-4 max-w-md">
+                        <form onSubmit={handleSubmit} className="mt-4 space-y-4 max-w-md mx-auto">
                             
                             <FeedbackMessage />
 
