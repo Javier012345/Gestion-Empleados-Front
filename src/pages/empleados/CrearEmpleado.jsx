@@ -404,14 +404,14 @@ const CrearEmpleado = () => {
                 )}
 
                 <div className="mt-8 pt-4 border-t dark:border-gray-700 flex justify-between items-center">
-                    <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">Anterior</button>
-                    <div>
-                        <button type="button" onClick={() => setCancelConfirmOpen(true)} className="px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">Cancelar</button>
+                    <button type="button" onClick={handlePrev} disabled={currentStep === 1} className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50 text-sm sm:text-base">Anterior</button>
+                    <div className="flex items-center gap-1 sm:gap-2">
+                        <button type="button" onClick={() => setCancelConfirmOpen(true)} className="px-3 sm:px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm sm:text-base">Cancelar</button>
                         
-                        <button type="button" onClick={handleNext} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? 'hidden' : ''}`}>
+                        <button type="button" onClick={handleNext} className={`px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm sm:text-base ${currentStep === 4 ? 'hidden' : ''}`}>
                             Siguiente
                         </button>
-                        <button type="button" onClick={handleFinalSubmit} className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${currentStep === 4 ? '' : 'hidden'}`}>
+                        <button type="button" onClick={handleFinalSubmit} className={`px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm sm:text-base ${currentStep === 4 ? '' : 'hidden'}`}>
                             Finalizar
                         </button>
                     </div>
