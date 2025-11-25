@@ -156,6 +156,7 @@ const EditarEmpleado = () => {
         const fetchEmpleado = async () => {
             try {
                 const response = await getEmpleadoById(id);
+                console.log('Datos del empleado recibidos por ID:', response.data);
                 const empleado = response.data;
                 setFormData({
                     nombre: empleado.nombre || '',
@@ -173,10 +174,14 @@ const EditarEmpleado = () => {
                     documentos: {}, // Handled separately
                 });
                 if (empleado.ruta_foto) {
-                    setPhotoPreview(`http://localhost:8000${empleado.ruta_foto}`);
+                    setPhotoPreview(empleado.ruta_foto);
                 }
-                if (empleado.documentos) {
-                    setExistingDocuments(empleado.documentos);
+                if (empleado.legajo && empleado.legajo.documento_set) {
+                    const docs = {};
+                    empleado.legajo.documento_set.forEach(doc => {
+                        docs[`documento_${doc.id_requisito}`] = doc.ruta_archivo;
+                    });
+                    setExistingDocuments(docs);
                 }
             } catch (error) {
                 console.error('Error al obtener los datos del empleado:', error.response?.data || error.message);
@@ -398,19 +403,24 @@ const EditarEmpleado = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">4. Documentación Requerida</h3>
                         <div className="space-y-3">
-                            {requisitos.map(req => (
-                                <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
-                                    <div className="flex items-center gap-4">
-                                        {existingDocuments[`documento_${req.id}`] && (
-                                            <a href={`http://localhost:8000${existingDocuments[`documento_${req.id}`]}`} target="_blank" rel="noopener noreferrer" className="text-sm text-red-600 hover:underline">
-                                                Ver Archivo
-                                            </a>
-                                        )}
-                                        <input type="file" name={`documento_${req.id}`} onChange={handleFileChange} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"/>
+                            {requisitos.map(req => {
+                                const docPath = existingDocuments[`documento_${req.id}`];
+                                const hasValidDoc = docPath && !docPath.includes('/vacio_');
+
+                                return (
+                                    <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{req.nombre_doc} {req.obligatorio && <span className="text-red-500">*</span>}</p>
+                                        <div className="flex items-center gap-4">
+                                            {hasValidDoc && (
+                                                <a href={docPath} target="_blank" rel="noopener noreferrer" className="text-sm text-red-600 hover:underline">
+                                                    Ver Archivo
+                                                </a>
+                                            )}
+                                            <input type="file" name={`documento_${req.id}`} onChange={handleFileChange} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"/>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}

@@ -74,7 +74,9 @@ function App() {
               <Route path="/mis-recibos" element={<RouteWithTitle title="Mis Recibos" element={<MisRecibos />} />} />
               <Route path="/mis-horarios" element={<RouteWithTitle title="Mis Horarios" element={<MisHorarios />} />} />
               <Route path="/mis-incidentes" element={<RouteWithTitle title="Mis Incidentes" element={<MisIncidentes />} />} />
+              <Route path="/mis-incidentes/:id" element={<RouteWithTitle title="Detalle Incidente" element={<DetalleIncidente />} />} />
               <Route path="/mis-sanciones" element={<RouteWithTitle title="Mis Sanciones" element={<MisSanciones />} />} />
+              <Route path="/mis-sanciones/:id" element={<RouteWithTitle title="Detalle Sancion" element={<DetalleSancion />} />} />
               <Route path="/mis-asistencias" element={<RouteWithTitle title="Mis Asistencias" element={<MisAsistencias />} />} />
             </Route>
 

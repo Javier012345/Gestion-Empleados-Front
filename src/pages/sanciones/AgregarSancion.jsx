@@ -32,6 +32,7 @@ const AgregarSancion = () => {
                     getTiposSancion()
                 ]);
                 setEmpleados(empleadosRes.data);
+                console.log('Tipos de sanción obtenidos:', tiposSancionRes.data);
                 setTiposSancion(tiposSancionRes.data);
             } catch (err) {
                 setError('Error al cargar los datos iniciales. Inténtalo de nuevo.');
@@ -160,7 +161,7 @@ const AgregarSancion = () => {
                             >
                                 <option value="" disabled>Seleccione un tipo...</option>
                                 {tiposSancion.map(ts => (
-                                    <option key={ts.id} value={ts.id} className="bg-white text-black">{ts.tipo_sancion}</option>
+                                    <option key={ts.id} value={ts.id}>{ts.nombre}</option>
                                 ))}
                             </select>
                         </div>
