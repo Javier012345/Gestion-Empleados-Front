@@ -173,7 +173,7 @@ const AplicarSancionIncidente = ({ incidente, resolucion, onVolver }) => {
                                             <>
                                                 <option value="" disabled className="text-gray-500">Seleccione una sanción...</option>
                                                 {tiposSancion && tiposSancion.length > 0 ? tiposSancion.map(ts => (
-                                                    <option key={ts.id} value={ts.id} className="bg-white text-black">{ts.tipo_sancion}</option>
+                                                    <option key={ts.id} value={ts.id}>{ts.nombre}</option>
                                                 )) : <option disabled>No hay sanciones disponibles</option>}
                                             </>
                                         )}

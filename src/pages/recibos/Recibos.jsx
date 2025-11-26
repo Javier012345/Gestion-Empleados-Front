@@ -50,10 +50,20 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.id_empl) {
-            setUploadError("Por favor, selecciona un empleado.");
+
+        const { id_empl, fecha_emision, periodo, ruta_pdf, ruta_imagen } = formData;
+        if (!id_empl || !fecha_emision || !periodo || !ruta_pdf || !ruta_imagen) {
+            setUploadError("Debe completar todos los campos.");
             return;
         }
+
+        // Validación de formato de período
+        const periodoRegex = /^\d{4}-\d{2}$/;
+        if (!periodoRegex.test(periodo)) {
+            setUploadError("El formato del período debe ser YYYY-MM.");
+            return;
+        }
+
         setIsSubmitting(true);
         setUploadError('');
 
@@ -61,12 +71,8 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
         data.append('id_empl', formData.id_empl);
         data.append('fecha_emision', formData.fecha_emision);
         data.append('periodo', formData.periodo);
-        if (formData.ruta_pdf) {
-            data.append('ruta_pdf', formData.ruta_pdf);
-        }
-        if (formData.ruta_imagen) {
-            data.append('ruta_imagen', formData.ruta_imagen);
-        }
+        data.append('ruta_pdf', formData.ruta_pdf);
+        data.append('ruta_imagen', formData.ruta_imagen);
 
         try {
             await createRecibo(data);
@@ -94,7 +100,6 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
                             id="id_empl"
                             value={formData.id_empl}
                             onChange={handleInputChange}
-                            required
                             className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500"
                         >
                             <option value="">Selecciona un empleado</option>
@@ -105,12 +110,12 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
                     </div>
                     <div>
                         <label htmlFor="fecha_emision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
-                        <input type="date" name="fecha_emision" id="fecha_emision" value={formData.fecha_emision} onChange={handleInputChange} required
+                        <input type="date" name="fecha_emision" id="fecha_emision" value={formData.fecha_emision} onChange={handleInputChange}
                                className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="periodo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
-                        <input type="text" name="periodo" id="periodo" placeholder="2023-10" value={formData.periodo} onChange={handleInputChange} required
+                        <input type="text" name="periodo" id="periodo" placeholder="2023-10" value={formData.periodo} onChange={handleInputChange}
                                className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
@@ -129,7 +134,14 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
                             {isSubmitting ? 'Guardando...' : 'Guardar Recibo'}
                         </button>
                     </div>
-                    {uploadError && <p className="text-sm text-red-500 text-right mt-2">{uploadError}</p>}
+                    {uploadError && (
+                        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                <p className="text-sm text-red-700 dark:text-red-300">{uploadError}</p>
+                            </div>
+                        </div>
+                    )}
                 </form>
             </div>
         </div>
@@ -176,33 +188,44 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
-        setUploadError('');
 
-        const data = new FormData();
-        let hasChanges = false;
+        const { fecha_emision, periodo } = formData;
+        if (!fecha_emision || !periodo) {
+            setUploadError("Debe completar todos los campos.");
+            return;
+        }
 
-        // Compara y añade solo los campos modificados
-        Object.keys(formData).forEach(key => {
-            if (formData[key] !== originalData[key]) {
-                if (formData[key] !== null) { // No enviar archivos si no se seleccionó uno nuevo
-                    data.append(key, formData[key]);
-                    hasChanges = true;
-                }
-            }
-        });
+        // Validación de formato de período
+        const periodoRegex = /^\d{4}-\d{2}$/;
+        if (!periodoRegex.test(periodo)) {
+            setUploadError("El formato del período debe ser YYYY-MM.");
+            return;
+        }
 
-        if (!hasChanges) {
+        const hasFileChanges = formData.ruta_pdf || formData.ruta_imagen;
+        const hasFieldChanges = formData.fecha_emision !== originalData.fecha_emision || formData.periodo !== originalData.periodo;
+        if (!hasFileChanges && !hasFieldChanges) {
             setUploadError("No se ha realizado ningún cambio.");
             setIsSubmitting(false);
             return;
         }
 
+        setIsSubmitting(true);
+        setUploadError('');
+
+        const data = new FormData();
+        // Compara y añade solo los campos modificados
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== originalData[key] && formData[key] !== null) {
+                data.append(key, formData[key]);
+            }
+        });
+
         try {
             await updateRecibo(recibo.id, data);
             onUpdateSuccess();
         } catch (error) {
-            setUploadError('Error al actualizar el recibo. Inténtalo de nuevo.');
+            setUploadError("Error al actualizar el recibo. Inténtalo de nuevo.");
             console.error("Error updating receipt:", error);
         } finally {
             setIsSubmitting(false);
@@ -220,18 +243,34 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
                     {/* Los campos son similares al modal de carga, pero sin el selector de empleado */}
                     <div>
                         <label htmlFor="fecha_emision_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
-                        <input type="date" name="fecha_emision" id="fecha_emision_edit" value={formData.fecha_emision || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
+                        <input type="date" name="fecha_emision" id="fecha_emision_edit" value={formData.fecha_emision || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="periodo_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Período (YYYY-MM)</label>
-                        <input type="text" name="periodo" id="periodo_edit" placeholder="2023-10" value={formData.periodo || ''} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
+                        <input type="text" name="periodo" id="periodo_edit" placeholder="2023-10" value={formData.periodo || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-200 shadow-sm" />
                     </div>
                     <div>
                         <label htmlFor="ruta_pdf_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar PDF</label>
+                        {recibo.ruta_pdf && (
+                            <div className="mt-2 mb-3">
+                                <a href={recibo.ruta_pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/30 dark:text-red-300 dark:hover:text-red-200">
+                                    <FileText className="w-4 h-4" />
+                                    <span>Ver PDF Actual</span>
+                                </a>
+                            </div>
+                        )}
                         <input type="file" name="ruta_pdf" id="ruta_pdf_edit" onChange={handleFileChange} accept=".pdf" className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/40 file:text-red-700 dark:file:text-red-300 hover:file:bg-red-100 dark:hover:file:bg-red-900/60"/>
                     </div>
                     <div>
                         <label htmlFor="ruta_imagen_edit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reemplazar Imagen</label>
+                        {recibo.ruta_imagen && (
+                            <div className="mt-2 mb-3">
+                                <a href={recibo.ruta_imagen} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 dark:text-blue-300 dark:hover:text-blue-200">
+                                    <Image className="w-4 h-4" />
+                                    <span>Ver Imagen Actual</span>
+                                </a>
+                            </div>
+                        )}
                         <input type="file" name="ruta_imagen" id="ruta_imagen_edit" onChange={handleFileChange} accept="image/*" className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/40 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/60"/>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
@@ -240,7 +279,14 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
                             {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
                         </button>
                     </div>
-                    {uploadError && <p className="text-sm text-red-500 text-right mt-2">{uploadError}</p>}
+                    {uploadError && (
+                        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                <p className="text-sm text-red-700 dark:text-red-300">{uploadError}</p>
+                            </div>
+                        </div>
+                    )}
                 </form>
             </div>
         </div>
