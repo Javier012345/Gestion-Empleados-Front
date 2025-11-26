@@ -179,39 +179,116 @@ const DetalleIncidente = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <Link to={location.pathname.startsWith('/mis-incidentes') ? "/mis-incidentes" : "/incidentes"} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6">
+        <div className="max-w-2xl mx-auto printable-area">
+            {/* Estilos solo para impresión */}
+            <style>
+                {`
+                    @media print {
+                        /* --- Estilos Generales de Impresión --- */
+                        body {
+                            background-color: #fff;
+                            color: #000;
+                            font-size: 11pt;
+                        }
+                        .printable-area {
+                            padding: 0;
+                            margin: 0;
+                            width: 100%;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                        .print-friendly {
+                            box-shadow: none !important;
+                            border: none !important;
+                            padding: 0 !important;
+                        }
+
+                        /* --- Encabezado y Pie de Página --- */
+                        .printable-area::before {
+                            content: 'Reporte de Incidente - Nuevas Energias';
+                            display: block;
+                            text-align: center;
+                            font-size: 16pt;
+                            font-weight: bold;
+                            margin-bottom: 2rem;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 1rem;
+                        }
+                        .printable-area::after {
+                            content: 'Generado el ${new Date().toLocaleDateString('es-AR')}';
+                            display: block;
+                            text-align: right;
+                            font-size: 9pt;
+                            margin-top: 2rem;
+                            border-top: 1px solid #ccc;
+                            padding-top: 0.5rem;
+                        }
+
+                        /* --- Títulos y Secciones --- */
+                        .print-title {
+                            font-size: 20pt;
+                            font-weight: bold;
+                            margin-bottom: 1.5rem;
+                            text-align: center;
+                        }
+                        .print-section-title {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                            border-bottom: 1px solid #ccc;
+                            padding-bottom: 0.25rem;
+                        }
+
+                        /* --- Simplificar Historial --- */
+                        .print-timeline { border-left: none !important; }
+                        .print-timeline-item { margin-left: 0 !important; padding-left: 0 !important; }
+                        .print-timeline-icon { display: none !important; }
+                    }
+                `}
+            </style>
+
+            <Link to={location.pathname.startsWith('/mis-incidentes') ? "/mis-incidentes" : "/incidentes"} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 mb-6 no-print">
                 <ArrowLeft size={16} /> Volver
             </Link>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between items-start">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Detalle del Incidente</h2>
-                    <div className="flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 print-friendly" id="incident-details">
+                <div className="flex justify-between items-start ">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white no-print">Detalle del Incidente</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white print-title hidden">Detalle del Incidente</h2>
+                    <div className="flex items-center gap-2 no-print">
                         {incidente?.grupo_anterior && (
                             <Link to={`/incidentes/${incidente?.grupo_anterior}`} className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-emerald-700 text-sm">
                                 <History size={16} /> Ver Incidente Original
                             </Link>
                         )}
                         {!incidente?.resolucion && (
-                            <Link to={`/incidentes/corregir/${incidente?.grupo_incidente}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700">
+                            <Link to={`/incidentes/corregir/${incidente?.grupo_incidente}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 text-sm">
                                 <Pencil size={16} />Corregir
                             </Link>
                         )}
-                        <a href={`/incidentes/pdf/${incidente?.grupo_incidente}`} target="_blank" rel="noopener noreferrer" className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
+                        <button onClick={() => window.print()} className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-700 text-sm">
                             <Printer size={16} /> Imprimir
-                        </a>
+                        </button>
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <div><h4 className="text-sm font-semibold text-gray-500">Nombre del Incidente</h4><p className="text-gray-900 dark:text-white">{incidente?.incidente.tipo_incid}</p></div>
-                    <div><h4 className="text-sm font-semibold text-gray-500">Fecha</h4><p className="text-gray-900 dark:text-white">{new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</p></div>
-                    <div><h4 className="text-sm font-semibold text-gray-500">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente?.descripcion}</p></div>
-                    
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
-                        <div className="space-y-2">
+                        <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400">Tipo de Incidente</h4>
+                        <p className="text-gray-900 dark:text-white">{incidente?.incidente.tipo_incid}</p>
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400">Fecha</h4>
+                        <p className="text-gray-900 dark:text-white">{new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</p>
+                    </div>
+                    <div className="md:col-span-2"><h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente?.descripcion}</p></div>
+                </div>
+                    
+                <div className="mt-6">
+                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 print-section-title">Empleados Involucrados</h4>
+                    <div className="space-y-2">
                             {Array.isArray(incidente?.empleados_involucrados) && incidente.empleados_involucrados.map((involucrado, index) => (
                                 <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
                                     <div className="flex items-center gap-3">
@@ -228,13 +305,12 @@ const DetalleIncidente = () => {
                                 </div>
                             ))}
                         </div>
-                    </div>
                 </div>
 
-                <h4 className="text-sm font-semibold text-gray-500 mt-6 mb-3">Historial del Caso</h4>
-                <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-2">
-                    <li className="mb-6 ml-6">
-                        <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-blue-900">
+                <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-6 mb-3 print-section-title">Historial del Caso</h4>
+                <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-2 print-timeline">
+                    <li className="mb-6 ml-6 print-timeline-item">
+                        <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-blue-900 print-timeline-icon">
                             <FilePlus size={12} className="text-blue-800 dark:text-blue-300" />
                         </span>
                         <h3 className="flex items-center mb-1 text-md font-semibold text-gray-900 dark:text-white">Incidente Reportado</h3>
@@ -242,8 +318,8 @@ const DetalleIncidente = () => {
                     </li>
 
                     {incidente?.descargos_del_grupo.length > 0 ? (
-                        <li className="mb-6 ml-6">
-                            <span className="absolute flex items-center justify-center w-6 h-6 bg-cyan-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-cyan-900">
+                        <li className="mb-6 ml-6 print-timeline-item">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-cyan-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-cyan-900 print-timeline-icon">
                                 <MessageSquare size={12} className="text-cyan-800 dark:text-cyan-300" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-900 dark:text-white">Descargos Recibidos</h3>
@@ -266,8 +342,8 @@ const DetalleIncidente = () => {
                             ))}
                         </li>
                     ) : (
-                        <li className="mb-6 ml-6">
-                            <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-gray-700">
+                        <li className="mb-6 ml-6 print-timeline-item">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-gray-700 print-timeline-icon">
                                 <MessageSquare size={12} className="text-gray-500" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-500 dark:text-gray-400">Sin Descargos</h3>
@@ -276,8 +352,8 @@ const DetalleIncidente = () => {
                     )}
 
                     {incidente?.resolucion ? (
-                        <li className="ml-6">
-                            <span className="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-green-900">
+                        <li className="ml-6 print-timeline-item">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-green-900 print-timeline-icon">
                                 <Gavel size={12} className="text-green-800 dark:text-green-300" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-900 dark:text-white">Incidente Resuelto</h3>
@@ -285,8 +361,8 @@ const DetalleIncidente = () => {
                             <p className="text-sm font-normal text-gray-500 dark:text-gray-400">{incidente.resolucion.descripcion_resolucion}</p>
                         </li>
                     ) : (
-                        <li className="ml-6">
-                            <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-gray-700">
+                        <li className="ml-6 print-timeline-item">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800 dark:bg-gray-700 print-timeline-icon">
                                 <Gavel size={12} className="text-gray-800 dark:text-gray-300" />
                             </span>
                             <h3 className="text-md font-semibold text-gray-500 dark:text-gray-400">Resolución Pendiente</h3>
@@ -295,7 +371,7 @@ const DetalleIncidente = () => {
                 </ol>
 
                 {!incidente?.resolucion && (
-                    <div id="incident-actions-container" className="mt-8 pt-6 border-t dark:border-gray-700">
+                    <div id="incident-actions-container" className="mt-8 pt-6 border-t dark:border-gray-700 no-print">
                         <div className="flex justify-end">
                             <button onClick={handleOpenModal} className="bg-red-600 text-white px-6 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700">
                                 <Gavel size={16} /><span>Registrar Resolución</span>
@@ -305,7 +381,7 @@ const DetalleIncidente = () => {
                 )}
 
                 {/* Formulario de Descargo para el Empleado */}
-                {isMyIncidentRoute && incidente?.estado === 'ABIERTO' && !hasSubmittedDescargo && (
+                {isMyIncidentRoute && incidente?.estado === 'ABIERTO' && !hasSubmittedDescargo && !incidente?.resolucion && (
                     <div id="descargo-form-container" className="mt-8 pt-6 border-t dark:border-gray-700">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Enviar Descargo</h3>
                         

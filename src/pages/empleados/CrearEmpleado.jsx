@@ -8,27 +8,31 @@ import { UserPlus, AlertTriangle, CheckCircle } from 'lucide-react';
 const validationRules = {
     nombre: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
-        message: 'Solo se permiten letras, acentos y espacios.',
+        message: 'El nombre solo puede contener letras y espacios.',
+        minLength: 2,
         required: true,
     },
     apellido: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
-        message: 'Solo se permiten letras, acentos y espacios.',
+        message: 'El apellido solo puede contener letras y espacios.',
+        minLength: 2,
         required: true,
     },
     dni: {
         regex: /^\d{7,8}$/,
-        message: 'El DNI debe contener entre 7 y 8 dígitos numéricos.',
+        // La validación para DNI argentino es que tenga 7 u 8 dígitos.
+        // No posee un algoritmo de verificación como el CUIT/CUIL.
+        message: 'El DNI debe contener 7 u 8 dígitos numéricos.',
         required: true,
     },
     telefono: {
         regex: /^\d{10}$/,
-        message: 'El teléfono debe contener 10 dígitos.',
+        message: 'El teléfono debe contener 10 dígitos (código de área + número).',
         required: true,
     },
     email: {
-        regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: 'El formato del email no es válido.',
+        regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        message: 'Por favor, ingrese un formato de email válido (ej: usuario@dominio.com).',
         required: true,
     },
     fecha_nacimiento: { required: true },
@@ -41,10 +45,17 @@ const validateField = (name, value) => {
     const rule = validationRules[name];
     if (!rule) return '';
 
-    if (rule.required && !value) {
+    // 1. Validar que no esté vacío o solo contenga espacios
+    if (rule.required && !value.trim()) {
         return 'Este campo es obligatorio.';
     }
 
+    // 2. Validar longitud mínima
+    if (rule.minLength && value.trim().length < rule.minLength) {
+        return `Debe tener al menos ${rule.minLength} caracteres.`;
+    }
+
+    // 3. Validar con expresión regular
     if (rule.regex && value && !rule.regex.test(value)) {
         return rule.message;
     }
@@ -77,7 +88,7 @@ const Stepper = ({ currentStep }) => {
 };
 
 // Componente para un campo de formulario genérico
-const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error, children, accept }) => {
+const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error, children, accept, placeholder }) => {
     const inputClasses = `mt-1 block w-full rounded-md border-2 bg-white text-gray-900 dark:bg-gray-700 dark:text-white shadow-sm ${
         error 
         ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500' 
@@ -107,6 +118,7 @@ const FormField = ({ label, name, type = 'text', value, onChange, onBlur, error,
                     onChange={onChange}
                     onBlur={onBlur}
                     accept={accept}
+                    placeholder={placeholder}
                     className={type === 'file' ? fileInputClasses : inputClasses}
                 />
             )}
@@ -344,9 +356,9 @@ const CrearEmpleado = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">1. Datos Personales</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} />
-                            <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} />
-                            <FormField label="DNI" name="dni" type="text" value={formData.dni} onChange={handleChange} onBlur={handleBlur} error={errors.dni} />
+                            <FormField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} error={errors.nombre} placeholder="Ej: Juan" />
+                            <FormField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} error={errors.apellido} placeholder="Ej: Pérez" />
+                            <FormField label="DNI" name="dni" type="text" value={formData.dni} onChange={handleChange} onBlur={handleBlur} error={errors.dni} placeholder="Ej: 30123456" />
                             <FormField label="Fecha de Nacimiento" name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur} error={errors.fecha_nacimiento} />
                             <FormField label="Género" name="genero" value={formData.genero} onChange={handleChange} onBlur={handleBlur} error={errors.genero}>
                                 <select>
@@ -375,8 +387,8 @@ const CrearEmpleado = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">2. Datos de Contacto</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} />
-                            <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} />
+                            <FormField label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} error={errors.telefono} placeholder="Ej: 1122334455" />
+                            <FormField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={errors.email} placeholder="Ej: juan.perez@email.com" />
                         </div>
                     </div>
                 )}
