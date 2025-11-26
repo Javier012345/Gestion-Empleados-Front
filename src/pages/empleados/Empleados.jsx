@@ -252,6 +252,35 @@ const Empleados = () => {
 
     return (
         <div className="p-4 sm:p-6 printable-area">
+            {/* Estilos solo para impresión */}
+            <style>
+                {`
+                    @media print {
+                        body {
+                            background-color: #fff;
+                        }
+                        .printable-area {
+                            padding: 0;
+                        }
+                        .no-print {
+                            display: none;
+                        }
+                        .employee-table-print {
+                            display: table !important;
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .employee-table-print th, .employee-table-print td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        .employee-table-print th {
+                            background-color: #f2f2f2;
+                        }
+                    }
+                `}
+            </style>
             <div className="no-print">
             <EmployeeControls 
                 searchTerm={searchTerm}
@@ -267,7 +296,7 @@ const Empleados = () => {
             </div>
 
             {/* --- Lista de Empleados (Tabla para md y superior) --- */}
-            <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="hidden md:block overflow-visible bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 employee-table-print">
                 <table className="w-full" data-testid="employee-table">
                     <thead className="bg-gray-50 dark:bg-gray-700/50">
                         <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
@@ -277,7 +306,7 @@ const Empleados = () => {
                             <th className="px-6 py-4 hidden lg:table-cell">Email</th>
                             <th className="px-6 py-4">Cargo</th>
                             <th className="px-6 py-4">Estado</th>
-                            <th className="px-6 py-4">Acciones</th>
+                            <th className="px-6 py-4 no-print">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -305,7 +334,7 @@ const Empleados = () => {
                                         {empleado.estado}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-4 no-print">
     <EmployeeActions empleado={empleado} onDeactivateClick={handleOpenModal} />
                                 </td>
                             </tr>
@@ -315,7 +344,7 @@ const Empleados = () => {
             </div>
 
             {/* --- Lista de Empleados (Tarjetas para móvil) --- */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden no-print">
                 {currentItems.map(empleado => (
                     <div key={empleado.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
                         <div className="p-4">
