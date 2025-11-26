@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Users, User, ChevronDown, AlertTriangle, Loader, Edit, X, Clock, CheckCircle } from 'lucide-react';
-import { getHorarios, updateHorario } from '../../services/api';
+import { Users, User, ChevronDown, AlertTriangle, Loader, Edit, X, Clock, CheckCircle, Trash2 } from 'lucide-react';
+import { getHorarios, updateHorario, deleteHorario } from '../../services/api';
 
 // --- Sub-componente: Modal de Edición ---
 const EditHorarioModal = ({ isOpen, onClose, horario, onUpdateSuccess }) => {
@@ -154,12 +154,54 @@ const EditHorarioModal = ({ isOpen, onClose, horario, onUpdateSuccess }) => {
     );
 };
 
+// --- Sub-componente: Modal de Confirmación de Eliminación ---
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isDeleting }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6 m-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-4">
+                    <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full flex-shrink-0">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Confirmar Eliminación</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">¿Estás seguro de que quieres eliminar este horario? Esta acción no se puede deshacer.</p>
+                    </div>
+                </div>
+                <div className="mt-8 flex justify-center gap-4">
+                    <button type="button" onClick={onClose} disabled={isDeleting} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">
+                        Cancelar
+                    </button>
+                    <button type="button" onClick={onConfirm} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-400 flex items-center justify-center gap-2 w-32">
+                        {isDeleting ? (
+                            <>
+                                <Loader className="animate-spin w-4 h-4" />
+                                <span>Eliminando...</span>
+                            </>
+                        ) : (
+                            'Eliminar'
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const VerHorariosAsignados = () => {
     const [horarios, setHorarios] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [horarioToEdit, setHorarioToEdit] = useState(null);
+    
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [horarioToDelete, setHorarioToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const [successMessage, setSuccessMessage] = useState('');
     const location = useLocation();
 
@@ -190,6 +232,30 @@ const VerHorariosAsignados = () => {
     const handleOpenEditModal = (horario) => {
         setHorarioToEdit(horario);
         setEditModalOpen(true);
+    };
+
+    const handleOpenDeleteModal = (horario) => {
+        setHorarioToDelete(horario);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!horarioToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await deleteHorario(horarioToDelete.id);
+            setHorarios(prev => prev.filter(h => h.id !== horarioToDelete.id));
+            setSuccessMessage(`El horario "${horarioToDelete.nombre}" ha sido eliminado.`);
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (err) {
+            setError('Error al eliminar el horario. Es posible que tenga empleados asignados.');
+            console.error("Error deleting schedule:", err);
+        } finally {
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+            setHorarioToDelete(null);
+        }
     };
 
     const handleUpdateSuccess = () => {
@@ -246,6 +312,9 @@ const VerHorariosAsignados = () => {
                                 <button onClick={(e) => { e.stopPropagation(); handleOpenEditModal(horario); }} className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-500 transition-colors">
                                     <Edit className="w-4 h-4" />
                                 </button>
+                                <button onClick={(e) => { e.stopPropagation(); handleOpenDeleteModal(horario); }} className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-500 transition-colors">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                     {horario.empleados_asignados.length} / {horario.cantidad_personal_requerida}
                                     <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">Asignados</span>
@@ -287,6 +356,12 @@ const VerHorariosAsignados = () => {
                 onClose={() => setEditModalOpen(false)}
                 horario={horarioToEdit}
                 onUpdateSuccess={handleUpdateSuccess}
+            />
+            <DeleteConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                isDeleting={isDeleting}
             />
         </>
     );

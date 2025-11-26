@@ -146,6 +146,11 @@ export const updateHorario = (id, horarioData) => {
     return apiClient.put(`horarios/${id}/`, horarioData);
 };
 
+export const deleteHorario = (id) => {
+    return apiClient.delete(`horarios/${id}/`);
+};
+
+
 export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
     const data = {
         empleado_ids: empleadoIds

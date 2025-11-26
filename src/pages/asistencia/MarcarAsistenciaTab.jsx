@@ -7,9 +7,6 @@ const STATUS_MESSAGES = {
     INITIAL: 'Cargando modelos de IA...',
     WAITING: 'Esperando rostro...',
     DETECTED: 'Rostro detectado, procesando...',
-    SUCCESS: (name) => `Asistencia marcada para ${name}`,
-    ALREADY_MARKED: (name) => `${name} ya ha marcado asistencia hoy.`,
-    NOT_FOUND: 'Rostro no reconocido. Inténtalo de nuevo.',
     ERROR: 'Error en el servidor. Por favor, contacte a soporte.',
 };
 
@@ -61,18 +58,25 @@ const MarcarAsistenciaTab = () => {
 
             try {
                 const response = await marcarAsistencia(imageSrc);
-                const { status: responseStatus, empleado } = response.data;
+                // Caso de éxito (201 Created)
+                const { message } = response.data;
+                setStatus({ message: message, type: STATUS_TYPE.SUCCESS });
 
-                if (responseStatus === 'success') {
-                    setStatus({ message: STATUS_MESSAGES.SUCCESS(empleado), type: STATUS_TYPE.SUCCESS });
-                } else if (responseStatus === 'already_marked') {
-                    setStatus({ message: STATUS_MESSAGES.ALREADY_MARKED(empleado), type: STATUS_TYPE.ERROR });
-                } else if (responseStatus === 'not_found') {
-                    setStatus({ message: STATUS_MESSAGES.NOT_FOUND, type: STATUS_TYPE.ERROR });
-                }
             } catch (error) {
-                console.error("Error en el reconocimiento:", error);
-                setStatus({ message: STATUS_MESSAGES.ERROR, type: STATUS_TYPE.ERROR });
+                console.error("Error en el reconocimiento:", error.response || error);
+                
+                if (error.response && error.response.data) {
+                    // Manejo de errores de lógica de negocio (4xx)
+                    const { message, empleado } = error.response.data;
+                    let finalMessage = message;
+                    if (empleado) {
+                        finalMessage = `${empleado}: ${message}`;
+                    }
+                    setStatus({ message: finalMessage, type: STATUS_TYPE.ERROR });
+                } else {
+                    // Error genérico de servidor o red
+                    setStatus({ message: STATUS_MESSAGES.ERROR, type: STATUS_TYPE.ERROR });
+                }
             } finally {
                 // Pausa antes de volver a intentar para dar feedback al usuario
                 setTimeout(() => {

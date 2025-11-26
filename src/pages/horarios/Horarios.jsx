@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CalendarRange, Users, PlusCircle, History } from 'lucide-react';
 import VerHorariosAsignados from './VerHorariosAsignados';
 import AsignarHorario from './AsignarHorario';
@@ -6,7 +7,16 @@ import CargarHorario from './CargarHorario';
 import HistorialHorarios from './HistorialHorarios';
 
 const Horarios = () => {
+    const location = useLocation();
     const [activeTab, setActiveTab] = useState('view-assignments');
+
+    useEffect(() => {
+        // Si venimos de crear un horario, el estado de la ubicación tendrá un successMessage.
+        // En ese caso, forzamos la vista a la pestaña de asignaciones para ver el resultado.
+        if (location.state?.successMessage) {
+            setActiveTab('view-assignments');
+        }
+    }, [location.state]);
 
     const tabs = [
         { id: 'view-assignments', name: 'Ver Asignaciones', icon: <CalendarRange size={16} /> },

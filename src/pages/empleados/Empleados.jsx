@@ -132,6 +132,7 @@ const Empleados = () => {
 
     useEffect(() => {
         const fetchEmpleados = async () => {
+            document.title = 'Nuevas Energias';
             try {
                 setLoading(true);
                 const response = await getEmpleadosBasico();
@@ -278,6 +279,9 @@ const Empleados = () => {
                         .employee-table-print th {
                             background-color: #f2f2f2;
                         }
+                        .employee-table-print .print-visible {
+                            display: table-cell !important;
+                        }
                     }
                 `}
             </style>
@@ -302,8 +306,8 @@ const Empleados = () => {
                         <tr className="text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
                             <th className="px-6 py-4">Foto</th>
                             <th className="px-6 py-4">Nombre</th>
-                            <th className="px-6 py-4 hidden lg:table-cell">DNI</th>
-                            <th className="px-6 py-4 hidden lg:table-cell">Email</th>
+                            <th className="px-6 py-4 hidden lg:table-cell print-visible">DNI</th>
+                            <th className="px-6 py-4 hidden lg:table-cell print-visible">Email</th>
                             <th className="px-6 py-4">Cargo</th>
                             <th className="px-6 py-4">Estado</th>
                             <th className="px-6 py-4 no-print">Acciones</th>
@@ -322,8 +326,8 @@ const Empleados = () => {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 font-medium text-gray-800 dark:text-gray-100">{empleado.nombre} {empleado.apellido}</td>
-                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell">{empleado.dni}</td>
-                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell">{empleado.email}</td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell print-visible">{empleado.dni}</td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden lg:table-cell print-visible">{empleado.email}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getGroupColorClasses(empleado.grupo)}`}>
                                         {empleado.grupo || '-'}
