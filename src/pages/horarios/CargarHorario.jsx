@@ -103,14 +103,18 @@ const PresetForm = ({ isSubmitting, setIsSubmitting, setError, navigate }) => {
             const current = plantillas[selected];
             const horarioData = {
                 ...current,
-                cantidad_personal_requerida: cantidad,
+                cantidad_personal_requerida: parseInt(cantidad, 10),
             };
             await createHorario(horarioData);
             navigate('/horarios', { 
                 state: { successMessage: `Horario "${current.nombre}" creado con éxito.` } 
             });
         } catch (err) {
-            setError(err.message || 'Error al crear el horario.');
+            if (err.response && err.response.status === 400) {
+                setError('El horario ya existe. Por favor, elige un nombre diferente.');
+            } else {
+                setError(err.response?.data?.detail || err.message || 'Error al crear el horario.');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -220,7 +224,11 @@ const CustomForm = ({ isSubmitting, setIsSubmitting, setError, navigate }) => {
                 state: { successMessage: `Horario "${formData.nombre}" creado con éxito.` } 
             });
         } catch (err) {
-            setError(err.response?.data?.detail || err.message || 'Error al crear el horario personalizado.');
+            if (err.response && err.response.status === 400) {
+                setError('El horario ya existe. Por favor, elige un nombre diferente.');
+            } else {
+                setError(err.response?.data?.detail || err.message || 'Error al crear el horario personalizado.');
+            }
         } finally {
             setIsSubmitting(false);
         }
