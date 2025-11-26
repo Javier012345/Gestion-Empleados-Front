@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Sun, Moon, Bell, UserCog, User, Settings, LogOut } from 'lucide-react';
 import { getMisNotificaciones, marcarNotificacionesLeidas } from '../../services/api';
 import { formatDistanceToNow } from 'date-fns';
@@ -16,6 +16,7 @@ const Header = ({
     pageTitle
 }) => {
     const { user, viewMode, toggleViewMode, logout } = useAuth();
+    const navigate = useNavigate();
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -25,6 +26,7 @@ const Header = ({
         const fetchNotifications = async () => {
             try {
                 const response = await getMisNotificaciones();
+                console.log('Notificaciones recibidas:', response.data);
                 setNotifications(response.data);
             } catch (error) {
                 console.error("Error al obtener las notificaciones:", error);
@@ -49,6 +51,17 @@ const Header = ({
         }
     };
 
+    const handleNotificationClick = (enlace) => {
+        if (enlace) {
+            // Si estamos en modo admin, primero cambiamos a modo empleado.
+            if (viewMode === 'admin') {
+                toggleViewMode(); // Esto cambiará la vista a 'employee'.
+            }
+            // Cerramos el menú y navegamos al enlace correspondiente.
+            setNotificationsOpen(false);
+            navigate(enlace); // React Router se encargará de la navegación.
+        }
+    };
     const handleLogoutClick = () => {
         setProfileOpen(false); // Cierra el dropdown del perfil
         setAlertOpen(true);
@@ -102,12 +115,16 @@ const Header = ({
                             </div>
                             <div className="max-h-96 overflow-y-auto divide-y dark:divide-gray-700">
                                 {notifications.length > 0 ? notifications.map(notif => (
-                                    <Link to={notif.enlace || '#'} key={notif.id} className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                    <div 
+                                        key={notif.id} 
+                                        onClick={() => handleNotificationClick(notif.enlace)}
+                                        className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+                                    >
                                         <p className={`text-sm font-medium ${!notif.leida ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>{notif.mensaje}</p>
                                         <span className="text-xs text-gray-500 dark:text-gray-400">
                                             {formatDistanceToNow(new Date(notif.fecha_creacion), { addSuffix: true, locale: es })}
                                         </span>
-                                    </Link>
+                                    </div>
                                 )) : (
                                     <p className="p-4 text-sm text-center text-gray-500 dark:text-gray-400">No tienes notificaciones nuevas.</p>
                                 )}

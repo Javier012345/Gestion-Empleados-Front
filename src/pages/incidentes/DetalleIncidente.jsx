@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
-import { getIncidenteAgrupadoPorId, createResolucion, getIncidenteEmpleadoPorId } from '../../services/api';
+import { ArrowLeft, History, Pencil, Printer, FilePlus, MessageSquare, Paperclip, Gavel, X, ShieldPlus, Loader, AlertTriangle, CheckCircle, Send } from 'lucide-react';
+import { getIncidenteAgrupadoPorId, createResolucion, getIncidenteEmpleadoPorId, createDescargo } from '../../services/api';
 import AplicarSancionIncidente from './AplicarSancionIncidente';
 
 const DetalleIncidente = () => {
@@ -22,35 +22,44 @@ const DetalleIncidente = () => {
     const [showSancionForm, setShowSancionForm] = useState(false);
     const [localResolucion, setLocalResolucion] = useState(null);
 
+    // State for descargo form
+    const [descargoContent, setDescargoContent] = useState('');
+    const [descargoFile, setDescargoFile] = useState(null);
+    const [isSubmittingDescargo, setIsSubmittingDescargo] = useState(false);
+    const [descargoError, setDescargoError] = useState('');
+    const [descargoSuccess, setDescargoSuccess] = useState('');
+    const [hasSubmittedDescargo, setHasSubmittedDescargo] = useState(false);
+
     const isMyIncidentRoute = location.pathname.startsWith('/mis-incidentes');
 
     const fetchIncidente = useCallback(async () => {
         try {
-            setIsLoading(true);
-            const response = isMyIncidentRoute
-                ? await getIncidenteEmpleadoPorId(id)
-                : await getIncidenteAgrupadoPorId(id);
-            
-            let incidenteData = response.data;
-            if (isMyIncidentRoute && incidenteData.id_incidente) {
-                // Normalizamos la propiedad del tipo de incidente
-                incidenteData.incidente = incidenteData.id_incidente;
+            setIsLoading(true); // Inicia la carga
+            let incidenteId = id;
 
-                // Normalizamos la estructura de los descargos
-                if (Array.isArray(incidenteData.descargos)) {
-                    incidenteData.descargos_del_grupo = incidenteData.descargos.map(descargo => ({
-                        empleado: descargo.autor,
-                        descargo: {
-                            fecha_descargo: descargo.fecha_descargo,
-                            contenido_descargo: descargo.contenido_descargo,
-                            ruta_archivo_descargo: descargo.ruta_archivo_descargo
-                        }
-                    }));
+            // Si estamos en la ruta del empleado, primero obtenemos el ID del grupo de incidente.
+            if (isMyIncidentRoute) {
+                const incidenteEmpleadoRes = await getIncidenteEmpleadoPorId(id);
+                if (!incidenteEmpleadoRes.data.grupo_incidente) {
+                    throw new Error("No se encontró el grupo de incidente para este registro.");
                 }
+                incidenteId = incidenteEmpleadoRes.data.grupo_incidente;
+            }
+            
+            // Ahora, siempre usamos la llamada unificada para obtener los detalles completos.
+            const response = await getIncidenteAgrupadoPorId(incidenteId);
+            const incidenteData = response.data;
+            
+            // Aseguramos que `descargos_del_grupo` sea siempre un array para evitar errores de renderizado.
+            if (!incidenteData.descargos_del_grupo) {
+                incidenteData.descargos_del_grupo = [];
             }
 
-            console.log('Datos del incidente recibidos:', incidenteData);
             setIncidente(incidenteData);
+            // Check if the current user (assuming one descargo per user per incident) has already submitted.
+            if (isMyIncidentRoute && incidenteData.descargos_del_grupo?.length > 0) {
+                setHasSubmittedDescargo(true);
+            }
             setError('');
         } catch (err) {
             setError('No se pudo cargar el detalle del incidente. Inténtalo de nuevo más tarde.');
@@ -58,7 +67,7 @@ const DetalleIncidente = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [id, isMyIncidentRoute]);
+    }, [id, isMyIncidentRoute]); // isMyIncidentRoute is a dependency
 
     useEffect(() => {
         fetchIncidente();
@@ -130,6 +139,41 @@ const DetalleIncidente = () => {
         }
     };
 
+    const handleDescargoSubmit = async (e) => {
+        e.preventDefault();
+        setDescargoError('');
+        setDescargoSuccess('');
+
+        if (!descargoContent.trim()) {
+            setDescargoError('El contenido del descargo es obligatorio.');
+            return;
+        }
+
+        setIsSubmittingDescargo(true);
+
+        const formData = new FormData();
+        formData.append('id_incid_empl', id); // The ID from the URL is the IncidenteEmpleado ID
+        formData.append('contenido_descargo', descargoContent);
+        if (descargoFile) {
+            formData.append('ruta_archivo_descargo', descargoFile);
+        }
+        formData.append('estado', true);
+
+        try {
+            await createDescargo(formData);
+            setDescargoSuccess('Tu descargo ha sido enviado con éxito.');
+            setHasSubmittedDescargo(true); // Prevent further submissions
+            // Optionally, refresh the incident data to show the new descargo
+            setTimeout(fetchIncidente, 2000);
+        } catch (err) {
+            setDescargoError('Error al enviar el descargo. Inténtalo de nuevo.');
+            console.error("Error submitting descargo:", err.response?.data || err.message);
+        } finally {
+            setIsSubmittingDescargo(false);
+        }
+    };
+
+
     if (showSancionForm) {
         return <AplicarSancionIncidente incidente={incidente} resolucion={localResolucion} onVolver={() => setShowSancionForm(false)} />;
     }
@@ -165,28 +209,26 @@ const DetalleIncidente = () => {
                     <div><h4 className="text-sm font-semibold text-gray-500">Fecha</h4><p className="text-gray-900 dark:text-white">{new Date(incidente?.fecha_ocurrencia).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</p></div>
                     <div><h4 className="text-sm font-semibold text-gray-500">Descripción</h4><p className="text-gray-600 dark:text-gray-300">{incidente?.descripcion}</p></div>
                     
-                    {!isMyIncidentRoute && (
-                        <div>
-                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
-                            <div className="space-y-2">
-                                {Array.isArray(incidente?.empleados_involucrados) && incidente.empleados_involucrados.map((involucrado, index) => (
-                                    <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
-                                        <div className="flex items-center gap-3">
-                                            <div>
-                                                <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.nombre} {involucrado.apellido}</p>
-                                                <p className="text-xs text-gray-500">DNI: {involucrado.dni}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
-                                                {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
-                                            </span>
+                    <div>
+                        <h4 className="text-sm font-semibold text-gray-500 mb-2">Empleados Involucrados</h4>
+                        <div className="space-y-2">
+                            {Array.isArray(incidente?.empleados_involucrados) && incidente.empleados_involucrados.map((involucrado, index) => (
+                                <div key={index} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
+                                    <div className="flex items-center gap-3">
+                                        <div>
+                                            <p className="font-semibold text-sm text-gray-900 dark:text-white">{involucrado.nombre} {involucrado.apellido}</p>
+                                            <p className="text-xs text-gray-500">DNI: {involucrado.dni}</p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
+                                            {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 <h4 className="text-sm font-semibold text-gray-500 mt-6 mb-3">Historial del Caso</h4>
@@ -207,14 +249,15 @@ const DetalleIncidente = () => {
                             <h3 className="text-md font-semibold text-gray-900 dark:text-white">Descargos Recibidos</h3>
                             {incidente.descargos_del_grupo.map((item, index) => (
                                 <div key={index} className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.empleado.nombre} {item.empleado.apellido}</p>
-                                        <time className="text-xs text-gray-400 dark:text-gray-500 ml-auto">{new Date(item.descargo.fecha_descargo).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</time>
+                                    {item.autor && (<div className="flex items-center gap-2 mb-2">
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.autor.nombre} {item.autor.apellido}</p>
+                                        <time className="text-xs text-gray-400 dark:text-gray-500 ml-auto">{new Date(item.fecha_descargo).toLocaleDateString('es-AR', { timeZone: 'UTC' })}</time>
                                     </div>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 italic">"{item.descargo.contenido_descargo}"</p>
-                                    {item.descargo.ruta_archivo_descargo && (
+                                    )}
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 italic">"{item.contenido_descargo}"</p>
+                                    {item.ruta_archivo_descargo && (
                                         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                            <a href={item.descargo.ruta_archivo_descargo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
+                                            <a href={item.ruta_archivo_descargo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
                                                 <Paperclip size={12} /><span>Archivo Adjunto</span>
                                             </a>
                                         </div>
@@ -258,6 +301,46 @@ const DetalleIncidente = () => {
                                 <Gavel size={16} /><span>Registrar Resolución</span>
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* Formulario de Descargo para el Empleado */}
+                {isMyIncidentRoute && incidente?.estado === 'ABIERTO' && !hasSubmittedDescargo && (
+                    <div id="descargo-form-container" className="mt-8 pt-6 border-t dark:border-gray-700">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Enviar Descargo</h3>
+                        
+                        {descargoSuccess && <div className="mb-4 flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-900/20 p-4 text-sm text-green-700 dark:text-green-300"><CheckCircle className="h-5 w-5" /><p>{descargoSuccess}</p></div>}
+                        {descargoError && <div className="mb-4 flex items-center gap-3 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-700 dark:text-red-300"><AlertTriangle className="h-5 w-5" /><p>{descargoError}</p></div>}
+
+                        <form onSubmit={handleDescargoSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="contenido_descargo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tu versión de los hechos</label>
+                                <textarea
+                                    id="contenido_descargo"
+                                    rows="5"
+                                    value={descargoContent}
+                                    onChange={(e) => setDescargoContent(e.target.value)}
+                                    required
+                                    className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white focus:border-red-500 focus:ring-red-500"
+                                    placeholder="Explica detalladamente lo sucedido..."
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label htmlFor="ruta_archivo_descargo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Adjuntar Archivo (Opcional)</label>
+                                <input
+                                    type="file"
+                                    id="ruta_archivo_descargo"
+                                    onChange={(e) => setDescargoFile(e.target.files[0])}
+                                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900/50 dark:file:text-red-300 dark:hover:file:bg-red-900"
+                                />
+                            </div>
+                            <div className="flex justify-end">
+                                <button type="submit" disabled={isSubmittingDescargo} className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 disabled:bg-red-400">
+                                    <Send size={16} />
+                                    {isSubmittingDescargo ? 'Enviando...' : 'Enviar Descargo'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 )}
 

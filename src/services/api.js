@@ -142,6 +142,10 @@ export const getHorarios = () => {
     return apiClient.get('horarios/');
 };
 
+export const updateHorario = (id, horarioData) => {
+    return apiClient.put(`horarios/${id}/`, horarioData);
+};
+
 export const sincronizarEmpleadosHorario = (horarioId, empleadoIds) => {
     const data = {
         empleado_ids: empleadoIds
@@ -187,6 +191,14 @@ export const corregirIncidente = (id, incidenteData) => {
 
 export const createResolucion = (resolucionData) => {
     return apiClient.post('resoluciones/', resolucionData);
+};
+
+export const createDescargo = (descargoData) => {
+    return apiClient.post('descargos/', descargoData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 };
 
 export const getTiposSancion = () => {
