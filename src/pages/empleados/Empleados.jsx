@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Search, Printer, Plus, Eye, Edit2, Trash2, MoreHorizontal, ChevronLeft, ChevronRight, Users, AlertCircle, Loader, Mail, Phone } from 'lucide-react';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import { getEmpleadosBasico, deleteEmpleado } from '../../services/api'; // Importar la función de la API
@@ -130,6 +130,7 @@ const Empleados = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const location = useLocation();
     useEffect(() => {
         const fetchEmpleados = async () => {
             document.title = 'Nuevas Energias';
@@ -150,7 +151,13 @@ const Empleados = () => {
         };
 
         fetchEmpleados();
-    }, []);
+    }, [location]);
+
+    const getFullImageUrl = (path) => {
+        if (!path) return null;
+        // Si la ruta ya es una URL completa, la devuelve. Si no, le añade el prefijo del servidor.
+        return path.startsWith('http') ? path : `http://localhost:8000${path}`;
+    };
 
     const handleOpenModal = (empleado) => {
         setSelectedEmployee(empleado);
@@ -316,9 +323,9 @@ const Empleados = () => {
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                         {currentItems.map(empleado => (
                             <tr key={empleado.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200">
-                                <td className="px-6 py-4">
-                                    {empleado.ruta_foto ? (
-                                        <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-10 w-10 rounded-full object-cover" />
+                                <td className="px-6 py-4">                                  
+                                    {empleado.ruta_foto ? (                                        
+                                        <img src={getFullImageUrl(empleado.ruta_foto)} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-10 w-10 rounded-full object-cover" />
                                     ) : (
                                         <span className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500">
                                             {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
@@ -352,9 +359,9 @@ const Empleados = () => {
                 {currentItems.map(empleado => (
                     <div key={empleado.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
                         <div className="p-4">
-                            <div className="flex items-center gap-4 mb-4">
-                                {empleado.ruta_foto ? (
-                                    <img src={empleado.ruta_foto} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-16 w-16 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600" />
+                            <div className="flex items-center gap-4 mb-4">                                
+                                {empleado.ruta_foto ? (                                    
+                                    <img src={getFullImageUrl(empleado.ruta_foto)} alt={`${empleado.nombre} ${empleado.apellido}`} className="h-16 w-16 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600" />
                                 ) : (
                                     <span className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 text-2xl">
                                         {empleado.nombre.slice(0, 1)}{empleado.apellido.slice(0, 1)}
@@ -429,10 +436,10 @@ const Empleados = () => {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
-                employeeName={selectedEmployee ? `${selectedEmployee.nombre} ${selectedEmployee.apellido}` : ''}
-                title="Confirmar Inactivación"
-                message="¿Estás seguro de que quieres cambiar el estado de {employeeName} a 'Inactivo'? Esta acción se puede revertir editando el perfil del empleado."
-                confirmText="Sí, inactivar"
+                employeeName={selectedEmployee ? `${selectedEmployee.nombre} ${selectedEmployee.apellido}` : 'este empleado'}
+                title="Desactivar Empleado"
+                message="¿Estás seguro de que quieres desactivar a {employeeName}? Su estado cambiará a 'Inactivo'."
+                confirmText="Desactivar"
             />
         </div>
     );

@@ -9,13 +9,15 @@ const validationRules = {
     nombre: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
         message: 'El nombre solo puede contener letras y espacios.',
-        minLength: 2,
+        minLength: 3,
+        maxLength: 30,
         required: true,
     },
     apellido: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
         message: 'El apellido solo puede contener letras y espacios.',
-        minLength: 2,
+        minLength: 3,
+        maxLength: 30,
         required: true,
     },
     dni: {
@@ -26,8 +28,8 @@ const validationRules = {
         required: true,
     },
     telefono: {
-        regex: /^\d{10}$/,
-        message: 'El teléfono debe contener 10 dígitos (código de área + número).',
+        regex: /^\d{10,11}$/,
+        message: 'El teléfono debe contener entre 10 y 11 dígitos.',
         required: true,
     },
     email: {
@@ -55,7 +57,12 @@ const validateField = (name, value) => {
         return `Debe tener al menos ${rule.minLength} caracteres.`;
     }
 
-    // 3. Validar con expresión regular
+    // 3. Validar longitud máxima
+    if (rule.maxLength && value.trim().length > rule.maxLength) {
+        return `No puede exceder los ${rule.maxLength} caracteres.`;
+    }
+
+    // 4. Validar con expresión regular
     if (rule.regex && value && !rule.regex.test(value)) {
         return rule.message;
     }
@@ -217,7 +224,7 @@ const CrearEmpleado = () => {
         // --- Lógica de filtrado de entrada ---
         if (name === 'nombre' || name === 'apellido') {
             // Solo permite letras, acentos y espacios.
-            if (!/^[a-zA-Z\s\u00C0-\u017F]*$/.test(value)) return;
+        if (!/^[a-zA-Z\s\u00C0-\u017F]*$/.test(value) || value.length > 30) return;
         }
         if (name === 'dni') {
             // Solo permite números y hasta 8 dígitos.
@@ -225,7 +232,7 @@ const CrearEmpleado = () => {
         }
         if (name === 'telefono') {
             // Solo permite números y hasta 10 dígitos.
-            if (!/^[0-9]*$/.test(value) || value.length > 10) return;
+            if (!/^[0-9]*$/.test(value) || value.length > 11) return;
         }
 
         setFormData(prev => ({ ...prev, [name]: value }));

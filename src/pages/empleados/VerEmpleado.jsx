@@ -74,29 +74,15 @@ const VerEmpleado = () => {
         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
 
+    const getFullImageUrl = (path) => {
+        if (!path) return '/images/default-user.jpg';
+        return path.startsWith('http') ? path : `http://localhost:8000${path}`;
+    };
+
     const groupColor = empleado.grupo ? getGroupColorClasses(empleado.grupo) : '';
 
     return (
         <div className="max-w-7xl mx-auto printable-area">
-            {/* Estilos para impresión */}
-            <style>
-                {`
-                    @media print {
-                        body {
-                            background-color: #fff;
-                        }
-                        .printable-area {
-                            color: #000 !important; /* Texto negro para todo el área */
-                        }
-                        .no-print {
-                            display: none !important;
-                        }
-                        .print-text-strong {
-                            color: #000 !important; /* Asegura que los títulos de los campos sean negros */
-                        }
-                    }
-                `}
-            </style>
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 no-print">
                 <Link to="/empleados" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500">
                     <ArrowLeft size={16} /> Volver a Empleados
@@ -117,7 +103,7 @@ const VerEmpleado = () => {
                             className="relative group disabled:cursor-default"
                         >
                             <img
-                                src={empleado.ruta_foto || '/images/default-user.jpg'}
+                                src={getFullImageUrl(empleado.ruta_foto)}
                                 alt={`Foto de ${empleado.nombre}`}
                                 className="h-32 w-32 rounded-full mx-auto mb-4 object-cover"
                             />
@@ -169,12 +155,12 @@ const VerEmpleado = () => {
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
                         <h3 className="text-lg font-semibold border-b pb-3 dark:border-gray-700 text-gray-900 dark:text-gray-100">Datos Personales</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-900 dark:text-gray-100">
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">DNI:</strong> {empleado.dni}</div>
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">Email:</strong> {empleado.email}</div>
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">Teléfono:</strong> {empleado.telefono || '-'}</div>
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">Fecha de Nac.:</strong> {new Date(empleado.fecha_nacimiento).toLocaleDateString()}</div>
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">Género:</strong> {empleado.genero}</div>
-                            <div><strong className="block text-gray-600 dark:text-gray-400 print-text-strong">Estado Civil:</strong> {empleado.estado_civil}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">DNI:</strong> {empleado.dni}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Email:</strong> {empleado.email}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Teléfono:</strong> {empleado.telefono || '-'}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Fecha de Nac.:</strong> {new Date(empleado.fecha_nacimiento).toLocaleDateString()}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Género:</strong> {empleado.genero}</div>
+                            <div><strong className="block text-gray-600 dark:text-gray-400">Estado Civil:</strong> {empleado.estado_civil}</div>
                         </div>
                     </div>
 
@@ -213,7 +199,7 @@ const VerEmpleado = () => {
                     <button onClick={() => setPhotoModalOpen(false)} className="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
                         <X size={32} />
                     </button>
-                    <img src={empleado.ruta_foto} alt="Foto de perfil ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
+                    <img src={getFullImageUrl(empleado.ruta_foto)} alt="Foto de perfil ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
                 </div>
             )}
         </div>

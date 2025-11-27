@@ -9,11 +9,15 @@ const validationRules = {
     nombre: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
         message: 'Solo se permiten letras, acentos y espacios.',
+        minLength: 3,
+        maxLength: 30,
         required: true,
     },
     apellido: {
         regex: /^[a-zA-Z\s\u00C0-\u017F]+$/,
         message: 'Solo se permiten letras, acentos y espacios.',
+        minLength: 3,
+        maxLength: 30,
         required: true,
     },
     dni: {
@@ -22,8 +26,8 @@ const validationRules = {
         required: true,
     },
     telefono: {
-        regex: /^\d{10}$/,
-        message: 'El teléfono debe contener 10 dígitos.',
+        regex: /^\d{10,11}$/,
+        message: 'El teléfono debe contener entre 10 y 11 dígitos.',
         required: true,
     },
     email: {
@@ -43,6 +47,16 @@ const validateField = (name, value) => {
 
     if (rule.required && !value) {
         return 'Este campo es obligatorio.';
+    }
+
+    // Validar longitud mínima
+    if (rule.minLength && value.trim().length < rule.minLength) {
+        return `Debe tener al menos ${rule.minLength} caracteres.`;
+    }
+
+    // Validar longitud máxima
+    if (rule.maxLength && value.trim().length > rule.maxLength) {
+        return `No puede exceder los ${rule.maxLength} caracteres.`;
     }
 
     if (rule.regex && value && !rule.regex.test(value)) {
@@ -242,13 +256,13 @@ const EditarEmpleado = () => {
         const { name, value } = e.target;
 
         if (name === 'nombre' || name === 'apellido') {
-            if (!/^[a-zA-Z\s\u00C0-\u017F]*$/.test(value)) return;
+            if (!/^[a-zA-Z\s\u00C0-\u017F]*$/.test(value) || value.length > 30) return;
         }
         if (name === 'dni') {
             if (!/^[0-9]*$/.test(value) || value.length > 8) return;
         }
         if (name === 'telefono') {
-            if (!/^[0-9]*$/.test(value) || value.length > 10) return;
+            if (!/^[0-9]*$/.test(value) || value.length > 11) return;
         }
 
         setFormData(prev => ({ ...prev, [name]: value }));
