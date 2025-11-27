@@ -263,7 +263,7 @@ const DetalleIncidente = () => {
                                 <History size={16} /> Ver Incidente Original
                             </Link>
                         )}
-                        {!incidente?.resolucion && (
+                        {!incidente?.resolucion && !isMyIncidentRoute && (
                             <Link to={`/incidentes/corregir/${incidente?.grupo_incidente}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 text-sm">
                                 <Pencil size={16} />Corregir
                             </Link>
@@ -370,7 +370,7 @@ const DetalleIncidente = () => {
                     )}
                 </ol>
 
-                {!incidente?.resolucion && (
+                {!incidente?.resolucion && !isMyIncidentRoute && (
                     <div id="incident-actions-container" className="mt-8 pt-6 border-t dark:border-gray-700 no-print">
                         <div className="flex justify-end">
                             <button onClick={handleOpenModal} className="bg-red-600 text-white px-6 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700">
