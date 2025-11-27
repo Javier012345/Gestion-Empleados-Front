@@ -51,6 +51,18 @@ const EditHorarioModal = ({ isOpen, onClose, horario, onUpdateSuccess }) => {
             return;
         }
 
+        // Validación de hora
+        const [entradaHoras, entradaMinutos] = hora_entrada.split(':').map(Number);
+        const [salidaHoras, salidaMinutos] = hora_salida.split(':').map(Number);
+        const entradaEnMinutos = entradaHoras * 60 + entradaMinutos;
+        const salidaEnMinutos = salidaHoras * 60 + salidaMinutos;
+
+        if (salidaEnMinutos - entradaEnMinutos < 60) {
+            setFormError("La hora de salida debe ser al menos una hora mayor que la de entrada.");
+            setIsSubmitting(false);
+            return;
+        }
+
         const diasSeleccionados = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].filter(dia => formData[dia]);
         if (diasSeleccionados.length === 0) {
             setFormError("Debe seleccionar al menos un día de la semana.");

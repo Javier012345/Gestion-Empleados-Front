@@ -31,6 +31,16 @@ const HistorialHorarios = () => {
         }
     };
 
+    const resetFilters = () => {
+        setFilters({
+            dni: '',
+            nombreApellido: '',
+            estado: '',
+            mes: '',
+            año: ''
+        });
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -177,6 +187,7 @@ const HistorialHorarios = () => {
                                         value={filters.mes}
                                         onChange={handleFilterChange}
                                         className="pl-9 w-full rounded-lg border-gray-500 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 cursor-pointer text-sm transition-all duration-200 text-gray-900 dark:text-white">
+                                        <option value="">Mes</option>
                                         {[...Array(12).keys()].map(i => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('es-ES', { month: 'long' })}</option>)}
                                     </select>
                                 </div>
@@ -198,7 +209,7 @@ const HistorialHorarios = () => {
                     </div>
 
                     <div className="mt-4 flex justify-end">
-                        <button type="reset" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <button type="button" onClick={resetFilters} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <RotateCcw className="w-4 h-4" />
                             <span>Limpiar Filtros</span>
                         </button>
@@ -214,52 +225,55 @@ const HistorialHorarios = () => {
                     <div className="flex justify-center items-center p-8 text-red-600 dark:text-red-400"><AlertTriangle className="mr-2" /> {error}</div>
                 )}
 
-                {!isLoading && !error && (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-700/50">
-                            <tr>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                        <User className="w-4 h-4" />
-                                        <span>Empleado</span>
-                                    </div>
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                        <Calendar className="w-4 h-4" />
-                                        <span>Horario</span>
-                                    </div>
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-4 h-4" />
-                                        <span>Fecha de Asignación</span>
-                                    </div>
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                        <Activity className="w-4 h-4" />
-                                        <span>Estado</span>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {filteredHistorial.map(item => (
-                                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{item.empleado}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'}`}>
-                                            {item.estado ? 'Activo' : 'Inactivo'}
-                                        </span>
-                                    </td>
+                {!isLoading && !error && filteredHistorial.length > 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-700/50">
+                                <tr>
+                                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <User className="w-4 h-4" />
+                                            <span>Empleado</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4" />
+                                            <span>Horario</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="w-4 h-4" />
+                                            <span>Fecha de Asignación</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <Activity className="w-4 h-4" />
+                                            <span>Estado</span>
+                                        </div>
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                {filteredHistorial.map(item => (
+                                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{item.empleado}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item.horario}</td>                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{formatDate(item.fecha_asignacion)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.estado ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'}`}>
+                                                {item.estado ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {!isLoading && !error && filteredHistorial.length === 0 && (
+                    <div className="text-center py-10 px-6"><p className="text-gray-500 dark:text-gray-400">No se encontraron registros para los filtros seleccionados.</p></div>
                 )}
             </div>
         </div>

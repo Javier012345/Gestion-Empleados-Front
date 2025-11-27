@@ -93,6 +93,11 @@ const DetalleIncidente = () => {
         return <div className="flex justify-center items-center p-8"><Loader className="animate-spin mr-2" /> Cargando detalle del incidente...</div>;
     }
 
+    const handleSancionVolver = () => {
+        setShowSancionForm(false);
+        fetchIncidente(); // Vuelve a cargar los datos del incidente
+    };
+
     if (error) {
         return <div className="flex justify-center items-center p-8 text-red-500"><AlertTriangle className="mr-2" /> {error}</div>;
     }
@@ -175,7 +180,7 @@ const DetalleIncidente = () => {
 
 
     if (showSancionForm) {
-        return <AplicarSancionIncidente incidente={incidente} resolucion={localResolucion} onVolver={() => setShowSancionForm(false)} />;
+        return <AplicarSancionIncidente incidente={incidente} resolucion={localResolucion} onVolver={handleSancionVolver} />;
     }
 
     return (

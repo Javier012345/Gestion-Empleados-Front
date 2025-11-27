@@ -64,6 +64,14 @@ const UploadReciboModal = ({ isOpen, onClose, empleados, onUploadSuccess }) => {
             return;
         }
 
+        // Nueva validación para el mes
+        const [, month] = periodo.split('-');
+        const monthInt = parseInt(month, 10);
+        if (monthInt < 1 || monthInt > 12) {
+            setUploadError("El mes en el período debe estar entre 01 y 12.");
+            return;
+        }
+
         setIsSubmitting(true);
         setUploadError('');
 
@@ -199,6 +207,14 @@ const EditReciboModal = ({ isOpen, onClose, recibo, onUpdateSuccess }) => {
         const periodoRegex = /^\d{4}-\d{2}$/;
         if (!periodoRegex.test(periodo)) {
             setUploadError("El formato del período debe ser YYYY-MM.");
+            return;
+        }
+
+        // Nueva validación para el mes
+        const [, month] = periodo.split('-');
+        const monthInt = parseInt(month, 10);
+        if (monthInt < 1 || monthInt > 12) {
+            setUploadError("El mes en el período debe estar entre 01 y 12.");
             return;
         }
 
