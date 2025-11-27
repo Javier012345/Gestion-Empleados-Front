@@ -198,6 +198,18 @@ const CustomForm = ({ isSubmitting, setIsSubmitting, setError, navigate }) => {
             return;
         }
 
+        // Validación de hora
+        const [entradaHoras, entradaMinutos] = hora_entrada.split(':').map(Number);
+        const [salidaHoras, salidaMinutos] = hora_salida.split(':').map(Number);
+        const entradaEnMinutos = entradaHoras * 60 + entradaMinutos;
+        const salidaEnMinutos = salidaHoras * 60 + salidaMinutos;
+
+        if (salidaEnMinutos - entradaEnMinutos < 60) {
+            setError("La hora de salida debe ser al menos una hora mayor que la de entrada.");
+            setIsSubmitting(false);
+            return;
+        }
+
         const diasSeleccionados = Object.keys(formData).filter(key => typeof formData[key] === 'boolean' && formData[key]);
         if (diasSeleccionados.length === 0) {
             setError("Debe seleccionar al menos un día de la semana.");

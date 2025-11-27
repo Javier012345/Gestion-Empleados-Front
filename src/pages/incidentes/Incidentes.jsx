@@ -132,7 +132,12 @@ const Incidentes = () => {
                         <div key={incidente.grupo_incidente} className="incidente-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 flex flex-col border dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                             <div className="flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{incidente.incidente.tipo_incid}</h3>
+                                    <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">
+                                        {incidente.incidente.tipo_incid}
+                                        {incidente.grupo_anterior && (
+                                            <span className="text-sm font-normal text-emerald-600 dark:text-emerald-400 ml-2">(CORREGIDO)</span>
+                                        )}
+                                    </h3>
                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${incidente.estado === 'ABIERTO' ? 'text-yellow-800 bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300' : 'text-green-800 bg-green-200 dark:bg-green-900 dark:text-green-300'}`}>
                                         {incidente.estado === 'ABIERTO' ? 'Abierto' : 'Cerrado'}
                                     </span>

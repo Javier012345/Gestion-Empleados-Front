@@ -146,7 +146,11 @@ const DetalleSancion = () => {
                                             <p className="text-sm text-gray-600 dark:text-gray-400">Ocurrido el: {new Date(sancion.fecha_sancion).toLocaleDateString('es-ES')}</p>
                                         </div>
                                     </div>
-                                    <Link to={`/incidentes/${sancion.incidente_asociado}`} className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium ">
+                                    <Link 
+                                        to={location.pathname.startsWith('/mis-sanciones') 
+                                            ? `/mis-incidentes/${sancion.incidente_asociado}` // Vista de empleado
+                                            : `/incidentes/${sancion.incidente_agrupado}`}   // Vista de admin
+                                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium ">
                                         <span>Ver Detalles del Incidente</span>
                                         <ArrowRight size={16} />
                                     </Link>

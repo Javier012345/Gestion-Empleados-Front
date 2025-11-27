@@ -19,6 +19,7 @@ const Sanciones = () => {
             try {
                 setLoading(true);
                 const response = await getSancionesEmpleados();
+                console.log('Sanciones obtenidas:', response.data);
                 setSanciones(response.data);
             } catch (err) {
                 setError('No se pudieron cargar las sanciones. Inténtalo de nuevo más tarde.');
@@ -146,7 +147,7 @@ const Sanciones = () => {
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{sancion.motivo}</p>
                                 {!!sancion.incidente_asociado && (
                                     <div className="mb-4">
-                                        <Link to={`/incidentes/${sancion.incidente_asociado}`} className="inline-flex items-center gap-2 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <Link to={`/incidentes/${sancion.incidente_agrupado}`} className="inline-flex items-center gap-2 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                                             <LinkIcon size={16} />
                                             <span>Ver Incidente Vinculado</span>
                                         </Link>

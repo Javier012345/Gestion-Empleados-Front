@@ -51,6 +51,7 @@ const MisIncidentes = () => {
             try {
                 setLoading(true);
                 const response = await getMisIncidentes();
+                console.log('Mis incidentes obtenidos:', response.data);
                 setAllIncidentes(response.data);
                 setError(null);
             } catch (err) {
@@ -159,7 +160,12 @@ const MisIncidentes = () => {
                             <div key={incidente.grupo_incidente} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex flex-col">
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
-                                        <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-white">{incidente.id_incidente.tipo_incid}</h3>
+                                        <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-white">
+                                            {incidente.id_incidente?.tipo_incid || 'Incidente'}
+                                            {incidente.grupo_anterior && (
+                                                <span className="text-sm font-normal text-emerald-600 dark:text-emerald-400 ml-2">(CORREGIDO)</span>
+                                            )}
+                                        </h3>
                                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                             {new Date(incidente.fecha_ocurrencia).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                         </span>
