@@ -207,12 +207,12 @@ const EditarEmpleado = () => {
         fetchEmpleado();
         setGrupos([ { id: 1, name: 'Administrador' }, { id: 2, name: 'Empleado' } ]);
         setRequisitos([
-            { id: 1, nombre_doc: 'DNI (frente)', obligatorio: false },
-            { id: 2, nombre_doc: 'DNI (dorso)', obligatorio: false },
-            { id: 3, nombre_doc: 'Constancia de CUIL', obligatorio: false },
-            { id: 4, nombre_doc: 'Alta en AFIP (Formulario 931)', obligatorio: false },
-            { id: 5, nombre_doc: 'Contrato de trabajo (firmado)', obligatorio: false },
-            { id: 6, nombre_doc: 'Examen preocupacional/Certificado de aptitud laboral', obligatorio: false },
+            { id: 1, nombre_doc: 'DNI (frente)', obligatorio: true },
+            { id: 2, nombre_doc: 'DNI (dorso)', obligatorio: true },
+            { id: 3, nombre_doc: 'Constancia de CUIL', obligatorio: true },
+            { id: 4, nombre_doc: 'Alta en AFIP (Formulario 931)', obligatorio: true },
+            { id: 5, nombre_doc: 'Contrato de trabajo (firmado)', obligatorio: true },
+            { id: 6, nombre_doc: 'Examen preocupacional/Certificado de aptitud laboral', obligatorio: true },
             { id: 7, nombre_doc: 'Certificado de antecedentes penales', obligatorio: false },
             { id: 8, nombre_doc: 'Constancia de inscripción en la ART', obligatorio: false },
             { id: 9, nombre_doc: 'Afiliación a obra social', obligatorio: false },

@@ -135,8 +135,16 @@ const VerAsistenciasTab = () => {
                                                 minute: '2-digit',
                                                 second: '2-digit'
                                             })}</td>
-                                            <td className={`p-3 ${asistencia.minutos_retraso > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
-                                                {asistencia.minutos_retraso}
+                                            <td className="p-3">
+                                                {asistencia.minutos_retraso > 5 ? (
+                                                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
+                                                        {asistencia.minutos_retraso} min - TARDE
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
+                                                        {asistencia.minutos_retraso} min - NORMAL
+                                                    </span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
