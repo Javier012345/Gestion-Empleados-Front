@@ -59,8 +59,8 @@ const MarcarAsistenciaTab = () => {
             try {
                 const response = await marcarAsistencia(imageSrc);
                 // Caso de éxito (201 Created)
-                const { message } = response.data;
-                setStatus({ message: message, type: STATUS_TYPE.SUCCESS });
+                const { message, empleado } = response.data;
+                setStatus({ message: `${empleado}: ${message}`, type: STATUS_TYPE.SUCCESS });
 
             } catch (error) {
                 console.error("Error en el reconocimiento:", error.response || error);
